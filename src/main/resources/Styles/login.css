@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: "Lato", sans-serif;
+    -fx-background-color: #f0f2f5; /* Light gray background for the root */
+}
+
+/* Container Styles */
+.logo_container {
+    -fx-background-color: linear-gradient(to bottom, #003749, #002b36); /* Darker blue gradient */
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 15, 0.5, 0, 0); /* Stronger shadow effect */
+}
+
+.login_container {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f0f0f0); /* Subtle gradient */
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 25; /* Slightly more padding for breathing room */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 2); /* Enhanced shadow effect */
+}
+
+/* Label Styles */
+.login_container .label {
+    -fx-font-family: "Lato", sans-serif;
+    -fx-font-weight: 700; /* Bold */
+    -fx-text-fill: #002b36; /* Dark blue for text */
+}
+
+/* TextField and PasswordField Styles */
+.text-field, .password-field {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #90a4ae; /* Slightly darker border */
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-prompt-text-fill: #607d8b; /* Darker placeholder text for better visibility */
+    -fx-font-size: 15px;
+    -fx-font-family: "Lato", sans-serif;
+    -fx-transition: -fx-border-color 0.3s, -fx-background-color 0.3s;
+}
+
+/* Focused State for TextField and PasswordField */
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #00796b; /* Darker teal border on focus */
+}
+
+/* Button Styles */
+.login-button {
+    -fx-background-color: #004d40; /* Dark teal */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 12 24;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 5, 0.5, 0, 2); /* Stronger shadow effect */
+    -fx-font-family: "Lato", sans-serif;
+    -fx-font-weight: 700; /* Bold */
+    -fx-transition: -fx-background-color 0.3s, -fx-transform 0.1s; /* Transition for smoother interaction */
+}
+
+.login-button:hover {
+    -fx-background-color: #00332a; /* Darker teal on hover */
+}
+
+.login-button:pressed {
+    -fx-background-color: #00221a; /* Even darker teal on press */
+}
