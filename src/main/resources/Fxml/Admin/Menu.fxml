@@ -9,7 +9,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="850.0" prefWidth="250.0" stylesheets="@../../Styles/AdminMenu.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.MenuController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="850.0" prefWidth="250.0" stylesheets="@../../Styles/AdminMenu.css"
+      xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.f4.logicielf4.Controllers.Admin.MenuController"
+      VBox.vgrow="ALWAYS">
+
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="250.0" styleClass="header">
          <children>
@@ -25,9 +30,10 @@
             </VBox>
          </children>
       </AnchorPane>
-      <VBox prefHeight="391.0" prefWidth="212.0" styleClass="menu">
+
+      <VBox prefHeight="391.0" prefWidth="212.0" styleClass="menu" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="btnDashboard" layoutX="25.0" layoutY="55.0" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Tableau de bord">
+            <Button fx:id="btnDashboard" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Tableau de bord">
                <graphic>
                   <FontAwesomeIconView glyphName="HOME" size="20" />
                </graphic>
@@ -60,7 +66,8 @@
             </Button>
          </children>
       </VBox>
-      <VBox prefHeight="188.0" prefWidth="250.0" styleClass="footer">
+
+      <VBox prefHeight="188.0" prefWidth="250.0" styleClass="footer" VBox.vgrow="ALWAYS">
          <children>
             <Label styleClass="footer-label" text="Signaler bug/suggestion?" />
             <Label styleClass="footer-description" text="Utilisez ceci pour signaler toute erreur." />
