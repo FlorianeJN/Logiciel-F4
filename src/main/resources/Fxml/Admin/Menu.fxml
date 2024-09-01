@@ -9,18 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="850.0" prefWidth="250.0" stylesheets="@../../Styles/AdminMenu.css"
-      xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.f4.logicielf4.Controllers.Admin.MenuController"
-      VBox.vgrow="ALWAYS">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="250.0" stylesheets="@../../Styles/AdminMenu.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.MenuController">
 
    <children>
-      <AnchorPane prefHeight="200.0" prefWidth="250.0" styleClass="header">
+      <AnchorPane prefHeight="180.0" prefWidth="250.0" styleClass="header"> <!-- Adjusted height from 200 to 180 -->
          <children>
-            <VBox prefHeight="200.0" prefWidth="250.0" styleClass="header-content" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <VBox prefHeight="180.0" prefWidth="250.0" styleClass="header-content" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fitHeight="100.0" fitWidth="132.0" pickOnBounds="true" preserveRatio="true" styleClass="logo">
+                  <ImageView fitHeight="90.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" styleClass="logo"> <!-- Adjusted size -->
                      <image>
                         <Image url="@../../Images/logo_no_background.png" />
                      </image>
@@ -31,7 +27,7 @@
          </children>
       </AnchorPane>
 
-      <VBox prefHeight="391.0" prefWidth="212.0" styleClass="menu" VBox.vgrow="ALWAYS">
+      <VBox prefHeight="350.0" prefWidth="212.0" styleClass="menu" VBox.vgrow="ALWAYS"> <!-- Adjusted height -->
          <children>
             <Button fx:id="btnDashboard" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Tableau de bord">
                <graphic>
@@ -67,7 +63,7 @@
          </children>
       </VBox>
 
-      <VBox prefHeight="188.0" prefWidth="250.0" styleClass="footer" VBox.vgrow="ALWAYS">
+      <VBox prefHeight="160.0" prefWidth="250.0" styleClass="footer" VBox.vgrow="ALWAYS"> <!-- Adjusted height -->
          <children>
             <Label styleClass="footer-label" text="Signaler bug/suggestion?" />
             <Label styleClass="footer-description" text="Utilisez ceci pour signaler toute erreur." />

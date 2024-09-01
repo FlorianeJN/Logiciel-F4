@@ -103,6 +103,7 @@ public class ViewFactory {
         Stage stage = new Stage();
         stage.setScene(scene);
         stage.setTitle("Système de gestion de quarts - F4 SANTÉ INC");
+        stage.setResizable(false);
         stage.show();
     }
 

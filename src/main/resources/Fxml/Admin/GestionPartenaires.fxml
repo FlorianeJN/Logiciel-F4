@@ -13,14 +13,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="850.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenairesController">
+<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenairesController">
    <children>
       <!-- Main Title -->
       <Label layoutX="352.0" layoutY="24.0" styleClass="main-title" text="Gestion des Partenaires" />
       <Line endX="960.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
       <!-- Stats Info -->
-      <HBox layoutX="30.0" layoutY="81.0" spacing="50">
+      <HBox layoutX="30.0" layoutY="80.0" spacing="40">
          <VBox alignment="center" spacing="10" styleClass="stat-box">
             <Label styleClass="stat-title" text="Partenaires Actifs" />
             <Label fx:id="activePartnersLabel" styleClass="stat-value" text="0" />
@@ -36,7 +36,7 @@
       </HBox>
 
       <!-- Partners Table -->
-      <TableView fx:id="partnersTable" layoutX="14.0" layoutY="209.0" prefHeight="300.0" prefWidth="940.0" styleClass="partners-table">
+      <TableView fx:id="partnersTable" layoutX="20.0" layoutY="200.0" prefHeight="206.0" prefWidth="962.0" styleClass="partners-table">
          <columns>
             <TableColumn fx:id="nameColumn" prefWidth="180.0" text="Nom" />
             <TableColumn fx:id="addressColumn" prefWidth="400.0" text="Adresse" />
@@ -47,9 +47,9 @@
       </TableView>
 
       <!-- Partner Details -->
-      <VBox layoutX="19.0" layoutY="525.0" spacing="15" styleClass="details-container">
+      <VBox layoutX="20.0" layoutY="426.0" prefHeight="170.0" prefWidth="419.0" spacing="20" styleClass="details-container">
          <Label styleClass="details-title" text="Détails du partenaire sélectionné" />
-         <GridPane alignment="CENTER_LEFT" hgap="20" vgap="15">
+         <GridPane alignment="CENTER_LEFT" hgap="20" vgap="10">
             <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
             <TextField fx:id="nameField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
@@ -61,24 +61,25 @@
 
             <Label styleClass="details-label" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
             <TextField fx:id="emailField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
             <columnConstraints>
-               <ColumnConstraints />
-               <ColumnConstraints />
+               <ColumnConstraints minWidth="100.0" />
+               <ColumnConstraints minWidth="300.0" />
             </columnConstraints>
             <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
+               <RowConstraints minHeight="30.0" />
+               <RowConstraints minHeight="30.0" />
+               <RowConstraints minHeight="30.0" />
+               <RowConstraints minHeight="30.0" />
             </rowConstraints>
          </GridPane>
       </VBox>
 
       <!-- Buttons for Adding, Updating, and Deleting Partners -->
-      <HBox layoutX="92.0" layoutY="777.0" spacing="40" styleClass="buttons-container">
+      <HBox layoutX="121.0" layoutY="687.0" spacing="20" styleClass="buttons-container">
          <Button prefWidth="200.0" styleClass="action-button" text="Ajouter un Partenaire" />
          <Button prefWidth="300.0" styleClass="action-button" text="Mettre à Jour les Informations" />
-         <Button prefHeight="40.0" prefWidth="239.0" styleClass="action-button" text="Supprimer un Partenaire" />
+         <Button prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Supprimer un Partenaire" />
       </HBox>
    </children>
 </AnchorPane>

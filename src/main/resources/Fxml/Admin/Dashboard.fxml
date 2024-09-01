@@ -2,71 +2,13 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="850.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.DashboardController">
+<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.DashboardController">
 
     <!-- Main Title -->
-    <Label layoutX="315.0" layoutY="24.0" styleClass="main-title" text="Tableau de bord (Statistiques)" AnchorPane.leftAnchor="315.0" AnchorPane.topAnchor="24.0" />
+    <Label layoutX="304.0" layoutY="14.0" styleClass="main-title" text="Tableau de bord (Statistiques)" AnchorPane.leftAnchor="304.0" AnchorPane.topAnchor="14.0" />
 
     <!-- Divider Line Under Title -->
-    <Line endX="960.0" layoutY="70.0" startX="20.0" styleClass="divider-line" AnchorPane.topAnchor="60.0" />
-
-    <!-- Top Section: Key Indicators -->
-    <HBox layoutY="100.0" spacing="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20">
-        <VBox fx:id="totalShiftsBox" alignment="center" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="totalShiftsLabel" styleClass="tile-label" text="Nombre total de quarts" />
-            <Label fx:id="totalShiftsValue" styleClass="tile-value" text="125" />
-        </VBox>
-        <VBox fx:id="activeEmployeesBox" alignment="center" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="activeEmployeesLabel" styleClass="tile-label" text="Employés actifs" />
-            <Label fx:id="activeEmployeesValue" styleClass="tile-value" text="45" />
-        </VBox>
-        <VBox fx:id="activePartnersBox" alignment="center" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="activePartnersLabel" styleClass="tile-label" text="Partenaires actifs" />
-            <Label fx:id="activePartnersValue" styleClass="tile-value" text="8" />
-        </VBox>
-    </HBox>
-
-    <!-- Middle Section: Employer Statistics -->
-    <HBox layoutX="100.0" layoutY="275.0" prefHeight="189.0" prefWidth="833.0" spacing="20" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="88.0">
-        <!-- Employer 1 Statistics -->
-        <VBox fx:id="statsArea1" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="statsLabel1" styleClass="stat-title" text="Statistiques Employeur 1" />
-            <Label fx:id="workedShiftsLabel1" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
-            <Label fx:id="cumulatedAmountLabel1" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
-        </VBox>
-        <!-- Employer 2 Statistics -->
-        <VBox fx:id="statsArea2" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="statsLabel2" styleClass="stat-title" text="Statistiques Employeur 2" />
-            <Label fx:id="workedShiftsLabel2" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
-            <Label fx:id="cumulatedAmountLabel2" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
-        </VBox>
-    </HBox>
-
-    <!-- Bottom Section: Summary and Payments -->
-    <HBox layoutX="100.0" layoutY="475.0" prefHeight="212.0" prefWidth="853.0" spacing="20" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="68.0">
-        <!-- Employee Payments Summary -->
-        <VBox fx:id="barChartArea" prefHeight="212.0" prefWidth="397.0" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="cumulatedAmountsEmployee" styleClass="stat-title" text="Montants cumulés paie employés (sans taxes)" />
-            <Label fx:id="amountEmploye1Label" styleClass="stat-detail" text="Employé 1 : 32423 $ " />
-            <Label fx:id="amountEmploye2Label" styleClass="stat-detail" text="Employé 2 : 4498 $" />
-            <Label fx:id="amountEmploye3Label" styleClass="stat-detail" text="Employé 3 : 48 $" />
-            <Label fx:id="totalAmountEmployeeLabel" styleClass="stat-total" text="Montant total : 7623$" />
-            <Label fx:id="amountEmploye4Label" styleClass="stat-detail" text="Employé 4 : 4823 $" />
-        </VBox>
-        <!-- Monthly Employer Payments Summary -->
-        <VBox fx:id="AmountsArea" prefHeight="220.0" prefWidth="400.0" styleClass="stat-box" VBox.vgrow="ALWAYS">
-            <Label fx:id="cumulatedAmountsPartners" styleClass="stat-title" text="Montants cumulés pour le mois (sans taxes)" />
-            <Label fx:id="amountPartner1Label" styleClass="stat-detail" text="Partenaire 1 : 43598 $" />
-            <Label fx:id="amountPartner2Label" styleClass="stat-detail" text="Partenaire 2 : 324 $" />
-            <Label fx:id="amountPartner3Label" styleClass="stat-detail" text="Partenaire 3 : 3324 $" />
-            <Label fx:id="totalAmountPartnerLabel" styleClass="stat-total" text="Montant total : 32 423$" />
-        </VBox>
-    </HBox>
-
-    <!-- Footer: Additional Information -->
-    <Label fx:id="labelRevenus" layoutX="416.0" layoutY="772.0" styleClass="stat-detail" text="Revenus bruts pour le mois : 24 800$" AnchorPane.bottomAnchor="50.0" AnchorPane.leftAnchor="416.0" />
+    <Line endX="960.0" layoutX="19.0" layoutY="70.0" startX="20.0" styleClass="divider-line" AnchorPane.topAnchor="69.0" />
 </AnchorPane>
