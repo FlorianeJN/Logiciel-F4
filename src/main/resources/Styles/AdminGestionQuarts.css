@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: 'Lato', sans-serif;
+    -fx-background-color: #f4f6f9; /* Very light gray background */
+    -fx-padding: 20px; /* Padding for general spacing */
+}
+
+/* Main Title Styling */
+.main-title {
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-padding-bottom: 20px; /* Padding below the title */
+}
+
+/* Divider Line Styling */
+.divider-line {
+    -fx-stroke: #004d40; /* Dark teal line */
+    -fx-stroke-width: 2;
+    -fx-opacity: 0.8; /* Slight transparency */
+    -fx-padding-bottom: 20px; /* Padding below the divider */
+}
+
+/* Action Buttons Container */
+.action-buttons-container {
+    -fx-spacing: 20px; /* Spacing between action buttons */
+}
+
+/* Action Boxes */
+.action-box {
+    -fx-background-color: #00796b; /* Dark teal background */
+    -fx-background-radius: 10;
+    -fx-padding: 20px; /* Internal padding for the box */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0.5, 0, 0); /* Soft shadow for depth */
+}
+
+/* Action Buttons */
+.action-button {
+    -fx-background-color: #ffffff; /* White background for buttons */
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 24px; /* Padding inside the buttons */
+    -fx-border-radius: 10; /* Rounded corners for buttons */
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.5, 0, 2); /* Soft shadow for buttons */
+    -fx-transition: -fx-background-color 0.3s, -fx-transform 0.1s; /* Smooth transitions */
+}
+
+.action-button:hover {
+    -fx-background-color: #004d40; /* Darker teal on hover */
+    -fx-text-fill: #ffffff; /* White text on hover */
+    -fx-transform: scale(1.02); /* Slight enlargement on hover */
+}
+
+.action-button:pressed {
+    -fx-background-color: #00332a; /* Even darker teal on press */
+    -fx-transform: scale(0.98); /* Slight shrink on press */
+}
+
+/* Recent Activities Section */
+.recent-activities-box {
+    -fx-background-color: #ffffff; /* Clean white background */
+    -fx-border-color: #b0bec5; /* Light gray border */
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0.5, 0, 0); /* Soft shadow for depth */
+}
+
+/* Recent Activity Items */
+.recent-activity-item {
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 14px;
+}
+
+/* Status Styles */
+.status-paid {
+    -fx-text-fill: #388E3C; /* Green for paid status */
+    -fx-font-weight: bold;
+}
+
+.status-pending {
+    -fx-text-fill: #F57C00; /* Orange for pending status */
+    -fx-font-weight: bold;
+}
+
+.status-modified {
+    -fx-text-fill: #1976D2; /* Blue for modified status */
+    -fx-font-weight: bold;
+}
+
+/* Summary Box */
+.summary-box {
+    -fx-background-color: #ffffff; /* Clean white background */
+    -fx-border-color: #b0bec5; /* Light gray border */
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0.5, 0, 0); /* Soft shadow for depth */
+}
+
+/* Summary Items */
+.summary-item {
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold; /* Bold for emphasis */
+}
+
+/* Section Title Styling */
+.section-title {
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-padding-bottom: 10px; /* Padding below the section title */
+}

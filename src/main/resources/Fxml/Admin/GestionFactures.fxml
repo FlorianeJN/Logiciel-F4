@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane prefHeight="850.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionFacturesController">
+
+    <!-- Main Title -->
+    <Label layoutX="367.0" styleClass="main-title" text="Gestion des factures" />
+
+    <!-- Divider Line Under the Title -->
+    <Line endX="960.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+
+    <!-- Section for Action Buttons -->
+    <HBox layoutX="20.0" layoutY="100.0" prefHeight="120.0" prefWidth="960.0" spacing="20" styleClass="action-buttons-container">
+        <!-- Button to Start a New Invoice -->
+        <VBox fx:id="newInvoiceBox" alignment="center" prefHeight="120.0" prefWidth="300.0" styleClass="action-box">
+            <Button fx:id="newInvoiceButton" styleClass="action-button" text="Commencer une nouvelle facture" />
+        </VBox>
+
+        <!-- Button to Modify/Visualize an Invoice -->
+        <VBox fx:id="viewEditInvoiceBox" alignment="center" prefHeight="120.0" prefWidth="300.0" styleClass="action-box">
+            <Button fx:id="viewEditInvoiceButton" styleClass="action-button" text="Modifier/Visualiser une facture" />
+        </VBox>
+
+        <!-- Button to Modify Invoice Status -->
+        <VBox fx:id="modifyStatusBox" alignment="center" prefHeight="120.0" prefWidth="300.0" styleClass="action-box">
+            <Button fx:id="modifyStatusButton" styleClass="action-button" text="Modifier le statut d'une facture" />
+        </VBox>
+    </HBox>
+
+    <!-- Section for Recent Activities -->
+    <VBox layoutX="20.0" layoutY="240.0" prefWidth="960.0" spacing="15" styleClass="recent-activities-box">
+        <Label styleClass="section-title" text="Activités récentes" />
+        <!-- List of Recent Activities -->
+        <HBox spacing="10">
+            <Label styleClass="recent-activity-item" text="Facture #001: " />
+            <Label styleClass="status-paid" text="Statut - Payée" />
+        </HBox>
+        <HBox spacing="10">
+            <Label styleClass="recent-activity-item" text="Facture #002: " />
+            <Label styleClass="status-pending" text="Statut - En attente" />
+        </HBox>
+        <HBox spacing="10">
+            <Label styleClass="recent-activity-item" text="Facture #003: " />
+            <Label styleClass="status-modified" text="Statut - Modifiée" />
+        </HBox>
+    </VBox>
+
+    <!-- Section for Summary or Statistics -->
+    <VBox layoutX="20.0" layoutY="430.0" prefWidth="960.0" spacing="15" styleClass="summary-box">
+        <Label styleClass="section-title" text="Résumé des factures" />
+        <HBox spacing="50">
+            <Label styleClass="summary-item" text="Total Factures Créées: 10" />
+            <Label styleClass="summary-item" text="Factures en Attente de Paiement: 3" />
+            <Label styleClass="summary-item" text="Factures Modifiées ce Mois: 2" />
+        </HBox>
+    </VBox>
+</AnchorPane>

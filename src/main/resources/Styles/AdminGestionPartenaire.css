@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: 'Lato', sans-serif;
+    -fx-background-color: #f0f2f5; /* Light gray background */
+}
+
+/* Main Title */
+.main-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #004d40; /* Dark teal */
+}
+
+/* Divider Line */
+.divider-line {
+    -fx-stroke: #004d40;
+    -fx-stroke-width: 2;
+    -fx-opacity: 0.7;
+}
+
+/* Stats Section */
+.stat-box {
+    -fx-background-color: #004d40; /* Dark teal background */
+    -fx-padding: 20;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.stat-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white; /* White text */
+}
+
+.stat-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white; /* White text */
+}
+
+/* Partners Table */
+.partners-table {
+    -fx-background-color: white;
+    -fx-border-color: #B0BEC5;
+    -fx-border-width: 2;
+    -fx-table-cell-border-color: #E0E0E0;
+    -fx-padding: 10;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+/* Partner Details Section */
+.details-container {
+    -fx-padding: 15;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #B0BEC5;
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+}
+
+.details-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #004d40;
+    -fx-padding-bottom: 10px;
+}
+
+.details-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #004d40;
+}
+
+.details-textfield {
+    -fx-background-color: #ECEFF1;
+    -fx-border-color: #B0BEC5;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+    -fx-background-radius: 5;
+}
+
+/* Buttons */
+.buttons-container {
+    -fx-alignment: center-left;
+}
+
+.action-button {
+    -fx-background-color: #004d40; /* Dark teal */
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-radius: 5;
+    -fx-padding: 10 20;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0.5, 0, 2);
+    -fx-font-family: 'Lato', sans-serif;
+    -fx-background-radius: 5;
+}
+
+.action-button:hover {
+    -fx-background-color: #00332a;
+}
+
+.action-button:pressed {
+    -fx-background-color: #00221a;
+}

@@ -9,7 +9,9 @@ import java.sql.ResultSet;
 
 public class DBUtils {
 
-    public static void loginUser(ActionEvent event, String username, String password) {
+    public static boolean loginUser(ActionEvent event, String username, String password) {
+        boolean loggedIn = false;
+
         String url = "jdbc:mysql://127.0.0.1:3306/f4santeinc";
         String user = "root";
         String pass = "!Secure!2011";
@@ -33,7 +35,7 @@ public class DBUtils {
                     if (retrievedPassword != null) {
                         if (retrievedPassword.equals(password)) {
                             // Successful login
-                            showAlert(Alert.AlertType.INFORMATION, "We are logged in!!!");
+                            loggedIn = true;
                         } else {
                             // Incorrect password
                             showAlert(Alert.AlertType.INFORMATION, "Mot de passe incorrect!");
@@ -46,6 +48,7 @@ public class DBUtils {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return loggedIn;
     }
 
     private static void showAlert(Alert.AlertType alertType, String message) {

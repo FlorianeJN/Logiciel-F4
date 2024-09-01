@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane prefHeight="850.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenairesController">
+   <children>
+      <!-- Main Title -->
+      <Label layoutX="352.0" layoutY="24.0" styleClass="main-title" text="Gestion des Partenaires" />
+      <Line endX="960.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+
+      <!-- Stats Info -->
+      <HBox layoutX="30.0" layoutY="81.0" spacing="50">
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Partenaires Actifs" />
+            <Label fx:id="activePartnersLabel" styleClass="stat-value" text="0" />
+         </VBox>
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Partenaires Inactifs" />
+            <Label fx:id="inactivePartnersLabel" styleClass="stat-value" text="0" />
+         </VBox>
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Total des partenaires" />
+            <Label fx:id="totalPartnersLabel" styleClass="stat-value" text="0" />
+         </VBox>
+      </HBox>
+
+      <!-- Partners Table -->
+      <TableView fx:id="partnersTable" layoutX="14.0" layoutY="209.0" prefHeight="300.0" prefWidth="940.0" styleClass="partners-table">
+         <columns>
+            <TableColumn fx:id="nameColumn" prefWidth="180.0" text="Nom" />
+            <TableColumn fx:id="addressColumn" prefWidth="400.0" text="Adresse" />
+            <TableColumn fx:id="phoneColumn" prefWidth="150.0" text="Téléphone" />
+            <TableColumn fx:id="emailColumn" prefWidth="210.0" text="Email" />
+            <TableColumn fx:id="resourcePersonColumn" prefWidth="210.0" text="Personne Ressource" />
+         </columns>
+      </TableView>
+
+      <!-- Partner Details -->
+      <VBox layoutX="19.0" layoutY="525.0" spacing="15" styleClass="details-container">
+         <Label styleClass="details-title" text="Détails du partenaire sélectionné" />
+         <GridPane alignment="CENTER_LEFT" hgap="20" vgap="15">
+            <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="nameField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="details-label" text="Adresse:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="addressField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="details-label" text="Téléphone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="phoneField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label styleClass="details-label" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="emailField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <columnConstraints>
+               <ColumnConstraints />
+               <ColumnConstraints />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+               <RowConstraints />
+            </rowConstraints>
+         </GridPane>
+      </VBox>
+
+      <!-- Buttons for Adding, Updating, and Deleting Partners -->
+      <HBox layoutX="92.0" layoutY="777.0" spacing="40" styleClass="buttons-container">
+         <Button prefWidth="200.0" styleClass="action-button" text="Ajouter un Partenaire" />
+         <Button prefWidth="300.0" styleClass="action-button" text="Mettre à Jour les Informations" />
+         <Button prefHeight="40.0" prefWidth="239.0" styleClass="action-button" text="Supprimer un Partenaire" />
+      </HBox>
+   </children>
+</AnchorPane>

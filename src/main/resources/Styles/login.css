@@ -71,3 +71,37 @@
 .login-button:pressed {
     -fx-background-color: #00221a; /* Even darker teal on press */
 }
+
+/* CheckBox Styles */
+.show-password-checkbox {
+    -fx-font-family: "Lato", sans-serif;
+    -fx-font-weight: 400;
+    -fx-text-fill: #004d40; /* Dark teal for text */
+    -fx-font-size: 14px;
+    -fx-padding: 5 0 5 5; /* Padding for spacing */
+}
+
+/* TextField for visible password */
+.password-field-visible {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #90a4ae; /* Slightly darker border */
+    -fx-border-width: 2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    -fx-prompt-text-fill: #607d8b; /* Darker placeholder text for better visibility */
+    -fx-font-size: 15px;
+    -fx-font-family: "Lato", sans-serif;
+    -fx-transition: -fx-border-color 0.3s, -fx-background-color 0.3s;
+}
+
+/* Focused State for visible TextField */
+.password-field-visible:focused {
+    -fx-border-color: #00796b; /* Darker teal border on focus */
+}
+
+/* Style adjustments for when the CheckBox is selected */
+.show-password-checkbox:selected {
+    -fx-text-fill: #002b36; /* Darker blue text when selected */
+    -fx-font-weight: bold; /* Bold text when selected */
+}

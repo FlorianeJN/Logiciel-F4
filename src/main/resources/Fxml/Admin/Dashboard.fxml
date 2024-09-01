@@ -9,7 +9,7 @@
 <AnchorPane prefHeight="850.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.DashboardController">
 
     <!-- Main Title -->
-    <Label layoutX="261.0" styleClass="main-title" text="Statistiques pour le mois en cours" />
+    <Label layoutX="278.0" styleClass="main-title" text="Tableau de bord (Statistiques)" />
 
     <!-- Divider Line Under Title -->
     <Line endX="960.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
@@ -35,14 +35,14 @@
         <!-- Employer 1 Statistics -->
         <AnchorPane fx:id="statsArea" prefHeight="240.0" prefWidth="460.0" styleClass="stat-box">
             <Label fx:id="statsLabel1" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Statistiques Employeur 1" />
-            <Label layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
-            <Label layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
+            <Label fx:id="workedShiftsLabel1" layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
+            <Label fx:id="cumulatedAmountLabel1" layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
         </AnchorPane>
         <!-- Employer 2 Statistics -->
         <AnchorPane fx:id="chartArea11" prefHeight="240.0" prefWidth="460.0" styleClass="stat-box">
             <Label fx:id="statsLabel2" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Statistiques Employeur 2" />
-            <Label layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
-            <Label layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
+            <Label fx:id="workedShiftsLabel2" layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Nombre de quarts travaillés: 34" />
+            <Label fx:id="cumulatedAmountLabel2" layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Montant cumulé : 3252 $" />
         </AnchorPane>
     </HBox>
 
@@ -50,23 +50,23 @@
     <HBox layoutX="20.0" layoutY="470.0" prefHeight="240.0" prefWidth="960.0" spacing="20">
         <!-- Employee Payments Summary -->
         <AnchorPane fx:id="barChartArea" prefHeight="240.0" prefWidth="460.0" styleClass="stat-box">
-            <Label fx:id="barChartLabel" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Montants cumulés paie employés (sans taxes)" />
-            <Label layoutX="20.0" layoutY="54.0" styleClass="stat-detail" text="Employé 1 : 32423 $ " />
-            <Label layoutX="19.0" layoutY="83.0" styleClass="stat-detail" text="Employé 2 : 4498 $" />
-            <Label layoutX="19.0" layoutY="109.0" styleClass="stat-detail" text="Employé 3 : 48 $" />
-            <Label layoutX="224.0" layoutY="210.0" style="-fx-font-size: 20px;" styleClass="stat-total" text="Montant total : 7623$" />
-            <Label layoutX="19.0" layoutY="138.0" styleClass="stat-detail" text="Employé 4 : 4823 $" />
+            <Label fx:id="cumulatedAmountsEmployee" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Montants cumulés paie employés (sans taxes)" />
+            <Label fx:id="amountEmploye1Label" layoutX="20.0" layoutY="54.0" styleClass="stat-detail" text="Employé 1 : 32423 $ " />
+            <Label fx:id="amountEmploye2Label" layoutX="19.0" layoutY="83.0" styleClass="stat-detail" text="Employé 2 : 4498 $" />
+            <Label fx:id="amountEmploye3Label" layoutX="19.0" layoutY="109.0" styleClass="stat-detail" text="Employé 3 : 48 $" />
+            <Label fx:id="totalAmountEmployeeLabel" layoutX="224.0" layoutY="210.0" style="-fx-font-size: 20px;" styleClass="stat-total" text="Montant total : 7623$" />
+            <Label fx:id="amountEmploye4Label" layoutX="19.0" layoutY="138.0" styleClass="stat-detail" text="Employé 4 : 4823 $" />
         </AnchorPane>
         <!-- Monthly Employer Payments Summary -->
         <AnchorPane fx:id="AmountsArea" prefHeight="240.0" prefWidth="460.0" styleClass="stat-box">
-            <Label fx:id="chartLabel1" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Montants cumulés pour le mois (sans taxes)" />
-            <Label layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Employeur 1 : 43598 $" />
-            <Label layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Employeur 2 : 324 $" />
-            <Label layoutX="26.0" layoutY="129.0" styleClass="stat-detail" text="Employeur 3 : 3324 $" />
-            <Label layoutX="217.0" layoutY="210.0" style="-fx-font-size: 20px;" styleClass="stat-total" text="Montant total : 32 423$" />
+            <Label fx:id="cumulatedAmountsPartners" layoutX="20.0" layoutY="20.0" styleClass="stat-title" text="Montants cumulés pour le mois (sans taxes)" />
+            <Label fx:id="amountPartner1Label" layoutX="26.0" layoutY="60.0" styleClass="stat-detail" text="Partenaire 1 : 43598 $" />
+            <Label fx:id="amountPartner2Label" layoutX="26.0" layoutY="96.0" styleClass="stat-detail" text="Partenaire 2 : 324 $" />
+            <Label fx:id="amountPartner3Label" layoutX="26.0" layoutY="129.0" styleClass="stat-detail" text="Partenaire 3 : 3324 $" />
+            <Label fx:id="totalAmountPartnerLabel" layoutX="217.0" layoutY="210.0" style="-fx-font-size: 20px;" styleClass="stat-total" text="Montant total : 32 423$" />
         </AnchorPane>
     </HBox>
 
     <!-- Footer: Additional Information -->
-    <Label fx:id="labelRevenus" layoutX="345.0" layoutY="767.0" styleClass="stat-detail" text="Revenus bruts pour le mois : 24 800$" />
+    <Label fx:id="labelRevenus" layoutX="324.0" layoutY="771.0" styleClass="stat-detail" text="Revenus bruts pour le mois : 24 800$" />
 </AnchorPane>

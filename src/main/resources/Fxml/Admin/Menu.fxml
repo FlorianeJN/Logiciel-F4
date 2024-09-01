@@ -32,27 +32,32 @@
                   <FontAwesomeIconView glyphName="HOME" size="20" />
                </graphic>
             </Button>
-            <Button fx:id="btnQuart" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Gestion des quarts">
+            <Button fx:id="btnFacture" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Gestion des factures">
                <graphic>
                   <FontAwesomeIconView glyphName="CLOCK_ALT" size="20" />
-               </graphic></Button>
+               </graphic>
+            </Button>
             <Button fx:id="btnPartenaire" mnemonicParsing="false" prefWidth="180.0" styleClass="menu-button" text="Gestion des partenaires">
                <graphic>
                   <FontAwesomeIconView glyphName="BRIEFCASE" size="20" />
-               </graphic></Button>
+               </graphic>
+            </Button>
             <Button fx:id="btnEmploye" mnemonicParsing="false" styleClass="menu-button" text="Gestion des employés">
                <graphic>
                   <FontAwesomeIconView glyphName="USERS" size="20" />
-               </graphic></Button>
+               </graphic>
+            </Button>
             <Line endX="241.0" startX="0.0" styleClass="divider" />
             <Button fx:id="btnMonProfil" mnemonicParsing="false" styleClass="menu-button-dark" text="Profil">
                <graphic>
                   <FontAwesomeIconView fx:id="btnProfil" glyphName="USER" size="20" />
-               </graphic></Button>
+               </graphic>
+            </Button>
             <Button fx:id="btnDeconnexion" mnemonicParsing="false" styleClass="menu-button-dark" text="Se déconnecter">
                <graphic>
                   <FontAwesomeIconView glyphName="EXTERNAL_LINK" size="20" />
-               </graphic></Button>
+               </graphic>
+            </Button>
          </children>
       </VBox>
       <VBox prefHeight="188.0" prefWidth="250.0" styleClass="footer">
@@ -62,7 +67,8 @@
             <Button fx:id="btnReport" mnemonicParsing="false" styleClass="footer-button" text="Signaler">
                <graphic>
                   <FontAwesomeIconView glyphName="PLUS" />
-               </graphic></Button>
+               </graphic>
+            </Button>
          </children>
       </VBox>
    </children>
