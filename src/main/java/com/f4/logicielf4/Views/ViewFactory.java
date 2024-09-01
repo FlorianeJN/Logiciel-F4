@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
@@ -102,11 +103,23 @@ public class ViewFactory {
         }
         Stage stage = new Stage();
         stage.setScene(scene);
-        stage.setTitle("Système de gestion de quarts - F4 SANTÉ INC");
+        stage.setTitle("Système de gestion - F4 SANTÉ INC");
         stage.setResizable(false);
+
+        rajouterImage(stage);
+
         stage.show();
     }
 
+    public void showAddPartnerWindow() {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/AjouterPartenaire.fxml"));
+        createStage(loader);
+    }
+
+    private void rajouterImage(Stage stage) {
+        Image icon = new Image(getClass().getResourceAsStream("/Images/logo.jpg"));
+        stage.getIcons().add(icon);
+    }
     public void closeStage(Stage stage){
         stage.close();
     }
