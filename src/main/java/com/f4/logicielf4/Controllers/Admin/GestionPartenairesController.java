@@ -1,12 +1,16 @@
 package com.f4.logicielf4.Controllers.Admin;
 
 import com.f4.logicielf4.Models.Model;
+import com.f4.logicielf4.Models.Partenaire;
+import com.f4.logicielf4.Utilitaire.DBUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class GestionPartenairesController implements Initializable {
@@ -27,8 +31,6 @@ public class GestionPartenairesController implements Initializable {
     @FXML
     private TableColumn emailColumn;
     @FXML
-    private TableColumn resourcePersonColumn;
-    @FXML
     private TextField nameField;
     @FXML
     private TextField addressField;
@@ -36,40 +38,47 @@ public class GestionPartenairesController implements Initializable {
     private TextField phoneField;
     @FXML
     private TextField emailField;
-
     @FXML
     private Button btnAjouter;
-
     @FXML
     private Button btnMAJ;
-
     @FXML
     private Button btnSupprimer;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        actionBtnAjouter();
-        actionBtnMAJ();
-        actionBtnSupprimer();
+
+        btnAjouter.setOnAction(event -> actionBtnAjouter());
+        btnMAJ.setOnAction(event -> actionBtnMAJ());
+        btnSupprimer.setOnAction(event -> actionBtnSupprimer());
+        setCellValues();
+        updateTable();
+    }
+
+    private void setCellValues() {
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("adresse"));
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("telephone"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("courriel"));
     }
 
     private void actionBtnAjouter(){
-        btnAjouter.setOnAction(event -> {
             System.out.println("Bouton ajouter appuyé");
             Stage stage = (Stage) btnAjouter.getScene().getWindow();
             Model.getInstance().getViewFactory().showAddPartnerWindow(stage);
-        });
+            updateTable();
+    }
+
+    private void updateTable(){
+        List<Partenaire> partenaires = DBUtils.fetchAllPartners();
+        partnersTable.getItems().setAll(partenaires);
     }
 
     private void actionBtnMAJ(){
-        btnMAJ.setOnAction(event -> {
-            System.out.println("Bouton MAJ appuyé");
-        });
+        System.out.println("Bouton MAJ appuyé");
     }
 
     private void actionBtnSupprimer(){
-        btnSupprimer.setOnAction(event -> {
-            System.out.println("Bouton supprimer appuyé");
-        });
+        System.out.println("Bouton Supprimer appuyé");
     }
 }

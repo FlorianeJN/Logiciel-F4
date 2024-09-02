@@ -42,7 +42,6 @@
             <TableColumn fx:id="addressColumn" prefWidth="400.0" text="Adresse" />
             <TableColumn fx:id="phoneColumn" prefWidth="150.0" text="Téléphone" />
             <TableColumn fx:id="emailColumn" prefWidth="210.0" text="Email" />
-            <TableColumn fx:id="resourcePersonColumn" prefWidth="210.0" text="Personne Ressource" />
          </columns>
       </TableView>
 

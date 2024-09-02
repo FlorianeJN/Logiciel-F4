@@ -34,38 +34,34 @@ public class LoginController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
-        // Bind password fields (one-way)
         passwordFieldVisible.textProperty().bind(passwordField.textProperty());
+        showPasswordCheckBox.setOnAction(event -> actionCheckBoxShowPassword());
+        loginButton.setOnAction(event -> actionBtnLogin());
+    }
 
-        // Handle show/hide password functionality
-        showPasswordCheckBox.setOnAction(event -> {
-            if (showPasswordCheckBox.isSelected()) {
-                passwordField.setVisible(false);
-                passwordFieldVisible.setVisible(true);
-            } else {
-                passwordField.setVisible(true);
-                passwordFieldVisible.setVisible(false);
-            }
-        });
+    private void actionCheckBoxShowPassword(){
+        if (showPasswordCheckBox.isSelected()) {
+            passwordField.setVisible(false);
+            passwordFieldVisible.setVisible(true);
+        } else {
+            passwordField.setVisible(true);
+            passwordFieldVisible.setVisible(false);
+        }
+    }
 
-        // When login button is pressed, validate the username and password
-        loginButton.setOnAction(actionEvent -> {
-            String username = usernameField.getText();
-            String password = passwordField.getText();  // Only using the PasswordField's content
+    private void actionBtnLogin(){
+        String username = usernameField.getText();
+        String password = passwordField.getText();
 
-            if (DBUtils.loginUser(actionEvent, username, password)) {
-                Stage stage = (Stage) loginButton.getScene().getWindow();
-                Model.getInstance().getViewFactory().closeStage(stage);
-                Model.getInstance().getViewFactory().showAdminWindow();
-            } else {
-                clearFields();
-            }
-
-            // Clear sensitive data
-            username = null;
-            password = null;
-        });
+        if (DBUtils.loginUser(username, password)) {
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            Model.getInstance().getViewFactory().closeStage(stage);
+            Model.getInstance().getViewFactory().showAdminWindow();
+        } else {
+            clearFields();
+        }
+        username = null;
+        password = null;
     }
 
     private void clearFields() {

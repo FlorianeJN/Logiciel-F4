@@ -14,6 +14,10 @@ public class AdminController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+       ajouterListeners();
+    }
+
+    private void ajouterListeners(){
         Model.getInstance().getViewFactory().getOptionSelectionnee().addListener(((observableValue, oldVal, newVal) -> {
             switch (newVal){
                 case "Factures" -> admin_parent.setCenter(Model.getInstance().getViewFactory().getFacturesView());

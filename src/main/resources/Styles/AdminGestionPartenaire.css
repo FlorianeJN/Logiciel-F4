@@ -20,6 +20,43 @@
     -fx-opacity: 0.7;
 }
 
+/* Partners Table */
+.partners-table {
+    -fx-background-color: white;
+    -fx-border-color: #004d40; /* Dark teal border */
+    -fx-border-width: 2;
+    -fx-table-cell-border-color: #B0BEC5;
+    -fx-padding: 10;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-selection-bar: #004d40; /* Dark teal selection */
+    -fx-selection-bar-non-focused: #B0BEC5; /* Light gray for unfocused selection */
+}
+
+.partners-table .column-header {
+    -fx-background-color: #01836e; /* Dark teal for column headers */
+    -fx-text-fill: white; /* White text for headers */
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER-LEFT;
+}
+
+.partners-table .cell {
+    -fx-text-fill: #004d40; /* Dark teal text for cells */
+    -fx-alignment: CENTER-LEFT;
+    -fx-border-color: transparent;
+    -fx-padding: 5;
+}
+
+.partners-table .cell:selected {
+    -fx-background-color: #00332a; /* Darker teal for selected cell */
+    -fx-text-fill: white; /* White text when selected */
+}
+
+.partners-table .column-header-background {
+    -fx-background-color: #004d40; /* Match header background */
+}
+
+
 /* Stats Section */
 .stat-box {
     -fx-background-color: #004d40; /* Dark teal background */

@@ -35,76 +35,40 @@ public class MenuController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        actionBtnDashboard();
-        actionBtnFacture();
-        actionBtnPartenaire();
-        actionBtnEmploye();
-        actionBtnMonProfil();
-        actionBtnDeconnexion();
-        actionBtnReport();
+        btnDashboard.setOnAction(event -> actionBtnDashboard());
+        btnFacture.setOnAction(event -> actionBtnFacture());
+        btnPartenaire.setOnAction(event -> actionBtnPartenaire());
+        btnEmploye.setOnAction(event -> actionBtnEmploye());
+        btnMonProfil.setOnAction(event -> actionBtnMonProfil());
+        btnDeconnexion.setOnAction(event -> actionBtnDeconnexion());
+        btnReport.setOnAction(event -> actionBtnReport());
     }
 
     private void actionBtnDashboard(){
-        btnDashboard.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Dashboard appuyé");
-                Model.getInstance().getViewFactory().getOptionSelectionnee().set("Dashboard");
-            }
-        });
+        System.out.println("Bouton Dashboard appuyé");
+        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Dashboard");
     };
 
     private void actionBtnFacture(){
-        btnFacture.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                Model.getInstance().getViewFactory().getOptionSelectionnee().set("Factures");
-                System.out.println("Bouton Facture appuyé");
-            }
-        });
+        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Factures");
+        System.out.println("Bouton Facture appuyé");
     };
     private void actionBtnPartenaire(){
-        btnPartenaire.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Partenaire appuyé");
-                Model.getInstance().getViewFactory().getOptionSelectionnee().set("Partenaires");
-            }
-        });
+        System.out.println("Bouton Partenaire appuyé");
+        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Partenaires");
     };
     private void actionBtnEmploye(){
-        btnEmploye.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Employé appuyé");
-                Model.getInstance().getViewFactory().getOptionSelectionnee().set("Employes");
-            }
-        });
+        System.out.println("Bouton Employé appuyé");
+        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Employes");
     };
     private void actionBtnMonProfil(){
-        btnMonProfil.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Profil appuyé");
-                Model.getInstance().getViewFactory().getOptionSelectionnee().set("Profil");
-            }
-        });
+        System.out.println("Bouton Profil appuyé");
+        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Profil");
     };
     private void actionBtnDeconnexion(){
-        btnDeconnexion.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Deconnexion appuyé");
-            }
-        });
+        System.out.println("Bouton deconnexion appuyé");
     };
     private void actionBtnReport(){
-        btnReport.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                System.out.println("Bouton Report appuyé");
-            }
-        });
+        System.out.println("Bouton report appuyé");
     };
-
 }
