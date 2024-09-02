@@ -10,6 +10,5 @@ public class App extends Application {
         ViewFactory viewFactory = new ViewFactory();
         //viewFactory.showLoginWindow();
         viewFactory.showAdminWindow();
-       // viewFactory.showAddPartnerWindow();
     }
 }

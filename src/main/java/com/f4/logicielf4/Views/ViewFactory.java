@@ -4,10 +4,14 @@ import com.f4.logicielf4.Controllers.Admin.AdminController;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class ViewFactory {
 
@@ -17,7 +21,6 @@ public class ViewFactory {
     private AnchorPane partenairesView;
     private AnchorPane profilView;
     private final StringProperty optionSelectionnee;
-
 
     public ViewFactory(){
         this.optionSelectionnee = new SimpleStringProperty("");
@@ -111,11 +114,26 @@ public class ViewFactory {
         stage.show();
     }
 
-    public void showAddPartnerWindow() {
+    public void showAddPartnerWindow(Stage stage) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/AjouterPartenaire.fxml"));
-        createStage(loader);
+        createStageAdd(loader,stage,"Ajouter un Partenaire - F4 SANTÉ INC");
     }
 
+    private void createStageAdd(FXMLLoader loader, Stage originalStage, String titre) {
+        try {
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.setResizable(false);
+            stage.setTitle(titre);
+            rajouterImage(stage);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.initOwner(originalStage);
+            stage.showAndWait();  // Bloque l'interaction avec d'autres fenêtres jusqu'à la fermeture de cette fenêtre
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void rajouterImage(Stage stage) {
         Image icon = new Image(getClass().getResourceAsStream("/Images/logo.jpg"));
         stage.getIcons().add(icon);

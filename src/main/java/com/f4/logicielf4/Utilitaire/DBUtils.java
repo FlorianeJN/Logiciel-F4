@@ -9,12 +9,16 @@ import java.sql.ResultSet;
 
 public class DBUtils {
 
+    private static String url = "jdbc:mysql://127.0.0.1:3306/f4santeinc";
+    private static String user = "root";
+    private static String pass = "root";
+
     public static boolean loginUser(ActionEvent event, String username, String password) {
         boolean loggedIn = false;
 
-        String url = "jdbc:mysql://127.0.0.1:3306/f4santeinc";
-        String user = "root";
-        String pass = "!Secure!2011";
+        //String url = "jdbc:mysql://127.0.0.1:3306/f4santeinc";
+        //String user = "root";
+       // String pass = "!Secure!2011";
 
         String query = "SELECT password FROM users WHERE id = ?";
 
@@ -55,6 +59,18 @@ public class DBUtils {
         Alert alert = new Alert(alertType);
         alert.setContentText(message);
         alert.show();
+    }
+
+    public static boolean addPartner(){
+        return false;
+    }
+
+    public static boolean updatePartner(){
+        return false;
+    }
+
+    public static boolean deletePartner(){
+        return false;
     }
 
 }

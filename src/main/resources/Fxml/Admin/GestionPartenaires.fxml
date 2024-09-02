@@ -77,9 +77,9 @@
 
       <!-- Buttons for Adding, Updating, and Deleting Partners -->
       <HBox layoutX="121.0" layoutY="687.0" spacing="20" styleClass="buttons-container">
-         <Button prefWidth="200.0" styleClass="action-button" text="Ajouter un Partenaire" />
-         <Button prefWidth="300.0" styleClass="action-button" text="Mettre à Jour les Informations" />
-         <Button prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Supprimer un Partenaire" />
+         <Button fx:id="btnAjouter" prefWidth="200.0" styleClass="action-button" text="Ajouter un partenaire" />
+         <Button fx:id="btnMAJ" prefWidth="300.0" styleClass="action-button" text="Mettre à jour les informations" />
+         <Button fx:id="btnSupprimer" prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Supprimer un partenaire" />
       </HBox>
    </children>
 </AnchorPane>
