@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../../Styles/TableauDeBord/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionFacture.GestionFacturesController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/TableauDeBord/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionFacture.GestionFacturesController">
 
     <!-- Main Title -->
     <Label layoutX="383.0" layoutY="14.0" styleClass="main-title" text="Gestion des factures" />

@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../../Styles/TableauDeBord/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.TableauDeBord.DashboardController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/TableauDeBord/AdminDashboard.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.TableauDeBord.DashboardController">
 
     <!-- Main Title -->
     <Label layoutX="304.0" layoutY="14.0" styleClass="main-title" text="Tableau de bord (Statistiques)" AnchorPane.leftAnchor="304.0" AnchorPane.topAnchor="14.0" />

@@ -2,6 +2,7 @@ package com.f4.logicielf4.Views;
 
 import com.f4.logicielf4.Controllers.Admin.AdminController;
 import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.MiseAJourPartenaireController;
+import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.SuppressionPartenaireController;
 import com.f4.logicielf4.Models.Partenaire;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -143,6 +144,14 @@ public class ViewFactory {
             e.printStackTrace();
         }
     }
+
+    public void showDeletePartnerWindow(Stage stage, Partenaire partenaire) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionPartenaire/SuppressionPartenaire.fxml"));
+        SuppressionPartenaireController controller = new SuppressionPartenaireController(partenaire);
+        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"Supprimer un partenaire - F4 SANTÉ INC");
+    }
+
     private void rajouterImage(Stage stage) {
         Image icon = new Image(getClass().getResourceAsStream("/Images/logo.jpg"));
         stage.getIcons().add(icon);

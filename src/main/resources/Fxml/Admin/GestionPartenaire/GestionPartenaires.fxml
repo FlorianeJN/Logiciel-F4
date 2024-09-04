@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../../Styles/GestionPartenaire/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionPartenaire/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
    <children>
       <!-- Main Title -->
       <Label layoutX="352.0" layoutY="24.0" styleClass="main-title" text="Gestion des Partenaires" />
@@ -30,7 +30,7 @@
             <Label fx:id="inactivePartnersLabel" styleClass="stat-value" text="0" />
          </VBox>
          <VBox alignment="center" spacing="10" styleClass="stat-box">
-            <Label styleClass="stat-title" text="Total des partenaires" />
+            <Label styleClass="stat-title" text="Total des Partenaires" />
             <Label fx:id="totalPartnersLabel" styleClass="stat-value" text="0" />
          </VBox>
       </HBox>

@@ -16,8 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
-public class MiseAJourPartenaireController implements Initializable {
-
+public class SuppressionPartenaireController implements Initializable {
     @FXML
     private ComboBox provinceComboBox;
     @FXML
@@ -35,43 +34,22 @@ public class MiseAJourPartenaireController implements Initializable {
     @FXML
     private TextField emailField;
     @FXML
-    private Button btnUpdate;
+    private Button btnSuppression;
     @FXML
     private Button btnCancel;
 
     private Partenaire partenaire;
 
-    public MiseAJourPartenaireController(Partenaire partenaire) {
-        this.partenaire = partenaire;
-    }
-
-    public void setPartenaire(Partenaire partenaire) {
+    public SuppressionPartenaireController(Partenaire partenaire) {
         this.partenaire = partenaire;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        btnUpdate.setOnAction(event -> actionBtnUpdate());
+        btnSuppression.setOnAction(event -> actionBtnSuppression());
         btnCancel.setOnAction(event -> actionBtnCancel());
         remplirTextFields();
-    }
-
-    private void remplirTextFields() {
-        if (partenaire != null) {
-            nomField.setText(partenaire.getNom());
-
-            Adresse adresse = partenaire.getAdresseObj(); // Get the Adresse object
-
-            if (adresse != null) {
-                numeroCiviqueField.setText(adresse.getNumeroCivique());
-                rueField.setText(adresse.getRue());
-                villeField.setText(adresse.getVille());
-                codePostalField.setText(adresse.getCodePostal());
-                provinceComboBox.setValue(adresse.getProvince());
-            }
-            telephoneField.setText(partenaire.getTelephone());
-            emailField.setText(partenaire.getCourriel());
-        }
+        setFieldsReadOnly();
     }
 
     public Map<String, String> retrieveInfos() {
@@ -134,20 +112,54 @@ public class MiseAJourPartenaireController implements Initializable {
         partnerInfo.put("telephone", telephone);
         partnerInfo.put("email", email);
 
-        Stage stage = (Stage) btnUpdate.getScene().getWindow();
-        stage.close();
+       // Stage stage = (Stage) btnSuppression.getScene().getWindow();
+       // stage.close();
 
         return partnerInfo;
     }
 
-    private void actionBtnUpdate(){
+    private void actionBtnSuppression() {
         Map<String , String> infos = retrieveInfos();
-        if (infos != null) {
-            if(DBUtils.updatePartner(infos)){
-                String message = "Les informations ont été mises à jour pour "+ infos.get("nom");
-                Dialogs.showMessageDialog(message,"MISE À JOUR RÉUSSIE - F4 SANTÉ INC");
+        if(infos != null) {
+            String message = "Vous êtes sur le point de supprimer " + infos.get("nom") +". Voulez-vous continuer?";
+            if(Dialogs.showConfirmDialog(message,"CONFIRMATION SUPPRESSION - F4 SANTÉ INC")){
+                if(DBUtils.deletePartner(infos)){
+                    String messageConfirmation = infos.get("nom") + " a bel et bien été supprimé.";
+                    Dialogs.showMessageDialog(messageConfirmation, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC");
+                    Stage stage = (Stage) btnSuppression.getScene().getWindow();
+                    stage.close();
+                }
             }
         }
+    }
+
+    private void remplirTextFields() {
+        if (partenaire != null) {
+            nomField.setText(partenaire.getNom());
+
+            Adresse adresse = partenaire.getAdresseObj(); // Get the Adresse object
+
+            if (adresse != null) {
+                numeroCiviqueField.setText(adresse.getNumeroCivique());
+                rueField.setText(adresse.getRue());
+                villeField.setText(adresse.getVille());
+                codePostalField.setText(adresse.getCodePostal());
+                provinceComboBox.setValue(adresse.getProvince());
+            }
+            telephoneField.setText(partenaire.getTelephone());
+            emailField.setText(partenaire.getCourriel());
+        }
+    }
+
+    private void setFieldsReadOnly() {
+        nomField.setEditable(false);
+        numeroCiviqueField.setEditable(false);
+        rueField.setEditable(false);
+        villeField.setEditable(false);
+        codePostalField.setEditable(false);
+        telephoneField.setEditable(false);
+        emailField.setEditable(false);
+        provinceComboBox.setDisable(true);
     }
 
     private void actionBtnCancel(){
