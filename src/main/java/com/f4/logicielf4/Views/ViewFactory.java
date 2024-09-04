@@ -1,6 +1,8 @@
 package com.f4.logicielf4.Views;
 
 import com.f4.logicielf4.Controllers.Admin.AdminController;
+import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.MiseAJourPartenaireController;
+import com.f4.logicielf4.Models.Partenaire;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXMLLoader;
@@ -33,7 +35,7 @@ public class ViewFactory {
     public AnchorPane getAdminDashboardView(){
         if(dashboardView == null){
             try{
-                dashboardView = new FXMLLoader(getClass().getResource("/Fxml/Admin/Dashboard.fxml")).load();
+                dashboardView = new FXMLLoader(getClass().getResource("/Fxml/Admin/TableauDeBord/Dashboard.fxml")).load();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -44,7 +46,7 @@ public class ViewFactory {
     public AnchorPane getFacturesView(){
         if(facturesView == null ){
             try{
-                facturesView = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFactures.fxml")).load();
+                facturesView = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/GestionFactures.fxml")).load();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -52,10 +54,17 @@ public class ViewFactory {
         return facturesView;
     }
 
+    public void showUpdatePartnerWindow(Stage stage, Partenaire partenaire){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionPartenaire/MiseAJourPartenaire.fxml"));
+       MiseAJourPartenaireController controller = new MiseAJourPartenaireController(partenaire);
+       loader.setController(controller);
+        createStageShowAndWait(loader,stage,"MISE A JOUR INFORMATIONS PARTENAIRE");
+    }
+
     public AnchorPane getEmployesView(){
         if(employesView == null ){
             try{
-                employesView= new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionEmployes.fxml")).load();
+                employesView= new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionEmploye/GestionEmployes.fxml")).load();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -66,7 +75,7 @@ public class ViewFactory {
     public AnchorPane getPartenairesView() {
         if(partenairesView == null ){
             try{
-                partenairesView= new FXMLLoader(getClass().getResource("/Fxml/Admin/Gestionpartenaires.fxml")).load();
+                partenairesView= new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionPartenaire/GestionPartenaires.fxml")).load();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -77,7 +86,7 @@ public class ViewFactory {
     public AnchorPane getProfilView() {
         if(profilView == null ){
             try{
-                profilView= new FXMLLoader(getClass().getResource("/Fxml/Admin/Profil.fxml")).load();
+                profilView= new FXMLLoader(getClass().getResource("/Fxml/Admin/Profil/Profil.fxml")).load();
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -115,11 +124,11 @@ public class ViewFactory {
     }
 
     public void showAddPartnerWindow(Stage stage) {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/AjouterPartenaire.fxml"));
-        createStageAdd(loader,stage,"Ajouter un Partenaire - F4 SANTÉ INC");
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionPartenaire/AjouterPartenaire.fxml"));
+        createStageShowAndWait(loader,stage,"Ajouter un Partenaire - F4 SANTÉ INC");
     }
 
-    private void createStageAdd(FXMLLoader loader, Stage originalStage, String titre) {
+    private void createStageShowAndWait(FXMLLoader loader, Stage originalStage, String titre) {
         try {
             Parent root = loader.load();
             Stage stage = new Stage();

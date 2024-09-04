@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: "Lato", sans-serif;
+    -fx-background-color: #f0f2f5; /* Light gray background */
+}
+
+/* Main Title */
+.main-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #004d40; /* Dark teal color */
+    -fx-padding: 10px 0;
+}
+
+/* Label Styles */
+.details-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #004d40; /* Dark teal color */
+}
+
+/* TextField Styles */
+.details-textfield {
+    -fx-pref-height: 36px;
+    -fx-pref-width: 400px;
+    -fx-background-color: white;
+    -fx-border-color: #004d40; /* Dark teal border */
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-text-fill: #004d40;
+}
+
+/* ComboBox Styles */
+.details-combobox {
+    -fx-pref-height: 34px;
+    -fx-background-color: white;
+    -fx-border-color: #004d40; /* Dark teal border */
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-text-fill: #004d40;
+}
+
+/* Buttons Container */
+.buttons-container {
+    -fx-alignment: center;
+}
+
+/* Button Styles */
+.action-button {
+    -fx-background-color: #004d40; /* Dark teal background */
+    -fx-text-fill: white; /* White text */
+    -fx-font-size: 18px;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+/* Hover Effect for Buttons */
+.action-button:hover {
+    -fx-background-color: #00332b; /* Darker teal for hover effect */
+}
+
+/* Divider Line */
+.divider-line {
+    -fx-stroke: #004d40; /* Dark teal color */
+    -fx-stroke-width: 2;
+}

@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../Styles/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenairesController">
+<AnchorPane prefHeight="750.0" prefWidth="1000.0" stylesheets="@../../../Styles/GestionPartenaire/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
    <children>
       <!-- Main Title -->
       <Label layoutX="352.0" layoutY="24.0" styleClass="main-title" text="Gestion des Partenaires" />
@@ -36,17 +36,18 @@
       </HBox>
 
       <!-- Partners Table -->
-      <TableView fx:id="partnersTable" layoutX="20.0" layoutY="200.0" prefHeight="206.0" prefWidth="962.0" styleClass="partners-table">
+      <TableView fx:id="partnersTable" layoutX="20.0" layoutY="200.0" prefHeight="216.0" prefWidth="960.0" styleClass="partners-table" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="200.0">
          <columns>
-            <TableColumn fx:id="nameColumn" prefWidth="180.0" text="Nom" />
-            <TableColumn fx:id="addressColumn" prefWidth="400.0" text="Adresse" />
-            <TableColumn fx:id="phoneColumn" prefWidth="150.0" text="Téléphone" />
-            <TableColumn fx:id="emailColumn" prefWidth="210.0" text="Email" />
+            <TableColumn fx:id="nameColumn" prefWidth="132.0" text="Nom" />
+            <TableColumn fx:id="addressColumn" prefWidth="380.8000183105469" text="Adresse" />
+            <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />
+            <TableColumn fx:id="emailColumn" prefWidth="192.800048828125" text="Email" />
+            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statuts" />
          </columns>
       </TableView>
 
       <!-- Partner Details -->
-      <VBox layoutX="20.0" layoutY="426.0" prefHeight="170.0" prefWidth="419.0" spacing="20" styleClass="details-container">
+      <VBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="462.0" spacing="20" styleClass="details-container">
          <Label styleClass="details-title" text="Détails du partenaire sélectionné" />
          <GridPane alignment="CENTER_LEFT" hgap="20" vgap="10">
             <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />

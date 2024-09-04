@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../../Styles/AjouterPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.AjouterPartenaireController">
+<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionPartenaire/AjouterPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.AjouterPartenaireController">
     <children>
         <!-- Title -->
         <Label layoutX="220.0" layoutY="20.0" styleClass="main-title" text="Ajouter un partenaire" />

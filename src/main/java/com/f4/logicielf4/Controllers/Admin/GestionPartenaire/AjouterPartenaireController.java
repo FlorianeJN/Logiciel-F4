@@ -1,9 +1,9 @@
-package com.f4.logicielf4.Controllers.Admin;
+package com.f4.logicielf4.Controllers.Admin.GestionPartenaire;
 
 import com.f4.logicielf4.Utilitaire.DBUtils;
+import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
@@ -41,7 +41,6 @@ public class AjouterPartenaireController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Setup event handlers for buttons
         mettreAJourLabels();
-        mettreAJourTableau();
         btnAjouter.setOnAction(event -> actionBtnAjouter());
         btnAnnuler.setOnAction(event -> actionBtnAnnuler());
     }
@@ -50,9 +49,6 @@ public class AjouterPartenaireController implements Initializable {
 
     }
 
-    private void mettreAJourTableau() {
-
-    }
 
     private void actionBtnAjouter(){
         // Handle the "Ajouter" button action here
@@ -63,11 +59,9 @@ public class AjouterPartenaireController implements Initializable {
 
         if(partnerInfo != null) {
             if(DBUtils.addPartner(partnerInfo)){
-                showMessageDialog("Le partenaire a été ajouté avec succès!","AJOUT PARTENAIRE TERMINÉ");
+                Dialogs.showMessageDialog("Le partenaire a été ajouté avec succès!","AJOUT PARTENAIRE TERMINÉ");
                 System.out.println("returned true (addPartner)");
             }
-        } else {
-            //on a pas obtenu les infos
         }
     }
 
@@ -93,13 +87,13 @@ public class AjouterPartenaireController implements Initializable {
         try {
             numeroCivique = Integer.parseInt(numeroCiviqueStr);
         } catch (NumberFormatException e) {
-            showMessageDialog("Le numéro civique doit être un nombre!", "ERREUR NUMERO CIVIQUE");
+            Dialogs.showMessageDialog("Le numéro civique doit être un nombre!", "ERREUR NUMERO CIVIQUE");
             valid = false;
         }
 
         // Validate telephone number
         if (telephone == null || !telephone.matches("\\d{10}")) {
-            showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
+            Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
             valid = false;
         }
 
@@ -112,7 +106,7 @@ public class AjouterPartenaireController implements Initializable {
                 codePostal == null || codePostal.isEmpty() ||
                 telephone == null || telephone.isEmpty() ||
                 email == null || email.isEmpty()) {
-            showMessageDialog("Veuillez remplir tous les champs", "ERREUR REMPLISSAGE DES CHAMPS");
+            Dialogs.showMessageDialog("Veuillez remplir tous les champs", "ERREUR REMPLISSAGE DES CHAMPS");
             valid = false;
         }
 
@@ -139,13 +133,7 @@ public class AjouterPartenaireController implements Initializable {
         return null;
     }
 
-    private void showMessageDialog(String message,String titre) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titre);
-        alert.setHeaderText(null); // No header
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+
 
     private void reinitialiserChamps(){
         nomField.setText("");
@@ -159,7 +147,6 @@ public class AjouterPartenaireController implements Initializable {
     }
 
     private void actionBtnAnnuler(){
-        // Handle the "Annuler" button action here
         Stage stage = (Stage) btnAnnuler.getScene().getWindow();
         stage.close();
     }

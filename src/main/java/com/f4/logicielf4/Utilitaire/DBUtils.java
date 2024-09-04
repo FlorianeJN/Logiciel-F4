@@ -33,7 +33,7 @@ public class DBUtils {
             try (ResultSet resultSet = psLogin.executeQuery()) {
                 if (!resultSet.isBeforeFirst()) {
                     // User does not exist
-                   showAlert(Alert.AlertType.INFORMATION, "L'utilisateur n'existe pas. Contactez l'admin pour le rajouter!");
+                    Dialogs.showMessageDialog("L'utilisateur n'existe pas. Contactez l'admin pour le rajouter!","ERREUR UTILISATEUR - F4 SANTÉ INC");
                 } else {
                     String retrievedPassword = null;
                     while (resultSet.next()) {
@@ -45,8 +45,8 @@ public class DBUtils {
                             // Successful login
                             loggedIn = true;
                         } else {
-                            // Incorrect password
-                            showAlert(Alert.AlertType.INFORMATION, "Mot de passe incorrect!");
+                            //Incorrect password
+                            Dialogs.showMessageDialog("Mot de passe incorrect!","ERREUR MOT DE PASSE - F4 SANTÉ INC");
                         }
                     } else {
                         System.err.println("Password is null (Did not get retrieved)");
@@ -59,11 +59,7 @@ public class DBUtils {
         return loggedIn;
     }
 
-    private static void showAlert(Alert.AlertType alertType, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setContentText(message);
-        alert.show();
-    }
+
 
     public static List<Partenaire> fetchAllPartners() {
         List<Partenaire> partners = new ArrayList<>();
@@ -83,8 +79,9 @@ public class DBUtils {
                 String codePostal = rs.getString("code_postal");
                 String telephone = rs.getString("telephone");
                 String courriel = rs.getString("courriel");
+                String status = rs.getString("status");
 
-                Partenaire partner = new Partenaire(nom, numeroCivique, rue, ville, province, codePostal, telephone, courriel);
+                Partenaire partner = new Partenaire(nom, numeroCivique, rue, ville, province, codePostal, telephone, courriel,status);
                 partners.add(partner);
             }
 
@@ -96,8 +93,8 @@ public class DBUtils {
     }
 
     public static boolean addPartner(Map<String, String> partnerInfo) {
-        String query = "INSERT INTO partenaire (nom, numero_civique, rue, ville, province, code_postal, telephone, courriel) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO partenaire (nom, numero_civique, rue, ville, province, code_postal, telephone, courriel,status) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -111,6 +108,7 @@ public class DBUtils {
             preparedStatement.setString(6, partnerInfo.get("codePostal"));
             preparedStatement.setString(7, partnerInfo.get("telephone"));
             preparedStatement.setString(8, partnerInfo.get("email"));
+            preparedStatement.setString(9, "actif");
 
             // Execute the insert
             int rowsAffected = preparedStatement.executeUpdate();
@@ -124,8 +122,41 @@ public class DBUtils {
     }
 
 
-    public static boolean updatePartner(){
-        return false;
+    public static boolean updatePartner(Map<String, String> partnerInfo) {
+        String query = "UPDATE partenaire SET "
+                + "numero_civique = ?, "
+                + "rue = ?, "
+                + "ville = ?, "
+                + "province = ?, "
+                + "code_postal = ?, "
+                + "telephone = ?, "
+                + "courriel = ?, "
+                + "status = ? "
+                + "WHERE nom = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            // Set parameters
+            preparedStatement.setString(1, partnerInfo.get("numeroCivique"));
+            preparedStatement.setString(2, partnerInfo.get("rue"));
+            preparedStatement.setString(3, partnerInfo.get("ville"));
+            preparedStatement.setString(4, partnerInfo.get("province"));
+            preparedStatement.setString(5, partnerInfo.get("codePostal"));
+            preparedStatement.setString(6, partnerInfo.get("telephone"));
+            preparedStatement.setString(7, partnerInfo.get("email"));
+            preparedStatement.setString(8, "actif");
+            preparedStatement.setString(9, partnerInfo.get("nom")); // The record to be updated
+
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Return true if at least one row was updated
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Log or handle the exception as needed
+            return false; // Return false if there was an error
+        }
     }
 
     public static boolean deletePartner(){

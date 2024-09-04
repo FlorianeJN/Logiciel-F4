@@ -1,8 +1,9 @@
-package com.f4.logicielf4.Controllers.Admin;
+package com.f4.logicielf4.Controllers.Admin.GestionPartenaire;
 
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Partenaire;
 import com.f4.logicielf4.Utilitaire.DBUtils;
+import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -30,6 +31,8 @@ public class GestionPartenairesController implements Initializable {
     private TableColumn phoneColumn;
     @FXML
     private TableColumn emailColumn;
+    @FXML
+    private TableColumn statusColumn;
     @FXML
     private TextField nameField;
     @FXML
@@ -60,6 +63,7 @@ public class GestionPartenairesController implements Initializable {
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("adresse"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("telephone"));
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("courriel"));
+        statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
 
     private void actionBtnAjouter(){
@@ -76,6 +80,15 @@ public class GestionPartenairesController implements Initializable {
 
     private void actionBtnMAJ(){
         System.out.println("Bouton MAJ appuyé");
+        Partenaire partenaireSelectionné = (Partenaire) partnersTable.getSelectionModel().getSelectedItem();
+        if(partenaireSelectionné == null){
+            Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de mise à jour.","ERREUR MAJ");
+        }
+        else{
+            Stage stage = (Stage) btnMAJ.getScene().getWindow();
+            Model.getInstance().getViewFactory().showUpdatePartnerWindow(stage,partenaireSelectionné);
+            updateTable();
+        }
     }
 
     private void actionBtnSupprimer(){
