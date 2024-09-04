@@ -4,12 +4,8 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
@@ -46,34 +42,17 @@
          </columns>
       </TableView>
 
-      <!-- Partner Details -->
-      <VBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="462.0" spacing="20" styleClass="details-container">
-         <Label styleClass="details-title" text="Détails du partenaire sélectionné" />
-         <GridPane alignment="CENTER_LEFT" hgap="20" vgap="10">
-            <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <TextField fx:id="nameField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-            <Label styleClass="details-label" text="Adresse:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <TextField fx:id="addressField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-            <Label styleClass="details-label" text="Téléphone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <TextField fx:id="phoneField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-            <Label styleClass="details-label" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <TextField fx:id="emailField" prefWidth="300.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-            <columnConstraints>
-               <ColumnConstraints minWidth="100.0" />
-               <ColumnConstraints minWidth="300.0" />
-            </columnConstraints>
-            <rowConstraints>
-               <RowConstraints minHeight="30.0" />
-               <RowConstraints minHeight="30.0" />
-               <RowConstraints minHeight="30.0" />
-               <RowConstraints minHeight="30.0" />
-            </rowConstraints>
-         </GridPane>
-      </VBox>
+      <!-- Graphiques Section -->
+      <HBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="960.0" spacing="40">
+         <VBox fx:id="quartsGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
+            <Label styleClass="chart-title" text="Graphique de répartition de quarts" />
+            <!-- Ajouter un PieChart ou BarChart ici via le contrôleur -->
+         </VBox>
+         <VBox fx:id="revenuGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
+            <Label styleClass="chart-title" text="Graphique de répartition de revenus" />
+            <!-- Ajouter un BarChart ou LineChart ici via le contrôleur -->
+         </VBox>
+      </HBox>
 
       <!-- Buttons for Adding, Updating, and Deleting Partners -->
       <HBox layoutX="121.0" layoutY="687.0" spacing="20" styleClass="buttons-container">

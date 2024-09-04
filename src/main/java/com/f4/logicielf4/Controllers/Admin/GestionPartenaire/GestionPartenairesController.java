@@ -6,8 +6,10 @@ import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -68,6 +70,12 @@ public class GestionPartenairesController implements Initializable {
     @FXML
     private Button btnSupprimer;
 
+    @FXML
+    private VBox quartsGraphBox;
+
+    @FXML
+    private VBox revenuGraphBox;
+
     /**
      * Initialise le contrôleur. Définit les actions des boutons, les valeurs des cellules et met à jour le tableau et les étiquettes.
      *
@@ -82,6 +90,31 @@ public class GestionPartenairesController implements Initializable {
         setCellValues();
         updateTable();
         updateLabels();
+        setupQuartsPieChart();      //MÉTHODE À MODIFIER À LA FIN
+        setupRevenuBarChart();      //MÉTHODE À MODIFIER À LA FIN
+    }
+
+    private void setupQuartsPieChart() {
+        PieChart pieChart = new PieChart();
+        pieChart.getData().add(new PieChart.Data("Employeur 1", 45));
+        pieChart.getData().add(new PieChart.Data("Employeur 2", 30));
+        pieChart.getData().add(new PieChart.Data("Employeur 3", 25));
+        quartsGraphBox.getChildren().add(pieChart);
+    }
+
+    private void setupRevenuBarChart() {
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+
+        XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
+        dataSeries.setName("Revenu 2024");
+        dataSeries.getData().add(new XYChart.Data<>("Employeur 1", 25000));
+        dataSeries.getData().add(new XYChart.Data<>("Employeur 2", 15000));
+        dataSeries.getData().add(new XYChart.Data<>("Employeur 3", 10000));
+
+        barChart.getData().add(dataSeries);
+        revenuGraphBox.getChildren().add(barChart);
     }
 
     /**
