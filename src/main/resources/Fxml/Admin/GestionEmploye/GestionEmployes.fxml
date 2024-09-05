@@ -1,12 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1065.0" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployésController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionEmploye/AdminGestionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployesController">
    <children>
-      <Label layoutX="442.0" layoutY="22.0" text="Gestion des employés" />
-      <Line endX="750.0" layoutX="193.0" layoutY="58.0" startX="-100.0" />
+      <!-- Main Title -->
+      <Label layoutX="352.0" layoutY="24.0" styleClass="main-title" text="Gestion des Employés" />
+      <Line endX="960.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+
+      <!-- Stats Info -->
+      <HBox layoutX="30.0" layoutY="80.0" spacing="40">
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Employés Actifs" />
+            <Label fx:id="activeEmployeesLabel" styleClass="stat-value" text="0" />
+         </VBox>
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Employés Inactifs" />
+            <Label fx:id="inactiveEmployeesLabel" styleClass="stat-value" text="0" />
+         </VBox>
+         <VBox alignment="center" spacing="10" styleClass="stat-box">
+            <Label styleClass="stat-title" text="Total des Employés" />
+            <Label fx:id="totalEmployeesLabel" styleClass="stat-value" text="0" />
+         </VBox>
+      </HBox>
+
+      <!-- Employees Table -->
+      <TableView fx:id="employeesTable" layoutX="20.0" layoutY="200.0" prefHeight="216.0" prefWidth="960.0" styleClass="employees-table" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="200.0">
+         <columns>
+            <TableColumn fx:id="idColumn" prefWidth="132.0" text="ID" />
+            <TableColumn fx:id="nomColumn" prefWidth="200.0" text="Nom" />
+            <TableColumn fx:id="prenomColumn" prefWidth="200.0" text="Prénom" />
+            <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />
+            <TableColumn fx:id="emailColumn" prefWidth="192.800048828125" text="Email" />
+            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statuts" />
+         </columns>
+      </TableView>
+
+      <!-- Graphiques Section -->
+      <HBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="960.0" spacing="40">
+         <VBox fx:id="departmentGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
+            <Label styleClass="chart-title" text="Répartition des quarts" />
+            <!-- Ajouter un PieChart ou BarChart ici via le contrôleur -->
+         </VBox>
+         <VBox fx:id="positionGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
+            <Label styleClass="chart-title" text="Répartition des revenus" />
+            <!-- Ajouter un BarChart ou LineChart ici via le contrôleur -->
+         </VBox>
+      </HBox>
+
+      <!-- Buttons for Adding, Updating, and Deleting Employees -->
+      <HBox layoutX="121.0" layoutY="687.0" spacing="20" styleClass="buttons-container">
+         <Button fx:id="btnAjouter" prefWidth="200.0" styleClass="action-button" text="Ajouter un employé">
+            <tooltip>
+               <Tooltip text="Cliquez pour ajouter un nouvel employé" />
+            </tooltip>
+         </Button>
+         <Button fx:id="btnMAJ" prefWidth="300.0" styleClass="action-button" text="Mettre à jour les informations">
+            <tooltip>
+               <Tooltip text="Cliquez pour mettre à jour les informations de l'employé sélectionné" />
+            </tooltip>
+         </Button>
+         <Button fx:id="btnSupprimer" prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Supprimer un employé">
+            <tooltip>
+               <Tooltip text="Cliquez pour supprimer l'employé sélectionné" />
+            </tooltip>
+         </Button>
+      </HBox>
    </children>
 </AnchorPane>

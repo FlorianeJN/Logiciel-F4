@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<AnchorPane prefHeight="400.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionEmploye/AjouterEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <!-- Title -->
+        <Label layoutX="220.0" layoutY="20.0" styleClass="main-title" text="Ajouter un employé" />
+
+        <!-- Form for entering employee details -->
+        <GridPane hgap="20" layoutX="40.0" layoutY="80.0" vgap="20"> <!-- Increased vertical gap -->
+            <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="nomField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="details-label" text="Prénom:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="prenomField" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="details-label" text="Téléphone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="telephoneField" prefWidth="391.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label styleClass="details-label" text="Courriel:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="emailField" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <columnConstraints>
+                <ColumnConstraints minWidth="120.0" prefWidth="150.0" />
+                <ColumnConstraints minWidth="350.0" prefWidth="450.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+            </rowConstraints>
+        </GridPane>
+
+        <!-- Buttons for submitting or canceling -->
+        <HBox layoutX="218.0" layoutY="320.0" prefHeight="40.0" prefWidth="263.0" spacing="50" styleClass="buttons-container">
+            <Button fx:id="btnAjouter" styleClass="action-button" text="Ajouter" />
+            <Button fx:id="btnAnnuler" styleClass="action-button" text="Annuler" />
+        </HBox>
+    </children>
+</AnchorPane>

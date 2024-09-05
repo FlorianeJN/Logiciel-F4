@@ -3,6 +3,7 @@ module com.f4.logicielf4 {
     requires javafx.fxml;
     requires de.jensd.fx.glyphs.fontawesome;
     requires java.sql;
+    requires java.desktop;
 
     opens com.f4.logicielf4.Controllers to javafx.fxml;
     opens com.f4.logicielf4.Controllers.Admin to javafx.fxml;

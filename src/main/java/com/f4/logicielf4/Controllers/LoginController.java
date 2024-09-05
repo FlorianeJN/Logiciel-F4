@@ -55,7 +55,7 @@ public class LoginController implements Initializable {
 
         if (DBUtils.loginUser(username, password)) {
             Stage stage = (Stage) loginButton.getScene().getWindow();
-            Model.getInstance().getViewFactory().closeStage(stage);
+            stage.close();
             Model.getInstance().getViewFactory().showAdminWindow();
         } else {
             clearFields();

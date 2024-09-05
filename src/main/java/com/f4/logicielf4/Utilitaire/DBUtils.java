@@ -1,5 +1,6 @@
 package com.f4.logicielf4.Utilitaire;
 
+import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Models.Partenaire;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -206,4 +207,136 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Fetches all employees from the database.
+     *
+     * @return A list of all employees.
+     */
+    public static List<Employe> fetchAllEmployees() {
+        List<Employe> employes = new ArrayList<>();
+        String query = "SELECT * FROM employes"; // Ensure the table name matches
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query);
+             ResultSet rs = psFetch.executeQuery()) {
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String nom = rs.getString("nom");
+                String prenom = rs.getString("prenom");
+                String telephone = rs.getString("telephone");
+                String email = rs.getString("email");
+                String statut = rs.getString("statut");
+
+                Employe employe = new Employe(id, nom, prenom, telephone, email, statut);
+                employes.add(employe);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return employes;
+    }
+
+    public static boolean addEmployee(Map<String, String> employeeInfo) {
+        String query = "INSERT INTO employes (nom, prenom, telephone, email, statut) "
+                + "VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            // Set parameters from the employeeInfo map
+            preparedStatement.setString(1, employeeInfo.get("nom"));
+            preparedStatement.setString(2, employeeInfo.get("prenom"));
+            preparedStatement.setString(3, employeeInfo.get("telephone"));
+            preparedStatement.setString(4, employeeInfo.get("email"));
+            preparedStatement.setString(5, "Actif"); // Default to 'Actif'
+
+            // Execute the insertion
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Returns true if at least one row has been inserted
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean updateEmploye(Map<String, String> employeeInfo) {
+        // First, retrieve the current status of the employee
+        String currentStatut = null;
+        String selectQuery = "SELECT statut FROM employes WHERE id = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement selectStatement = connection.prepareStatement(selectQuery)) {
+
+            selectStatement.setInt(1, Integer.parseInt(employeeInfo.get("id")));
+            ResultSet resultSet = selectStatement.executeQuery();
+
+            if (resultSet.next()) {
+                currentStatut = resultSet.getString("statut");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        // Now, construct the update query without changing the statut
+        String updateQuery = "UPDATE employes SET "
+                + "nom = ?, "
+                + "prenom = ?, "
+                + "telephone = ?, "
+                + "email = ?, "
+                + "statut = ? " // Use the current status
+                + "WHERE id = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+
+            // Set parameters from the employeeInfo map
+            preparedStatement.setString(1, employeeInfo.get("nom"));
+            preparedStatement.setString(2, employeeInfo.get("prenom"));
+            preparedStatement.setString(3, employeeInfo.get("telephone"));
+            preparedStatement.setString(4, employeeInfo.get("email"));
+            preparedStatement.setString(5, currentStatut); // Use the current statut
+            preparedStatement.setInt(6, Integer.parseInt(employeeInfo.get("id"))); // The record to update by ID
+
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Returns true if at least one row has been updated
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public static boolean deleteEmploye(Map<String, String> employeeInfo) {
+        String query = "UPDATE employes SET statut = ? WHERE id = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            // Set the status to "Inactif"
+            preparedStatement.setString(1, "Inactif");
+            preparedStatement.setInt(2, Integer.parseInt(employeeInfo.get("id"))); // Assuming ID is provided in the map
+
+            // Execute the update
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            return rowsAffected > 0; // Returns true if at least one row has been updated
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }
+
+

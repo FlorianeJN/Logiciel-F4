@@ -1,8 +1,12 @@
 package com.f4.logicielf4.Views;
 
 import com.f4.logicielf4.Controllers.Admin.AdminController;
+import com.f4.logicielf4.Controllers.Admin.GestionEmploye.AjouterEmployeController;
+import com.f4.logicielf4.Controllers.Admin.GestionEmploye.MiseAJourEmployeController;
+import com.f4.logicielf4.Controllers.Admin.GestionEmploye.SuppressionEmployeController;
 import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.MiseAJourPartenaireController;
 import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.SuppressionPartenaireController;
+import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Models.Partenaire;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -59,6 +63,13 @@ public class ViewFactory {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionPartenaire/MiseAJourPartenaire.fxml"));
        MiseAJourPartenaireController controller = new MiseAJourPartenaireController(partenaire);
        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"MISE A JOUR INFORMATIONS PARTENAIRE");
+    }
+
+    public void showUpdateEmployeeWindow(Stage stage, Employe employe){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionEmploye/MiseAJourEmploye.fxml"));
+        MiseAJourEmployeController controller = new MiseAJourEmployeController(employe);
+        loader.setController(controller);
         createStageShowAndWait(loader,stage,"MISE A JOUR INFORMATIONS PARTENAIRE");
     }
 
@@ -129,6 +140,13 @@ public class ViewFactory {
         createStageShowAndWait(loader,stage,"Ajouter un Partenaire - F4 SANTÉ INC");
     }
 
+    public void showAddEmployeeWindow(Stage stage) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionEmploye/AjouterEmploye.fxml"));
+        AjouterEmployeController controller = new AjouterEmployeController();
+        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"Ajouter un Employé - F4 SANTÉ INC");
+    }
+
     private void createStageShowAndWait(FXMLLoader loader, Stage originalStage, String titre) {
         try {
             Parent root = loader.load();
@@ -152,12 +170,17 @@ public class ViewFactory {
         createStageShowAndWait(loader,stage,"Supprimer un partenaire - F4 SANTÉ INC");
     }
 
+    public void showDeleteEmployeeWindow(Stage stage, Employe employe){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionEmploye/SuppressionEmploye.fxml"));
+        SuppressionEmployeController controller = new SuppressionEmployeController(employe);
+        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"Supprimer un employé - F4 SANTÉ INC");
+    }
+
+
     private void rajouterImage(Stage stage) {
         Image icon = new Image(getClass().getResourceAsStream("/Images/logo.jpg"));
         stage.getIcons().add(icon);
-    }
-    public void closeStage(Stage stage){
-        stage.close();
     }
 
 }

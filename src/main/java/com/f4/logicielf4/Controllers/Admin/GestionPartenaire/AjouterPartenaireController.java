@@ -39,16 +39,9 @@ public class AjouterPartenaireController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        // Setup event handlers for buttons
-        mettreAJourLabels();
         btnAjouter.setOnAction(event -> actionBtnAjouter());
         btnAnnuler.setOnAction(event -> actionBtnAnnuler());
     }
-
-    private void mettreAJourLabels() {
-
-    }
-
 
     private void actionBtnAjouter(){
         // Handle the "Ajouter" button action here
