@@ -14,6 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour l'ajout d'un nouveau partenaire.
+ * Ce contrôleur est responsable de la collecte des informations du partenaire,
+ * de la validation des informations, de l'ajout du partenaire à la base de données,
+ * et de la gestion des actions d'ajout et d'annulation.
+ */
 public class AjouterPartenaireController implements Initializable {
 
     @FXML
@@ -37,27 +43,45 @@ public class AjouterPartenaireController implements Initializable {
     @FXML
     private TextField nomField;
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Initialise les actions des boutons "Ajouter" et "Annuler".
+     *
+     * @param url L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnAjouter.setOnAction(event -> actionBtnAjouter());
         btnAnnuler.setOnAction(event -> actionBtnAnnuler());
     }
 
-    private void actionBtnAjouter(){
+    /**
+     * Action déclenchée lors du clic sur le bouton "Ajouter".
+     * Récupère les informations du partenaire, valide les données,
+     * ajoute le partenaire à la base de données et affiche un message de succès.
+     */
+    private void actionBtnAjouter() {
         // Handle the "Ajouter" button action here
         System.out.println("Add Partner button clicked");
 
         // Retrieve the information
         Map<String, String> partnerInfo = retrieveInfos();
 
-        if(partnerInfo != null) {
-            if(DBUtils.addPartner(partnerInfo)){
-                Dialogs.showMessageDialog("Le partenaire a été ajouté avec succès!","AJOUT PARTENAIRE TERMINÉ");
+        if (partnerInfo != null) {
+            if (DBUtils.addPartner(partnerInfo)) {
+                Dialogs.showMessageDialog("Le partenaire a été ajouté avec succès!", "AJOUT PARTENAIRE TERMINÉ");
                 System.out.println("returned true (addPartner)");
             }
         }
     }
 
+    /**
+     * Récupère les informations du partenaire à partir des champs de texte,
+     * valide les données, et retourne les informations sous forme de carte (Map).
+     *
+     * @return Une carte contenant les informations du partenaire si la validation est réussie, sinon null.
+     */
     public Map<String, String> retrieveInfos() {
         // Initialize a map to store the retrieved information
         Map<String, String> partnerInfo = new HashMap<>();
@@ -106,7 +130,7 @@ public class AjouterPartenaireController implements Initializable {
         // If validation passes, add the retrieved values to the map
         if (valid) {
             partnerInfo.put("nom", nom);
-            partnerInfo.put("numseroCivique", String.valueOf(numeroCivique));
+            partnerInfo.put("numeroCivique", String.valueOf(numeroCivique));
             partnerInfo.put("rue", rue);
             partnerInfo.put("ville", ville);
             partnerInfo.put("province", province);
@@ -126,9 +150,10 @@ public class AjouterPartenaireController implements Initializable {
         return null;
     }
 
-
-
-    private void reinitialiserChamps(){
+    /**
+     * Réinitialise les champs de texte à leur valeur par défaut.
+     */
+    private void reinitialiserChamps() {
         nomField.setText("");
         numeroCiviqueField.setText("");
         rueField.setText("");
@@ -139,9 +164,12 @@ public class AjouterPartenaireController implements Initializable {
         emailField.setText("");
     }
 
-    private void actionBtnAnnuler(){
+    /**
+     * Action déclenchée lors du clic sur le bouton "Annuler".
+     * Ferme la fenêtre sans effectuer d'ajout.
+     */
+    private void actionBtnAnnuler() {
         Stage stage = (Stage) btnAnnuler.getScene().getWindow();
         stage.close();
     }
 }
-

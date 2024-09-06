@@ -16,10 +16,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour la mise à jour des informations d'un partenaire existant.
+ * Ce contrôleur est responsable de l'affichage des informations actuelles du partenaire,
+ * de la validation des données modifiées et de la mise à jour des informations dans la base de données.
+ */
 public class MiseAJourPartenaireController implements Initializable {
 
     @FXML
-    private ComboBox provinceComboBox;
+    private ComboBox<String> provinceComboBox;
     @FXML
     private TextField nomField;
     @FXML
@@ -41,14 +46,32 @@ public class MiseAJourPartenaireController implements Initializable {
 
     private Partenaire partenaire;
 
+    /**
+     * Constructeur pour le contrôleur de mise à jour de partenaire.
+     *
+     * @param partenaire Le partenaire à mettre à jour.
+     */
     public MiseAJourPartenaireController(Partenaire partenaire) {
         this.partenaire = partenaire;
     }
 
+    /**
+     * Définit le partenaire à mettre à jour.
+     *
+     * @param partenaire Le partenaire à mettre à jour.
+     */
     public void setPartenaire(Partenaire partenaire) {
         this.partenaire = partenaire;
     }
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Initialise les actions des boutons "Update" et "Cancel",
+     * et remplit les champs de texte avec les informations du partenaire.
+     *
+     * @param url L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnUpdate.setOnAction(event -> actionBtnUpdate());
@@ -56,11 +79,14 @@ public class MiseAJourPartenaireController implements Initializable {
         remplirTextFields();
     }
 
+    /**
+     * Remplit les champs de texte avec les informations actuelles du partenaire.
+     */
     private void remplirTextFields() {
         if (partenaire != null) {
             nomField.setText(partenaire.getNom());
 
-            Adresse adresse = partenaire.getAdresseObj(); // Get the Adresse object
+            Adresse adresse = partenaire.getAdresseObj(); // Obtient l'objet Adresse
 
             if (adresse != null) {
                 numeroCiviqueField.setText(adresse.getNumeroCivique());
@@ -74,6 +100,12 @@ public class MiseAJourPartenaireController implements Initializable {
         }
     }
 
+    /**
+     * Récupère les informations modifiées du partenaire à partir des champs de texte,
+     * valide les données, et retourne les informations sous forme de carte (Map).
+     *
+     * @return Une carte contenant les informations du partenaire modifiées si la validation est réussie, sinon null.
+     */
     public Map<String, String> retrieveInfos() {
         // Initialize a map to store the retrieved information
         Map<String, String> partnerInfo = new HashMap<>();
@@ -83,7 +115,7 @@ public class MiseAJourPartenaireController implements Initializable {
         String numeroCiviqueStr = numeroCiviqueField.getText();
         String rue = rueField.getText();
         String ville = villeField.getText();
-        String province = (String) provinceComboBox.getValue();
+        String province = provinceComboBox.getValue();
         String codePostal = codePostalField.getText();
         String telephone = telephoneField.getText();
         String email = emailField.getText();
@@ -126,7 +158,7 @@ public class MiseAJourPartenaireController implements Initializable {
 
         // If validation passes, add the retrieved values to the map
         partnerInfo.put("nom", nom);
-        partnerInfo.put("numeroCivique", String.valueOf(numeroCivique)); // Fixed key
+        partnerInfo.put("numeroCivique", String.valueOf(numeroCivique));
         partnerInfo.put("rue", rue);
         partnerInfo.put("ville", ville);
         partnerInfo.put("province", province);
@@ -140,17 +172,25 @@ public class MiseAJourPartenaireController implements Initializable {
         return partnerInfo;
     }
 
-    private void actionBtnUpdate(){
-        Map<String , String> infos = retrieveInfos();
+    /**
+     * Action déclenchée lors du clic sur le bouton "Update".
+     * Récupère les informations modifiées et met à jour les informations du partenaire dans la base de données.
+     */
+    private void actionBtnUpdate() {
+        Map<String, String> infos = retrieveInfos();
         if (infos != null) {
-            if(DBUtils.updatePartner(infos)){
-                String message = "Les informations ont été mises à jour pour "+ infos.get("nom");
-                Dialogs.showMessageDialog(message,"MISE À JOUR RÉUSSIE - F4 SANTÉ INC");
+            if (DBUtils.updatePartner(infos)) {
+                String message = "Les informations ont été mises à jour pour " + infos.get("nom");
+                Dialogs.showMessageDialog(message, "MISE À JOUR RÉUSSIE - F4 SANTÉ INC");
             }
         }
     }
 
-    private void actionBtnCancel(){
+    /**
+     * Action déclenchée lors du clic sur le bouton "Cancel".
+     * Ferme la fenêtre sans effectuer de mise à jour.
+     */
+    private void actionBtnCancel() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         stage.close();
     }

@@ -17,9 +17,9 @@ import java.util.Map;
  */
 public class DBUtils {
 
-    private static final String url = "jdbc:mysql://127.0.0.1:3306/f4santeinc";
-    private static final String user = "root";
-    private static final String pass = "!Secure!2011";
+    private static final String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5729770";
+    private static final String user = "sql5729770";
+    private static final String pass = "99BunXYQIF";
 
     /**
      * Vérifie les informations d'identification d'un utilisateur pour se connecter.

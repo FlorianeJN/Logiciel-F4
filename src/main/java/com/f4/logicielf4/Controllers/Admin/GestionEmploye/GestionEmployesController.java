@@ -17,8 +17,15 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 /**
- * Controller for the "Gestion Employés" screen for managing employees.
- * It allows adding, updating, and deleting employees.
+ * Contrôleur pour l'écran de gestion des employés ("Gestion Employés").
+ * Il permet d'ajouter, mettre à jour et supprimer des employés.
+ *
+ * Fonctionnalités principales :
+ * - Ajout d'un nouvel employé
+ * - Mise à jour d'un employé sélectionné
+ * - Suppression d'un employé sélectionné
+ * - Affichage de graphiques illustrant la répartition des employés par département et poste
+ * - Mise à jour des étiquettes concernant les employés actifs/inactifs et le nombre total d'employés
  */
 public class GestionEmployesController implements Initializable {
 
@@ -67,6 +74,10 @@ public class GestionEmployesController implements Initializable {
     @FXML
     private VBox positionGraphBox;
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Configure les actions des boutons et initialise les tableaux et graphiques.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnAjouter.setOnAction(event -> actionBtnAjouter());
@@ -79,59 +90,65 @@ public class GestionEmployesController implements Initializable {
         setupPositionChart();
     }
 
-    /*RANDOM DATA GRAPHS JUST TO SEE WHAT IT WOULD LOOK LIKE */
+    /**
+     * Configure le graphique circulaire représentant la répartition des employés par département.
+     * Données fictives utilisées pour la démonstration.
+     */
     private void setupDepartmentChart() {
-        // Create the department pie chart
+        // Créer le graphique circulaire pour les départements
         PieChart departmentChart = new PieChart();
 
-        // Sample data for departments
-        PieChart.Data slice1 = new PieChart.Data("Sales", 30);
-        PieChart.Data slice2 = new PieChart.Data("HR", 25);
+        // Données fictives pour les départements
+        PieChart.Data slice1 = new PieChart.Data("Ventes", 30);
+        PieChart.Data slice2 = new PieChart.Data("RH", 25);
         PieChart.Data slice3 = new PieChart.Data("IT", 20);
         PieChart.Data slice4 = new PieChart.Data("Finance", 15);
         PieChart.Data slice5 = new PieChart.Data("Marketing", 10);
 
-        // Add slices to the pie chart
+        // Ajouter les données au graphique
         departmentChart.getData().addAll(slice1, slice2, slice3, slice4, slice5);
 
-        // Add the pie chart to the departmentGraphBox
+        // Ajouter le graphique à la boîte correspondante
         departmentGraphBox.getChildren().add(departmentChart);
     }
 
-    /*RANDOM DATA GRAPHS JUST TO SEE WHAT IT WOULD LOOK LIKE */
+    /**
+     * Configure le graphique à barres représentant la répartition des employés par poste.
+     * Données fictives utilisées pour la démonstration.
+     */
     private void setupPositionChart() {
-        // Create the position bar chart
+        // Créer le graphique à barres pour les postes
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         BarChart<String, Number> positionChart = new BarChart<>(xAxis, yAxis);
 
-        // Configure the axes
-        xAxis.setLabel("Position");
-        yAxis.setLabel("Count");
+        // Configurer les axes
+        xAxis.setLabel("Poste");
+        yAxis.setLabel("Nombre");
 
-        // Create the data series for positions
+        // Créer la série de données pour les postes
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Positions");
+        series.setName("Postes");
 
-        // Sample data for positions
+        // Données fictives pour les postes
         series.getData().add(new XYChart.Data<>("Manager", 10));
-        series.getData().add(new XYChart.Data<>("Developer", 20));
-        series.getData().add(new XYChart.Data<>("Analyst", 15));
-        series.getData().add(new XYChart.Data<>("Intern", 5));
+        series.getData().add(new XYChart.Data<>("Développeur", 20));
+        series.getData().add(new XYChart.Data<>("Analyste", 15));
+        series.getData().add(new XYChart.Data<>("Stagiaire", 5));
 
-        // Add the series to the bar chart
         positionChart.getData().add(series);
 
-        // Add the bar chart to the positionGraphBox
         positionGraphBox.getChildren().add(positionChart);
     }
 
-
+    /**
+     * Met à jour les étiquettes affichant le nombre d'employés actifs, inactifs et total.
+     */
     private void updateLabels() {
         int employeesActifs = 0;
         int employeesInactifs = 0;
         int employeesTotal = 0;
-        List<Employe> liste = DBUtils.fetchAllEmployees(); // Assuming you have a method to fetch all employees
+        List<Employe> liste = DBUtils.fetchAllEmployees(); // Supposons qu'il existe une méthode pour récupérer tous les employés
 
         for (Employe e : liste) {
             if (e.getStatut().equals("Actif")) employeesActifs++;
@@ -144,6 +161,9 @@ public class GestionEmployesController implements Initializable {
         totalEmployeesLabel.setText(String.valueOf(employeesTotal));
     }
 
+    /**
+     * Définit les colonnes de la table avec les valeurs correspondantes des objets Employé.
+     */
     private void setCellValues() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
@@ -152,7 +172,6 @@ public class GestionEmployesController implements Initializable {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        // Optionally, add sorting by status
         statusColumn.setComparator((status1, status2) -> {
             if (status1.equals("Actif") && status2.equals("Inactif")) {
                 return -1;
@@ -162,9 +181,13 @@ public class GestionEmployesController implements Initializable {
                 return 0;
             }
         });
-        employeesTable.getSortOrder().add(statusColumn); // Ensure sorting by status
+        employeesTable.getSortOrder().add(statusColumn); // Tri par statut
     }
 
+    /**
+     * Action effectuée lors de l'appui sur le bouton "Ajouter".
+     * Ouvre la fenêtre d'ajout d'un nouvel employé.
+     */
     private void actionBtnAjouter() {
         System.out.println("Bouton ajouter appuyé");
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
@@ -173,6 +196,10 @@ public class GestionEmployesController implements Initializable {
         updateLabels();
     }
 
+    /**
+     * Met à jour la table des employés avec les données actuelles.
+     * Affiche un message d'erreur en cas de problème de mise à jour.
+     */
     private void updateTable() {
         try {
             List<Employe> employees = DBUtils.fetchAllEmployees();
@@ -183,6 +210,11 @@ public class GestionEmployesController implements Initializable {
         }
     }
 
+    /**
+     * Action effectuée lors de l'appui sur le bouton "Mise à Jour".
+     * Ouvre la fenêtre de mise à jour de l'employé sélectionné.
+     * Affiche un message d'erreur si aucun employé n'est sélectionné.
+     */
     private void actionBtnMAJ() {
         System.out.println("Bouton MAJ appuyé");
         Employe employeSelectionné = employeesTable.getSelectionModel().getSelectedItem();
@@ -196,6 +228,11 @@ public class GestionEmployesController implements Initializable {
         }
     }
 
+    /**
+     * Action effectuée lors de l'appui sur le bouton "Supprimer".
+     * Ouvre la fenêtre de suppression de l'employé sélectionné.
+     * Affiche un message d'erreur si aucun employé n'est sélectionné.
+     */
     private void actionBtnSupprimer() {
         System.out.println("Bouton Supprimer appuyé");
         Employe employeSelectionné = employeesTable.getSelectionModel().getSelectedItem();

@@ -1,5 +1,8 @@
 package com.f4.logicielf4.Models;
 
+/**
+ * Représente un partenaire (Partenaire) dans le système.
+ */
 public class Partenaire {
     private String nom;
     private Adresse adresse;
@@ -8,7 +11,19 @@ public class Partenaire {
     private String courriel;
     private String status;
 
-    // Constructor
+    /**
+     * Constructeur pour initialiser un partenaire avec ses détails.
+     *
+     * @param nom           le nom du partenaire
+     * @param numeroCivique le numéro civique de l'adresse
+     * @param rue           la rue de l'adresse
+     * @param ville         la ville de l'adresse
+     * @param province      la province de l'adresse
+     * @param codePostal    le code postal de l'adresse
+     * @param telephone     le numéro de téléphone du partenaire
+     * @param courriel      l'adresse email du partenaire
+     * @param status        le statut du partenaire
+     */
     public Partenaire(String nom, String numeroCivique, String rue, String ville, String province, String codePostal, String telephone, String courriel, String status) {
         this.nom = nom;
         this.telephone = telephone;
@@ -17,13 +32,21 @@ public class Partenaire {
         genererAdresse(numeroCivique, rue, ville, province, codePostal);
     }
 
-    // Method to generate the address string
+    /**
+     * Génère l'objet `Adresse` et la chaîne d'adresse correspondante.
+     *
+     * @param numeroCivique le numéro civique de l'adresse
+     * @param rue           la rue de l'adresse
+     * @param ville         la ville de l'adresse
+     * @param province      la province de l'adresse
+     * @param codePostal    le code postal de l'adresse
+     */
     private void genererAdresse(String numeroCivique, String rue, String ville, String province, String codePostal) {
         this.adresse = new Adresse(numeroCivique, rue, ville, province, codePostal);
         this.adresseString = adresse.genererStringAdresse();
     }
 
-    // Getters for TableView binding
+
     public String getNom() {
         return nom;
     }
@@ -36,7 +59,7 @@ public class Partenaire {
         return adresseString;
     }
 
-    public String getStatus(){
+    public String getStatus() {
         return status;
     }
 

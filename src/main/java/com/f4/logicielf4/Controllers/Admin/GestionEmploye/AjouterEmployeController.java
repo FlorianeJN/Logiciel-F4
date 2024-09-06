@@ -13,6 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour l'écran d'ajout d'un nouvel employé.
+ * Permet de saisir les informations d'un employé et de les ajouter à la base de données.
+ */
 public class AjouterEmployeController implements Initializable {
 
     @FXML
@@ -33,41 +37,56 @@ public class AjouterEmployeController implements Initializable {
     @FXML
     private Button btnAnnuler;
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Configure les actions des boutons.
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnAjouter.setOnAction(event -> actionBtnAjouter());
         btnAnnuler.setOnAction(event -> actionBtnAnnuler());
     }
 
+    /**
+     * Action effectuée lors de l'appui sur le bouton "Ajouter".
+     * Récupère les informations de l'employé, les valide, et les ajoute à la base de données si elles sont valides.
+     */
     private void actionBtnAjouter() {
         Map<String, String> employeeInfo = retrieveInfos();
 
+        // Si les informations sont valides, ajout à la base de données
         if (employeeInfo != null) {
-            if (DBUtils.addEmployee(employeeInfo)) { // Assuming you have an addEmployee method in DBUtils
+            if (DBUtils.addEmployee(employeeInfo)) { // Supposons qu'il existe une méthode addEmployee dans DBUtils
                 Dialogs.showMessageDialog("L'employé a été ajouté avec succès!", "AJOUT EMPLOYÉ TERMINÉ");
             }
         }
     }
 
+    /**
+     * Récupère les informations des champs de saisie et les valide.
+     * Si les informations sont valides, elles sont renvoyées sous forme de Map.
+     *
+     * @return Une Map contenant les informations de l'employé si la validation est réussie, sinon null.
+     */
     public Map<String, String> retrieveInfos() {
         Map<String, String> employeeInfo = new HashMap<>();
 
-        // Retrieve information from each field
+        // Récupération des informations des champs
         String nom = nomField.getText();
         String prenom = prenomField.getText();
         String telephone = telephoneField.getText();
         String email = emailField.getText();
 
-        // Initialize a flag for validation
+        // Initialisation d'un indicateur de validation
         boolean valid = true;
 
-        // Validate telephone number
+        // Validation du numéro de téléphone (doit contenir exactement 10 chiffres)
         if (telephone == null || !telephone.matches("\\d{10}")) {
-            Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
+            Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMÉRO DE TÉLÉPHONE");
             valid = false;
         }
 
-        // Check if all fields are filled
+        // Vérification que tous les champs sont remplis
         if (nom == null || nom.isEmpty() ||
                 prenom == null || prenom.isEmpty() ||
                 telephone == null || telephone.isEmpty() ||
@@ -76,25 +95,28 @@ public class AjouterEmployeController implements Initializable {
             valid = false;
         }
 
-        // If validation passes, add the retrieved values to the map
+        // Si la validation est réussie, les informations sont ajoutées à la Map
         if (valid) {
             employeeInfo.put("nom", nom);
             employeeInfo.put("prenom", prenom);
             employeeInfo.put("telephone", telephone);
             employeeInfo.put("email", email);
 
-            // Reset fields and close window
+            // Réinitialiser les champs et fermer la fenêtre
             reinitialiserChamps();
             Stage stage = (Stage) btnAjouter.getScene().getWindow();
             stage.close();
 
-            return employeeInfo; // Return the map with all the information
+            return employeeInfo; // Retourne la Map contenant les informations
         }
 
-        // If validation fails, return null to indicate failure
+        // Si la validation échoue, retourne null
         return null;
     }
 
+    /**
+     * Réinitialise les champs de saisie à leur état vide.
+     */
     private void reinitialiserChamps() {
         nomField.setText("");
         prenomField.setText("");
@@ -102,6 +124,10 @@ public class AjouterEmployeController implements Initializable {
         emailField.setText("");
     }
 
+    /**
+     * Action effectuée lors de l'appui sur le bouton "Annuler".
+     * Ferme la fenêtre sans effectuer d'action.
+     */
     private void actionBtnAnnuler() {
         Stage stage = (Stage) btnAnnuler.getScene().getWindow();
         stage.close();

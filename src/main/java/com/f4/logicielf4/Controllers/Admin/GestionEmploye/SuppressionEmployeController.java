@@ -14,7 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour la suppression des informations d'un employé.
+ * Ce contrôleur est responsable de l'affichage des informations de l'employé en mode lecture seule,
+ * de la validation des informations et de la gestion des actions de suppression et d'annulation.
+ */
 public class SuppressionEmployeController implements Initializable {
+
     @FXML
     private TextField nomField;
     @FXML
@@ -28,16 +34,29 @@ public class SuppressionEmployeController implements Initializable {
     @FXML
     private Button btnCancel;
 
-    private Employe employe; // Assuming you have an Employe model
+    private Employe employe; // Modèle Employe
     private int employeId;
 
+    /**
+     * Constructeur pour initialiser le contrôleur avec un employé spécifique.
+     *
+     * @param employe L'employé dont les informations doivent être supprimées.
+     */
     public SuppressionEmployeController(Employe employe) {
         this.employe = employe;
-        if(employe != null) {
+        if (employe != null) {
             employeId = employe.getId();
         }
     }
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Initialise les actions des boutons, remplit les champs de texte avec les informations de l'employé,
+     * et définit les champs comme en lecture seule.
+     *
+     * @param url            L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnSuppression.setOnAction(event -> actionBtnSuppression());
@@ -46,6 +65,9 @@ public class SuppressionEmployeController implements Initializable {
         setFieldsReadOnly();
     }
 
+    /**
+     * Remplit les champs de texte avec les informations de l'employé.
+     */
     private void remplirTextFields() {
         if (employe != null) {
             nomField.setText(employe.getNom());
@@ -55,6 +77,9 @@ public class SuppressionEmployeController implements Initializable {
         }
     }
 
+    /**
+     * Définit les champs de texte comme étant en lecture seule.
+     */
     private void setFieldsReadOnly() {
         nomField.setEditable(false);
         prenomField.setEditable(false);
@@ -62,12 +87,17 @@ public class SuppressionEmployeController implements Initializable {
         emailField.setEditable(false);
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton de suppression.
+     * Récupère les informations de l'employé, affiche une confirmation de suppression,
+     * et supprime l'employé de la base de données si l'utilisateur confirme la suppression.
+     */
     private void actionBtnSuppression() {
         Map<String, String> infos = retrieveInfos();
         if (infos != null) {
             String message = "Vous êtes sur le point de supprimer " + infos.get("nom") + " " + infos.get("prenom") + ". Voulez-vous continuer?";
             if (Dialogs.showConfirmDialog(message, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC")) {
-                if (DBUtils.deleteEmploye(infos)) { // Assume this method handles employee deletion
+                if (DBUtils.deleteEmploye(infos)) {
                     String messageConfirmation = infos.get("nom") + " " + infos.get("prenom") + " a été supprimé avec succès.";
                     Dialogs.showMessageDialog(messageConfirmation, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC");
                     Stage stage = (Stage) btnSuppression.getScene().getWindow();
@@ -79,6 +109,12 @@ public class SuppressionEmployeController implements Initializable {
         }
     }
 
+    /**
+     * Récupère les informations de l'employé à partir des champs de texte,
+     * et les retourne sous forme de carte (Map) après validation.
+     *
+     * @return Une carte contenant les informations de l'employé si la validation est réussie, sinon null.
+     */
     private Map<String, String> retrieveInfos() {
         Map<String, String> employeeInfo = new HashMap<>();
         String nom = nomField.getText();
@@ -101,12 +137,12 @@ public class SuppressionEmployeController implements Initializable {
         return employeeInfo;
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton d'annulation.
+     * Ferme la fenêtre sans effectuer de suppression.
+     */
     private void actionBtnCancel() {
         Stage stage = (Stage) btnCancel.getScene().getWindow();
         stage.close();
-    }
-
-    public int getEmployeId() {
-        return employeId;
     }
 }
