@@ -1,6 +1,7 @@
 package com.f4.logicielf4.Utilitaire;
 
 import com.f4.logicielf4.Models.Employe;
+import com.f4.logicielf4.Models.FactureInfo;
 import com.f4.logicielf4.Models.Partenaire;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
@@ -117,7 +118,7 @@ public class DBUtils {
 
             // Définir les paramètres
             preparedStatement.setString(1, partnerInfo.get("nom"));
-            preparedStatement.setString(2, partnerInfo.get("numseroCivique"));
+            preparedStatement.setString(2, partnerInfo.get("numeroCivique"));
             preparedStatement.setString(3, partnerInfo.get("rue"));
             preparedStatement.setString(4, partnerInfo.get("ville"));
             preparedStatement.setString(5, partnerInfo.get("province"));
@@ -335,6 +336,33 @@ public class DBUtils {
             return false;
         }
     }
+
+    public static List<FactureInfo> fetchAllFactureInfo() {
+        List<FactureInfo> factures = new ArrayList<>();
+        String query = "SELECT * FROM Info_facture";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query);
+             ResultSet rs = psFetch.executeQuery()) {
+
+            while (rs.next()) {
+                String numeroFacture = rs.getString("numero_facture");
+                String nomPartenaire = rs.getString("nom_partenaire");
+                String date = rs.getString("date");
+                String montant = rs.getString("montant");
+                String statut = rs.getString("statut");
+
+                FactureInfo facture = new FactureInfo(numeroFacture, nomPartenaire, date, montant, statut);
+                factures.add(facture);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return factures;
+    }
+
 
 
 }

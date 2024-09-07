@@ -12,7 +12,8 @@
 <AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionPartenaire/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
    <children>
       <!-- Main Title -->
-      <Label layoutX="373.0" layoutY="25.0" styleClass="main-title" text="Gestion des Partenaires" />
+      <Label layoutY="22.0" text="Gestion des Partenaires" styleClass="main-title" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" alignment="CENTER" />
+
       <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
       <!-- Stats Info -->
@@ -38,7 +39,7 @@
             <TableColumn fx:id="addressColumn" prefWidth="380.8000183105469" text="Adresse" />
             <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />
             <TableColumn fx:id="emailColumn" prefWidth="192.800048828125" text="Email" />
-            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statuts" />
+            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statut" />
          </columns>
       </TableView>
 
@@ -46,11 +47,9 @@
       <HBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="960.0" spacing="40">
          <VBox fx:id="quartsGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
             <Label styleClass="chart-title" text="Graphique de répartition de quarts" />
-            <!-- Ajouter un PieChart ou BarChart ici via le contrôleur -->
          </VBox>
          <VBox fx:id="revenuGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
             <Label styleClass="chart-title" text="Graphique de répartition de revenus" />
-            <!-- Ajouter un BarChart ou LineChart ici via le contrôleur -->
          </VBox>
       </HBox>
 

@@ -13,8 +13,9 @@
 <AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionEmploye/AdminGestionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployesController">
    <children>
       <!-- Main Title -->
-      <Label layoutX="409.0" layoutY="22.0" styleClass="main-title" text="Gestion des Employés" />
-      <Line endX="1033.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+      <Label layoutY="22.0" text="Gestion des Employés" styleClass="main-title" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" alignment="CENTER" />
+
+      <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
       <!-- Stats Info -->
       <HBox layoutX="30.0" layoutY="80.0" spacing="40">
@@ -40,7 +41,7 @@
             <TableColumn fx:id="prenomColumn" prefWidth="200.0" text="Prénom" />
             <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />
             <TableColumn fx:id="emailColumn" prefWidth="192.800048828125" text="Email" />
-            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statuts" />
+            <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statut" />
          </columns>
       </TableView>
 
@@ -48,11 +49,9 @@
       <HBox layoutX="20.0" layoutY="434.0" prefHeight="216.0" prefWidth="960.0" spacing="40">
          <VBox fx:id="departmentGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
             <Label styleClass="chart-title" text="Répartition des quarts" />
-            <!-- Ajouter un PieChart ou BarChart ici via le contrôleur -->
          </VBox>
          <VBox fx:id="positionGraphBox" prefHeight="216.0" prefWidth="462.0" styleClass="chart-container">
             <Label styleClass="chart-title" text="Répartition des revenus" />
-            <!-- Ajouter un BarChart ou LineChart ici via le contrôleur -->
          </VBox>
       </HBox>
 
