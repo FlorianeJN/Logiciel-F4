@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: "Lato", sans-serif;
+    -fx-background-color: #f0f4f8; /* Light background for contrast */
+}
+
+/* Title Styles */
+.title-label {
+    -fx-font-size: 24px; /* Larger font for emphasis */
+    -fx-font-weight: bold; /* Bold for prominence */
+    -fx-text-fill: #00796b; /* Teal color for title */
+    -fx-padding: 10; /* Padding for space around the title */
+    -fx-alignment: center; /* Center alignment */
+}
+
+/* Label Styles */
+.label {
+    -fx-font-size: 16px; /* Consistent font size */
+    -fx-text-fill: #004d40; /* Dark teal color */
+    -fx-alignment: center; /* Center align label text */
+}
+
+/* TextField Styles */
+.details-textfield {
+    -fx-pref-height: 36px;
+    -fx-background-color: white; /* White background for input */
+    -fx-border-color: #b2dfdb; /* Light teal border */
+    -fx-border-radius: 5px; /* Rounded corners */
+    -fx-padding: 5px; /* Padding inside the field */
+    -fx-text-fill: #004d40; /* Dark teal text */
+}
+
+/* ComboBox Styles */
+.details-combobox {
+    -fx-pref-height: 36px; /* Match the height of text fields */
+    -fx-background-color: white; /* White background */
+    -fx-border-color: #b2dfdb; /* Light teal border */
+    -fx-border-radius: 5px; /* Rounded corners */
+    -fx-padding: 5px; /* Padding inside the combo box */
+    -fx-text-fill: #004d40; /* Dark teal text */
+}
+
+/* Button Styles */
+.action-button {
+    -fx-background-color: #00796b; /* Teal background */
+    -fx-text-fill: white; /* White text */
+    -fx-font-size: 16px; /* Font size */
+    -fx-padding: 10px 25px; /* Padding for button */
+    -fx-background-radius: 5px; /* Rounded corners */
+    -fx-cursor: hand; /* Hand cursor on hover */
+}

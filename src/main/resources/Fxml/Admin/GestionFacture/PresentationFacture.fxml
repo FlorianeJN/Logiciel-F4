@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1245.0" stylesheets="@../../../Styles/GestionEmploye/AdminGestionEmploye.css" xmlns="http://javafx.com/javafx/22"  xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <!-- Main Title -->
+        <Label fx:id="factureLabel" alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Facture" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+
+        <Line endX="1192.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+
+        <!-- Employees Table -->
+        <TableView fx:id="employeesTable" layoutX="25.0" layoutY="112.0" prefHeight="471.0" prefWidth="1205.0" styleClass="employees-table" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="112.0">
+            <columns>
+                <TableColumn fx:id="dateColumn" prefWidth="134.4000174999237" text="Date" />
+                <TableColumn fx:id="prestationColumn" prefWidth="140.80001831054688" text="Prestation" />
+                <TableColumn fx:id="debutQuartColumn" prefWidth="136.800048828125" text="Début du quart" />
+                <TableColumn fx:id="finQuartColumn" prefWidth="142.39996337890625" text="Fin du quart" />
+                <TableColumn fx:id="pauseColumn" prefWidth="118.4000244140625" text="Pause" />
+                <TableColumn fx:id="tempsTotalColumn" prefWidth="119.20001220703125" text="Temps total" />
+            <TableColumn fx:id="montantTotalColumn" prefWidth="143.20001220703125" text="Montant total" />
+            <TableColumn fx:id="tauxHoraireColumn" prefWidth="139.9998779296875" text="Taux horaire" />
+            <TableColumn fx:id="employeColumn" prefWidth="127.19989013671875" text="Employé" />
+            </columns>
+        </TableView>
+
+        <HBox layoutX="222.0" layoutY="622.0" spacing="20" styleClass="buttons-container">
+            <Button fx:id="btnAjouter" prefWidth="200.0" styleClass="action-button" text="Ajouter des quarts">
+                <tooltip>
+                    <Tooltip text="Cliquez pour ajouter des quarts" />
+                </tooltip>
+            </Button>
+            <Button fx:id="btnMAJ" prefWidth="300.0" styleClass="action-button" text="Modifier un quart">
+                <tooltip>
+                    <Tooltip text="Cliquez pour mettre à jour les informations d'un quart" />
+                </tooltip>
+            </Button>
+            <Button fx:id="btnSupprimer" prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Quitter">
+                <tooltip>
+                    <Tooltip text="Cliquez pour quitter la fenêtre" />
+                </tooltip>
+            </Button>
+        </HBox>
+    </children>
+</AnchorPane>

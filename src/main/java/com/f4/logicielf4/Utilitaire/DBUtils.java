@@ -1,14 +1,15 @@
 package com.f4.logicielf4.Utilitaire;
 
+import com.f4.logicielf4.Controllers.Strategie.*;
 import com.f4.logicielf4.Models.Employe;
-import com.f4.logicielf4.Models.FactureInfo;
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Partenaire;
-import javafx.event.ActionEvent;
-import javafx.scene.control.Alert;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import com.f4.logicielf4.Models.Quart;
+
+import java.math.BigDecimal;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,37 @@ public class DBUtils {
         List<Partenaire> partners = new ArrayList<>();
 
         String query = "SELECT * FROM partenaire";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query);
+             ResultSet rs = psFetch.executeQuery()) {
+
+            while (rs.next()) {
+                String nom = rs.getString("nom");
+                String numeroCivique = rs.getString("numero_civique");
+                String rue = rs.getString("rue");
+                String ville = rs.getString("ville");
+                String province = rs.getString("province");
+                String codePostal = rs.getString("code_postal");
+                String telephone = rs.getString("telephone");
+                String courriel = rs.getString("courriel");
+                String status = rs.getString("status");
+
+                Partenaire partner = new Partenaire(nom, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
+                partners.add(partner);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return partners;
+    }
+
+    public static List<Partenaire> fetchAllActivePartners() {
+        List<Partenaire> partners = new ArrayList<>();
+
+        String query = "SELECT * FROM partenaire WHERE status = 'actif'";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query);
@@ -315,21 +347,19 @@ public class DBUtils {
         }
     }
 
-
     public static boolean deleteEmploye(Map<String, String> employeeInfo) {
-        String query = "UPDATE employes SET statut = ? WHERE id = ?";
+        String query = "DELETE FROM employes WHERE id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            // Set the status to "Inactif"
-            preparedStatement.setString(1, "Inactif");
-            preparedStatement.setInt(2, Integer.parseInt(employeeInfo.get("id"))); // Assuming ID is provided in the map
+            // Set the employee ID from the employeeInfo map
+            preparedStatement.setInt(1, Integer.parseInt(employeeInfo.get("id"))); // Assuming ID is provided in the map
 
-            // Execute the update
+            // Execute the delete
             int rowsAffected = preparedStatement.executeUpdate();
 
-            return rowsAffected > 0; // Returns true if at least one row has been updated
+            return rowsAffected > 0; // Returns true if at least one row has been deleted
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -337,34 +367,86 @@ public class DBUtils {
         }
     }
 
-    public static List<FactureInfo> fetchAllFactureInfo() {
-        List<FactureInfo> factures = new ArrayList<>();
-        String query = "SELECT * FROM Info_facture";
+
+    public static List<Facture> fetchAllFacture() {
+        List<Facture> factures = new ArrayList<>();
+        String query = "SELECT * FROM Facture";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query);
              ResultSet rs = psFetch.executeQuery()) {
 
             while (rs.next()) {
-                String numeroFacture = rs.getString("numero_facture");
+                String numeroFacture = rs.getString("num_facture"); // Integer type for num_facture
                 String nomPartenaire = rs.getString("nom_partenaire");
-                String date = rs.getString("date");
-                String montant = rs.getString("montant");
+                LocalDate dateFacture = rs.getDate("date").toLocalDate();
+                BigDecimal montantAvantTaxes = rs.getBigDecimal("montant_avant_taxes"); // Handle decimal fields as BigDecimal
+                BigDecimal tps = rs.getBigDecimal("tps");
+                BigDecimal tvq = rs.getBigDecimal("tvq");
+                BigDecimal montantApresTaxes = rs.getBigDecimal("montant_apres_taxes");
                 String statut = rs.getString("statut");
 
-                FactureInfo facture = new FactureInfo(numeroFacture, nomPartenaire, date, montant, statut);
+                // Assuming your Facture class has an appropriate constructor for these parameters
+                Facture facture = new Facture(numeroFacture, nomPartenaire, dateFacture, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
                 factures.add(facture);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return factures;
     }
 
+    public static int obtenirProchainNumFacture() {
+        int num = 0;
+        String selectSql = "SELECT MAX(CAST(SUBSTRING_INDEX(num_facture, '-', 1) AS UNSIGNED)) AS maxNum FROM Facture";
 
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement statement = connection.prepareStatement(selectSql);
+             ResultSet rs = statement.executeQuery()) {
 
+            if (rs.next()) {
+                // Get the maximum number from the result set
+                num = rs.getInt("maxNum");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Increment the number for the next invoice
+        return num + 1;
+    }
+
+    public static boolean createNewInvoice(String numFacture, String partner, LocalDate invoiceDate, String status) {
+        String insertSql = "INSERT INTO Facture (num_facture, nom_partenaire, date, montant_avant_taxes, tps, tvq, montant_apres_taxes, statut) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement statement = connection.prepareStatement(insertSql)) {
+
+            // Set parameters for the SQL statement
+            statement.setString(1, numFacture);  // num_facture
+            statement.setString(2, partner);     // nom_partenaire
+            statement.setDate(3, java.sql.Date.valueOf(invoiceDate)); // date
+
+            // Set the remaining parameters to null
+            statement.setNull(4, java.sql.Types.DECIMAL); // montant_avant_taxes
+            statement.setNull(5, java.sql.Types.DECIMAL); // tps
+            statement.setNull(6, java.sql.Types.DECIMAL); // tvq
+            statement.setNull(7, java.sql.Types.DECIMAL); // montant_apres_taxes
+            statement.setString(8, status);    // statut
+
+            // Execute the update
+            int rowsAffected = statement.executeUpdate();
+
+            // Return true if at least one row was affected
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false; // Return false if an exception occurs
+        }
+    }
 }
 
 

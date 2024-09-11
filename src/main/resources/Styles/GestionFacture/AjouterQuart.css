@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+/* General Styles */
+.root {
+    -fx-font-family: 'Lato', sans-serif;
+    -fx-background-color: #f9f9f9; /* Light background */
+}
+
+/* Title Label */
+.label {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00796b; /* Teal color */
+    -fx-padding: 10;
+    -fx-alignment: center;
+}
+
+/* Regular Labels */
+.label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #004d40; /* Dark teal color for labels */
+    -fx-padding: 5px;
+    -fx-alignment: center-left;
+}
+
+/* TextField Styles */
+.text-field {
+    -fx-background-color: #ffffff; /* White background for input fields */
+    -fx-border-color: #b2dfdb; /* Light teal border */
+    -fx-border-radius: 5px; /* Rounded corners */
+    -fx-padding: 5px;
+    -fx-text-fill: #004d40; /* Dark teal text */
+    -fx-font-size: 14px;
+    -fx-pref-height: 30px; /* Consistent height for all text fields */
+}
+
+/* DatePicker Styles */
+.date-picker {
+    -fx-background-color: #ffffff; /* White background */
+    -fx-border-color: #b2dfdb; /* Light teal border */
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-text-fill: #004d40;
+    -fx-font-size: 14px;
+}
+
+/* ComboBox Styles */
+.combo-box {
+    -fx-background-color: #ffffff; /* White background */
+    -fx-border-color: #b2dfdb; /* Light teal border */
+    -fx-border-radius: 5px;
+    -fx-padding: 5px;
+    -fx-text-fill: #004d40;
+    -fx-font-size: 14px;
+    -fx-pref-height: 30px;
+}
+
+/* Button Styles */
+.button {
+    -fx-background-color: #00796b; /* Teal background for the button */
+    -fx-text-fill: #ffffff; /* White text */
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand; /* Hand cursor on hover */
+}
+
+.button:hover {
+    -fx-background-color: #004d40; /* Darker teal on hover */
+}

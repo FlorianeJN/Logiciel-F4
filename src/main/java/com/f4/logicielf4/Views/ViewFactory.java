@@ -4,9 +4,12 @@ import com.f4.logicielf4.Controllers.Admin.AdminController;
 import com.f4.logicielf4.Controllers.Admin.GestionEmploye.AjouterEmployeController;
 import com.f4.logicielf4.Controllers.Admin.GestionEmploye.MiseAJourEmployeController;
 import com.f4.logicielf4.Controllers.Admin.GestionEmploye.SuppressionEmployeController;
+import com.f4.logicielf4.Controllers.Admin.GestionFacture.AjouterQuartController;
+import com.f4.logicielf4.Controllers.Admin.GestionFacture.PresentationFactureController;
 import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.MiseAJourPartenaireController;
 import com.f4.logicielf4.Controllers.Admin.GestionPartenaire.SuppressionPartenaireController;
 import com.f4.logicielf4.Models.Employe;
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Partenaire;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -274,6 +277,25 @@ public class ViewFactory {
     private void rajouterImage(Stage stage) {
         Image icon = new Image(getClass().getResourceAsStream("/Images/logo.jpg"));
         stage.getIcons().add(icon);
+    }
+
+    public void showRecolteInfoPreliWindow(Stage stage){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/RecolteInfoPreli.fxml"));
+        createStageShowAndWait(loader,stage,"Commencer une facture");
+    }
+
+    public void showPresentationFactureWindow(Stage stage, String numFacture,String nomPartenaire){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/PresentationFacture.fxml"));
+        PresentationFactureController controller = new PresentationFactureController(numFacture,nomPartenaire);
+        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"Commencer une facture");
+    }
+
+    public void showAjouterQuartWindow(Stage stage,String numFacture){
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/AjouterQuart.fxml"));
+        AjouterQuartController controller = new AjouterQuartController(numFacture);
+        loader.setController(controller);
+        createStageShowAndWait(loader,stage,"Commencer une facture");
     }
 
 }

@@ -39,7 +39,7 @@
                 <TableColumn fx:id="numFactureColumn" prefWidth="183.0" text="Numéro de facture" />
                 <TableColumn fx:id="partenaireColumn" prefWidth="191.0" text="Partenaire" />
                 <TableColumn fx:id="dateColumn" prefWidth="224.0" text="Date" />
-                <TableColumn fx:id="montantColumn" prefWidth="182.0" text="Montant" />
+                <TableColumn fx:id="montantColumn" prefWidth="182.0" text="Montant après taxes" />
                 <TableColumn fx:id="statutColumn" prefWidth="203.0" text="Statut" />
             </columns>
         </TableView>

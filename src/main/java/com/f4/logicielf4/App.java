@@ -1,8 +1,14 @@
 package com.f4.logicielf4;
 
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Views.ViewFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
+
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+
 
 /**
  * La classe principale de l'application JavaFX.
@@ -19,7 +25,10 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         ViewFactory viewFactory = new ViewFactory();
-        //viewFactory.showLoginWindow();
+      //  viewFactory.showLoginWindow();
         viewFactory.showAdminWindow();
+
+        //viewFactory.showAjouterQuartWindow(new Stage(),"145-03-2023");
+
     }
 }

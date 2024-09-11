@@ -12,7 +12,7 @@
 <AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionPartenaire/AdminGestionPartenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
    <children>
       <!-- Main Title -->
-      <Label layoutY="22.0" text="Gestion des Partenaires" styleClass="main-title" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" alignment="CENTER" />
+      <Label alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Gestion des Partenaires" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
 
       <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
@@ -35,8 +35,8 @@
       <!-- Partners Table -->
       <TableView fx:id="partnersTable" layoutX="20.0" layoutY="200.0" prefHeight="216.0" prefWidth="960.0" styleClass="partners-table" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="200.0">
          <columns>
-            <TableColumn fx:id="nameColumn" prefWidth="132.0" text="Nom" />
-            <TableColumn fx:id="addressColumn" prefWidth="380.8000183105469" text="Adresse" />
+            <TableColumn fx:id="nameColumn" prefWidth="152.0" text="Nom" />
+            <TableColumn fx:id="addressColumn" prefWidth="361.6000061035156" text="Adresse" />
             <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />
             <TableColumn fx:id="emailColumn" prefWidth="192.800048828125" text="Email" />
             <TableColumn fx:id="statusColumn" prefWidth="165.60009765625" text="Statut" />

@@ -1,7 +1,7 @@
 package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Models.Facture;
-import com.f4.logicielf4.Models.FactureInfo;
+import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
@@ -26,22 +26,22 @@ public class GestionFacturesController implements Initializable {
     private Label factureAttentePaiementLabel;
 
     @FXML
-    private TableView<FactureInfo> factureTable;
+    private TableView<Facture> factureTable;
 
     @FXML
-    private TableColumn<FactureInfo, Integer> numFactureColumn;
+    private TableColumn<Facture, Integer> numFactureColumn;
 
     @FXML
-    private TableColumn<FactureInfo, String> partenaireColumn;
+    private TableColumn<Facture, String> partenaireColumn;
 
     @FXML
-    private TableColumn<FactureInfo, String> dateColumn;
+    private TableColumn<Facture, String> dateColumn;
 
     @FXML
-    private TableColumn<FactureInfo, Double> montantColumn;
+    private TableColumn<Facture, Double> montantColumn;
 
     @FXML
-    private TableColumn<FactureInfo, String> statutColumn;
+    private TableColumn<Facture, String> statutColumn;
 
     @FXML
     private Button btnCommencer;
@@ -60,14 +60,14 @@ public class GestionFacturesController implements Initializable {
 
         setCellValues();
         updateTable();
-        updateLabels();
+       // updateLabels();
     }
 
     private void setCellValues() {
-        numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numeroFacture"));
-        partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("partenaire"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montant"));
+        numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numFacture"));
+        partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("nomPartenaire"));
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateFacture"));
+        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
         factureTable.getSortOrder().add(statutColumn); // Sorting by status
@@ -75,7 +75,7 @@ public class GestionFacturesController implements Initializable {
 
     private void updateTable() {
         try {
-            List<FactureInfo> factures = DBUtils.fetchAllFactureInfo();
+            List<Facture> factures = DBUtils.fetchAllFacture();
             factureTable.getItems().setAll(factures);
             factureTable.sort();
         } catch (Exception e) {
@@ -83,13 +83,13 @@ public class GestionFacturesController implements Initializable {
         }
     }
 
-    private void updateLabels() {
+  /*  private void updateLabels() {
         int facturesCrees = 0;
         int facturesPayees = 0;
         int facturesAttente = 0;
-        List<FactureInfo> facturesInfo = DBUtils.fetchAllFactureInfo();
+        List<Facture> facturesInfo = DBUtils.fetchAllFactureInfo();
 
-        for (FactureInfo f : facturesInfo) {
+        for (Facture f : facturesInfo) {
            if (f.getStatut().equals("Payée")) facturesPayees++;
             else if (f.getStatut().equals("En attente")) facturesAttente++;
         }
@@ -98,7 +98,7 @@ public class GestionFacturesController implements Initializable {
         facturesCreesLabel.setText(String.valueOf(facturesCrees));
         facturesPayeesLabel.setText(String.valueOf(facturesPayees));
         factureAttentePaiementLabel.setText(String.valueOf(facturesAttente));
-    }
+    }*/
 
     private void actionBtnCommencer() {
         System.out.println("Commencer nouvelle facture");
@@ -107,14 +107,15 @@ public class GestionFacturesController implements Initializable {
         /*
         *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE COMMENCER FACTURE
         * */
+        Model.getInstance().getViewFactory().showRecolteInfoPreliWindow(stage);
 
         updateTable();
-        updateLabels();
+     //   updateLabels();
     }
 
     private void actionBtnModifier() {
         System.out.println("Modifier facture");
-        FactureInfo factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
+        Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
 
         if (factureSelectionnee == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de modifier.", "ERREUR MODIFICATION");
@@ -123,13 +124,13 @@ public class GestionFacturesController implements Initializable {
              *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE MODIFIER FACTURE
              * */
             updateTable();
-            updateLabels();
+          //  updateLabels();
         }
     }
 
     private void actionBtnSupprimer() {
         System.out.println("Supprimer facture");
-        FactureInfo factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
+        Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
 
         if (factureSelectionnee == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de supprimer.", "ERREUR SUPPRESSION");
@@ -139,7 +140,7 @@ public class GestionFacturesController implements Initializable {
              *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE SUPPRIMER FACTURE
              * */
             updateTable();
-            updateLabels();
+          //  updateLabels();
         }
     }
 }

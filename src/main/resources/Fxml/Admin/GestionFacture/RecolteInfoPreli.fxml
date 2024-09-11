@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="257.0" prefWidth="450.0" stylesheets="@../../../Styles/GestionFacture/RecolteInfoPreli.css" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionFacture.RecolteInfoPreliController" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Label layoutX="135.0" layoutY="14.0" styleClass="title-label" text="Commencer Facture" />
+
+        <VBox layoutX="50.0" layoutY="70.0" spacing="25">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label prefWidth="100" styleClass="label" text="Partenaire" />
+                <ComboBox fx:id="partnerComboBox" prefWidth="240.0" promptText="Sélectionner un partenaire" styleClass="details-combobox">
+                    <items>
+                        <FXCollections fx:factory="observableArrayList">
+                        </FXCollections>
+                    </items>
+                </ComboBox>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label prefWidth="100.0" styleClass="label" text="Date" />
+                <DatePicker fx:id="invoiceDatePicker" prefWidth="240.0" promptText="MM/YYYY" styleClass="details-textfield" />
+            </HBox>
+        </VBox>
+
+        <Button layoutX="164.0" fx:id="btnContinuer" layoutY="194.0" mnemonicParsing="false" styleClass="action-button" text="Continuer" />
+    </children>
+</AnchorPane>
