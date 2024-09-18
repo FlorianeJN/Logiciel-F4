@@ -34,17 +34,17 @@
 
       <!-- Right side inputs -->
       <Label layoutX="350.0" layoutY="80.0" text="Temps total" />
-      <TextField fx:id="tempsTotal" layoutX="450.0" layoutY="76.0" prefHeight="30.0" prefWidth="138.0" />
+      <TextField fx:id="tempsTotal" layoutX="450.0" layoutY="76.0" prefHeight="30.0" prefWidth="186.0" />
 
       <Label layoutX="350.0" layoutY="130.0" text="Taux horaire" />
-      <TextField fx:id="tauxHoraire" layoutX="450.0" layoutY="126.0" prefHeight="30.0" prefWidth="138.0" />
+      <TextField fx:id="tauxHoraire" layoutX="450.0" layoutY="126.0" prefHeight="30.0" prefWidth="186.0" />
 
       <Label layoutX="350.0" layoutY="180.0" text="Montant HT" />
-      <TextField fx:id="montantHT" layoutX="450.0" layoutY="176.0" prefHeight="30.0" prefWidth="138.0" />
+      <TextField fx:id="montantHT" layoutX="450.0" layoutY="176.0" prefHeight="30.0" prefWidth="186.0" />
 
       <Button fx:id="ajouterQuartBtn" layoutX="263.0" layoutY="487.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="154.0" text="Ajouter le quart" />
       <Label layoutX="350.0" layoutY="277.0" text="Employé" />
-      <ComboBox fx:id="empComboBox" layoutX="450.0" layoutY="271.0" prefHeight="41.0" prefWidth="138.0" />
+      <ComboBox fx:id="empComboBox" layoutX="450.0" layoutY="271.0" prefHeight="41.0" prefWidth="186.0" />
       <Label layoutX="350.0" layoutY="227.0" text="Associer un employé?" />
       <CheckBox fx:id="associerEmpCheckBox" layoutX="519.0" layoutY="229.0" mnemonicParsing="false" />
       <Label layoutX="29.0" layoutY="277.0" text="Pause ?" />

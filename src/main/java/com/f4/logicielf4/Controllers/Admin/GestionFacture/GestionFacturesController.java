@@ -2,6 +2,7 @@ package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
+import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
@@ -10,12 +11,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 public class GestionFacturesController implements Initializable {
 
+    @FXML
+    private Button btnExporter;
     @FXML
     private Label facturesCreesLabel;
 
@@ -49,14 +54,11 @@ public class GestionFacturesController implements Initializable {
     @FXML
     private Button btnModifier;
 
-    @FXML
-    private Button btnSupprimer;
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnCommencer.setOnAction(event -> actionBtnCommencer());
         btnModifier.setOnAction(event -> actionBtnModifier());
-        btnSupprimer.setOnAction(event -> actionBtnSupprimer());
+        btnExporter.setOnAction(event -> actionBtnExporter());
 
         setCellValues();
         updateTable();
@@ -67,7 +69,7 @@ public class GestionFacturesController implements Initializable {
         numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numFacture"));
         partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("nomPartenaire"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateFacture"));
-        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
+        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantAvantTaxes"));
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
         factureTable.getSortOrder().add(statutColumn); // Sorting by status
@@ -76,11 +78,24 @@ public class GestionFacturesController implements Initializable {
     private void updateTable() {
         try {
             List<Facture> factures = DBUtils.fetchAllFacture();
+            for(Facture facture : factures){
+                genererMontantTotal(facture);
+            }
             factureTable.getItems().setAll(factures);
             factureTable.sort();
         } catch (Exception e) {
             Dialogs.showMessageDialog("Erreur lors de la mise à jour des factures : " + e.getMessage(), "ERREUR");
         }
+    }
+
+    private void genererMontantTotal(Facture facture) {
+        double montant = 0;
+        String numFacture = facture.getNumFacture();
+        List<Quart> listeQuarts =  DBUtils.fetchQuartsByNumFacture(numFacture);
+        for(Quart quart : listeQuarts){
+            montant = montant + quart.getMontantTotal();
+        }
+        facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
     }
 
   /*  private void updateLabels() {
@@ -107,7 +122,7 @@ public class GestionFacturesController implements Initializable {
         /*
         *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE COMMENCER FACTURE
         * */
-        Model.getInstance().getViewFactory().showRecolteInfoPreliWindow(stage);
+        Model.getInstance().getViewFactory().showCommencerFactureWindow(stage);
 
         updateTable();
      //   updateLabels();
@@ -120,27 +135,23 @@ public class GestionFacturesController implements Initializable {
         if (factureSelectionnee == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de modifier.", "ERREUR MODIFICATION");
         } else {
-            /*
-             *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE MODIFIER FACTURE
-             * */
+            Stage stage = (Stage) btnModifier.getScene().getWindow();
+            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getNomPartenaire());
             updateTable();
           //  updateLabels();
         }
     }
 
-    private void actionBtnSupprimer() {
-        System.out.println("Supprimer facture");
+    private void actionBtnExporter() {
         Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
 
         if (factureSelectionnee == null) {
-            Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de supprimer.", "ERREUR SUPPRESSION");
+            Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de cliquer sur le bouton Exporter.", "ERREUR EXPORTATION");
         } else {
-            Stage stage = (Stage) btnSupprimer.getScene().getWindow();
+            Stage stage = (Stage) btnExporter.getScene().getWindow();
             /*
-             *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE SUPPRIMER FACTURE
+             *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE EXPORTER FACTURE
              * */
-            updateTable();
-          //  updateLabels();
         }
     }
 }

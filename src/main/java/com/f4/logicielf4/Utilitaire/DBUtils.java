@@ -1,6 +1,5 @@
 package com.f4.logicielf4.Utilitaire;
 
-import com.f4.logicielf4.Controllers.Strategie.*;
 import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Partenaire;
@@ -19,9 +18,9 @@ import java.util.Map;
  */
 public class DBUtils {
 
-    private static final String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5729770";
-    private static final String user = "sql5729770";
-    private static final String pass = "99BunXYQIF";
+    private static final String url = "jdbc:mysql://localhost:3306/f4santeinc";
+    private static final String user = "root";
+    private static final String pass = "!Secure!2011";
 
     /**
      * Vérifie les informations d'identification d'un utilisateur pour se connecter.
@@ -447,6 +446,114 @@ public class DBUtils {
             return false; // Return false if an exception occurs
         }
     }
+
+    public static void ajouterQuart(String numFacture, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
+                                    LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
+                                    boolean tempsDouble, boolean tempsDemi) throws SQLException {
+        String sql = "INSERT INTO Quart (num_facture, date_quart, debut_quart, fin_quart, pause, temps_total, prestation, taux_horaire, montant_total, notes, emp_name, tempsDemi, tempsDouble) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, numFacture);
+            pstmt.setDate(2, java.sql.Date.valueOf(dateQuart));
+            pstmt.setTime(3, java.sql.Time.valueOf(debutQuart));
+            pstmt.setTime(4, java.sql.Time.valueOf(finQuart));
+            pstmt.setTime(5, java.sql.Time.valueOf(pause));
+            pstmt.setString(6, tempsTotal);
+            pstmt.setString(7, prestation);
+            pstmt.setDouble(8, tauxHoraire);
+            pstmt.setDouble(9, montantTotal);
+            pstmt.setString(10, notes);
+            pstmt.setString(11, empName);
+            pstmt.setInt(12, tempsDemi ? 1 : 0);
+            pstmt.setInt(13, tempsDouble ? 1 : 0);
+
+            pstmt.executeUpdate();
+        }
+    }
+
+
+    public static List<Quart> fetchQuartsByNumFacture(String numFacture) {
+        List<Quart> quarts = new ArrayList<>();
+
+        String query = "SELECT * FROM Quart WHERE num_facture = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, numFacture);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String numFactureResult = rs.getString("num_facture");
+                Date dateQuart = rs.getDate("date_quart");
+                Time debutQuart = rs.getTime("debut_quart");
+                Time finQuart = rs.getTime("fin_quart");
+                Time pause = rs.getTime("pause");
+                String tempsTotal = rs.getString("temps_total"); // Changed from BigDecimal to double
+                String prestation = rs.getString("prestation");
+                BigDecimal tauxHoraire = rs.getBigDecimal("taux_horaire");
+                BigDecimal montantTotal = rs.getBigDecimal("montant_total");
+                String notes = rs.getString("notes");
+                String nomEmp = rs.getString("emp_name");
+                boolean tempsDemi = rs.getInt("tempsDemi") == 1;  // Converts 1 to true and 0 to false
+                boolean tempsDouble = rs.getInt("tempsDouble") == 1;  // Converts 1 to true and 0 to false
+
+                Quart quart = new Quart(id, numFactureResult, dateQuart, debutQuart, finQuart, pause,
+                        tempsTotal, prestation, tauxHoraire, montantTotal, notes,nomEmp,tempsDouble,tempsDemi);
+                quarts.add(quart);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exception
+        }
+
+        return quarts;
+    }
+
+    public static void mettreAJourFacture(Facture facture){
+// SQL query to update the Facture table
+        String updateQuery = "UPDATE Facture SET montant_avant_taxes = ?, tps = ?, tvq = ?, montant_apres_taxes = ? WHERE num_facture = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+            // Set parameters from the Facture object
+            pstmt.setBigDecimal(1, facture.getMontantAvantTaxes());
+            pstmt.setBigDecimal(2, facture.getTps());
+            pstmt.setBigDecimal(3, facture.getTvq());
+            pstmt.setBigDecimal(4, facture.getMontantApresTaxes());
+            pstmt.setString(5, facture.getNumFacture());
+
+            // Execute the update
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exception
+        }
+    }
+
+    public static boolean supprimerQuart(int id) {
+        String sql = "DELETE FROM Quart WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);  // Set the ID of the quart to be deleted
+            int rowsAffected = pstmt.executeUpdate(); // Execute the delete operation
+
+            // Return true if at least one row was deleted
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            // Log the exception (you could use a logging framework)
+            System.err.println("Error while deleting quart: " + e.getMessage());
+            return false; // Return false if an exception occurs
+        }
+    }
+
+
+
 }
 
 

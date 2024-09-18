@@ -17,7 +17,7 @@
         <Line endX="1192.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
         <!-- Employees Table -->
-        <TableView fx:id="employeesTable" layoutX="25.0" layoutY="112.0" prefHeight="471.0" prefWidth="1205.0" styleClass="employees-table" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="112.0">
+        <TableView fx:id="quartsTable" layoutX="25.0" layoutY="112.0" prefHeight="471.0" prefWidth="1205.0" styleClass="employees-table" AnchorPane.leftAnchor="25.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="112.0">
             <columns>
                 <TableColumn fx:id="dateColumn" prefWidth="134.4000174999237" text="Date" />
                 <TableColumn fx:id="prestationColumn" prefWidth="140.80001831054688" text="Prestation" />
@@ -42,9 +42,9 @@
                     <Tooltip text="Cliquez pour mettre à jour les informations d'un quart" />
                 </tooltip>
             </Button>
-            <Button fx:id="btnSupprimer" prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Quitter">
+            <Button fx:id="btnSupprimer" prefHeight="40.0" prefWidth="261.0" styleClass="action-button" text="Supprimer un quart">
                 <tooltip>
-                    <Tooltip text="Cliquez pour quitter la fenêtre" />
+                    <Tooltip text="Cliquez pour supprimer un quart" />
                 </tooltip>
             </Button>
         </HBox>

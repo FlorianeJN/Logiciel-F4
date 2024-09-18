@@ -1,5 +1,7 @@
 package com.f4.logicielf4.Models;
 
+import com.f4.logicielf4.Utilitaire.DBUtils;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -39,7 +41,6 @@ public class Facture {
         this.statut = statut;
     }
 
-    // Getters and Setters
     public String getNumFacture() {
         return numFacture;
     }
@@ -70,6 +71,15 @@ public class Facture {
 
     public void setMontantAvantTaxes(BigDecimal montantAvantTaxes) {
         this.montantAvantTaxes = montantAvantTaxes;
+        double montantHT = montantAvantTaxes.doubleValue();
+        this.tps = BigDecimal.valueOf(montantHT * 0.05);
+        this.tvq = BigDecimal.valueOf(montantHT * 0.09975);
+        this.montantApresTaxes = BigDecimal.valueOf(montantHT+tps.doubleValue()+tvq.doubleValue());
+        mettreAJourDB();
+    }
+
+    private void mettreAJourDB() {
+        DBUtils.mettreAJourFacture(this);
     }
 
     public BigDecimal getTps() {

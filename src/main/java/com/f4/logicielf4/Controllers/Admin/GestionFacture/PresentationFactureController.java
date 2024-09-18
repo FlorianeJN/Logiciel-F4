@@ -5,6 +5,8 @@ import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Quart;
+import com.f4.logicielf4.Utilitaire.DBUtils;
+import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,9 +17,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.ResourceBundle;
 
@@ -29,17 +31,18 @@ public class PresentationFactureController implements Initializable {
     @FXML
     private Label factureLabel;
     @FXML
-    private TableView<Quart> employeesTable;
-    @FXML
-    private TableColumn<Quart, Date> dateColumn;
+    private TableView<Quart> quartsTable;
+
     @FXML
     private TableColumn<Quart, StrategiePrestation> prestationColumn;
     @FXML
-    private TableColumn<Quart, Time> debutQuartColumn;
+    private TableColumn<Quart, LocalDate> dateColumn;
     @FXML
-    private TableColumn<Quart, Time> finQuartColumn;
+    private TableColumn<Quart, LocalTime> debutQuartColumn;
     @FXML
-    private TableColumn<Quart, Time> pauseColumn;
+    private TableColumn<Quart, LocalTime> finQuartColumn;
+    @FXML
+    private TableColumn<Quart, LocalTime> pauseColumn;
     @FXML
     private TableColumn<Quart, Double> tempsTotalColumn;
     @FXML
@@ -48,6 +51,7 @@ public class PresentationFactureController implements Initializable {
     private TableColumn<Quart, Double> tauxHoraireColumn;
     @FXML
     private TableColumn<Quart, Employe> employeColumn;
+
 
     @FXML
     private Button btnAjouter;
@@ -63,31 +67,53 @@ public class PresentationFactureController implements Initializable {
 
     private void setCellValues() {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateQuart"));
-        prestationColumn.setCellValueFactory(new PropertyValueFactory<>("prestation"));
+        prestationColumn.setCellValueFactory(new PropertyValueFactory<>("stringPrestation"));
         debutQuartColumn.setCellValueFactory(new PropertyValueFactory<>("debutQuart"));
         finQuartColumn.setCellValueFactory(new PropertyValueFactory<>("finQuart"));
         pauseColumn.setCellValueFactory(new PropertyValueFactory<>("pause"));
         tempsTotalColumn.setCellValueFactory(new PropertyValueFactory<>("tempsTotal"));
         montantTotalColumn.setCellValueFactory(new PropertyValueFactory<>("montantTotal"));
         tauxHoraireColumn.setCellValueFactory(new PropertyValueFactory<>("tauxHoraire"));
-        employeColumn.setCellValueFactory(new PropertyValueFactory<>("employe"));
+        employeColumn.setCellValueFactory(new PropertyValueFactory<>("nomEmploye"));
     }
 
     private void updateTable() {
-        // Implement table update logic
+        ArrayList<Quart> quarts = (ArrayList<Quart>) DBUtils.fetchQuartsByNumFacture(numFacture);
+        this.quartsTable.getItems().setAll(quarts);
     }
 
     private void actionBtnAjouter() {
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
         Model.getInstance().getViewFactory().showAjouterQuartWindow(stage,numFacture);
+        updateTable();
     }
 
     private void actionBtnMAJ() {
-        // Implement update action
+        Quart quartSelectionne = quartsTable.getSelectionModel().getSelectedItem();
+        if(quartSelectionne != null) {
+            Stage stage = (Stage) btnMAJ.getScene().getWindow();
+            Model.getInstance().getViewFactory().showModifierQuartWindow(stage,quartSelectionne);
+            updateTable();
+        }
+        else
+            Dialogs.showMessageDialog("Veuillez sélectionner un quart avant de cliquer sur le bouton Modifier.", "ERREUR MODIFICATION");
     }
 
     private void actionBtnSupprimer() {
-        // Implement delete action
+        Quart quartSelectionne = quartsTable.getSelectionModel().getSelectedItem();
+        if(quartSelectionne != null){
+            Stage stage = (Stage) btnSupprimer.getScene().getWindow();
+            Dialogs.showConfirmDialog("Vous êtes sur le point de supprimer un quart. Souhaitez-vous continuer?","CONFIRMATION SUPPRESSION QUART");
+            //CALL DBUTIL POUR SUPPRIMER LE QUART
+            if(DBUtils.supprimerQuart(quartSelectionne.getId())){
+                Dialogs.showMessageDialog("Quart supprimé","CONFIRMATION SUPPRESSION QUART");
+                updateTable();
+            }else
+                Dialogs.showMessageDialog("Problème de suppression","ERREUR SUPPRESSION");
+
+        }
+        else
+            Dialogs.showMessageDialog("Veuillez sélectionner un quart avant de cliquer sur le bouton Supprimer.", "ERREUR SUPPRESSION");
     }
 
     @Override
