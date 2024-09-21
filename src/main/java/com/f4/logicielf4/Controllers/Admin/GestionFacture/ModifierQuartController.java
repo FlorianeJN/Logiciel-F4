@@ -1,12 +1,17 @@
 package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Models.Quart;
+import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.stage.Stage;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ResourceBundle;
 
 public class ModifierQuartController extends AjouterModifierQuartTemplate implements Initializable {
@@ -80,7 +85,30 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
     }
 
     private void actionBtnMaj() {
-        Dialogs.showMessageDialog("BTN MAJ","BTN MAJ");
+        if(validateFields()){
+            LocalDate dateQuartValue = dateQuart.getValue();
+            String prestationValue = prestation.getValue();
+            LocalTime debutQuartValue = parseTime(debutQuart.getText());
+            LocalTime finQuartValue = parseTime(finQuart.getText());
+            LocalTime pauseValue = parseTime(pause.getText());
+            String tempsTotalValue = tempsTotal.getText();
+            double tauxHoraireValue = Double.parseDouble(tauxHoraire.getText().replace(',', '.'));
+            Double montantTotalValue = Double.parseDouble(montantHT.getText().replace(',', '.'));
+            String notesValue = notesTextArea.getText();
+            String empName = associerEmpCheckBox.isSelected() ? empComboBox.getValue() : "";
+            boolean tempsDouble = checkBoxTempsDouble.isSelected();
+            boolean tempsDemi = checkBoxTempsDemi.isSelected();
+            try{
+                DBUtils.updateQuart(quart.getId(),prestationValue,dateQuartValue,debutQuartValue,finQuartValue,pauseValue,tempsTotalValue,tauxHoraireValue,montantTotalValue,notesValue,empName,tempsDouble,tempsDemi);
+                Dialogs.showMessageDialog("Quart modifié avec succès","SUCCÈS MODIFICATION QUART");
+                Stage stage = (Stage) ajouterQuartBtn.getScene().getWindow();
+                stage.close();
+            } catch (Exception e) {
+                Dialogs.showMessageDialog(e.getMessage(),"Erreur");
+            }
+        }
+        else
+            Dialogs.showMessageDialog("Veuillez bien remplir tous les champs","ERREUR REMPLISSAGE CHAMPS");
     }
 
     private void remplirFormulaire(){
@@ -111,6 +139,5 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
                 prestation.setValue("PAB");
                 break;
         }
-
     }
 }

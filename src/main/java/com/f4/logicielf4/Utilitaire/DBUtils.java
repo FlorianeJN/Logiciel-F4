@@ -219,19 +219,18 @@ public class DBUtils {
      * @return true si le partenaire a été marqué comme inactif avec succès, false sinon
      */
     public static boolean deletePartner(Map<String, String> partnerInfo) {
-        String query = "UPDATE partenaire SET status = ? WHERE nom = ?";
+        String query = "DELETE FROM partenaire WHERE nom = ?";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            // Définir le statut à "inactif"
-            preparedStatement.setString(1, "inactif");
-            preparedStatement.setString(2, partnerInfo.get("nom"));
+            // Définir le nom du partenaire à supprimer
+            preparedStatement.setString(1, partnerInfo.get("nom"));
 
-            // Exécuter la mise à jour
+            // Exécuter la suppression
             int rowsAffected = preparedStatement.executeUpdate();
 
-            return rowsAffected > 0; // Retourne true si au moins une ligne a été mise à jour
+            return rowsAffected > 0; // Retourne true si au moins une ligne a été supprimée
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -474,7 +473,6 @@ public class DBUtils {
         }
     }
 
-
     public static List<Quart> fetchQuartsByNumFacture(String numFacture) {
         List<Quart> quarts = new ArrayList<>();
 
@@ -549,6 +547,35 @@ public class DBUtils {
             // Log the exception (you could use a logging framework)
             System.err.println("Error while deleting quart: " + e.getMessage());
             return false; // Return false if an exception occurs
+        }
+    }
+
+    public static void updateQuart(int id, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
+                                   LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
+                                   boolean tempsDouble, boolean tempsDemi) throws SQLException {
+        String sql = "UPDATE Quart SET prestation = ?, debut_quart = ?, fin_quart = ?, pause = ?, temps_total = ?, " +
+                "taux_horaire = ?, montant_total = ?, notes = ?, emp_name = ?, tempsDemi = ?, tempsDouble = ? " +
+                "WHERE id = ?";
+
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, prestation);
+            pstmt.setTime(2, java.sql.Time.valueOf(debutQuart));
+            pstmt.setTime(3, java.sql.Time.valueOf(finQuart));
+            pstmt.setTime(4, java.sql.Time.valueOf(pause));
+            pstmt.setString(5, tempsTotal);
+            pstmt.setDouble(6, tauxHoraire);
+            pstmt.setDouble(7, montantTotal);
+            pstmt.setString(8, notes);
+            pstmt.setString(9, empName);
+            pstmt.setInt(10, tempsDemi ? 1 : 0);
+            pstmt.setInt(11, tempsDouble ? 1 : 0);
+
+            // Use the id to find the correct record to update
+            pstmt.setInt(12, id);
+
+            pstmt.executeUpdate();
         }
     }
 

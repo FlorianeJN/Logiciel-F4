@@ -3,8 +3,9 @@ package com.f4.logicielf4.Models;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 
 import java.math.BigDecimal;
-import java.sql.Date;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.List;
 
 public class Facture {
     private String numFacture;
@@ -16,15 +17,10 @@ public class Facture {
     private BigDecimal montantApresTaxes;
     private String statut;
 
-    // Constructor
-    public Facture(String numFacture, String nomPartenaire, LocalDate dateFacture,String statut) {
+    public Facture(String numFacture, String nomPartenaire, LocalDate dateFacture, String statut) {
         this.numFacture = numFacture;
         this.nomPartenaire = nomPartenaire;
         this.dateFacture = dateFacture;
-      //  this.montantAvantTaxes = montantAvantTaxes;
-       // this.tps = tps;
-       // this.tvq = tvq;
-       // this.montantApresTaxes = montantApresTaxes;
         this.statut = statut;
     }
 
@@ -34,13 +30,14 @@ public class Facture {
         this.numFacture = numFacture;
         this.nomPartenaire = nomPartenaire;
         this.dateFacture = dateFacture;
-        this.montantAvantTaxes = montantAvantTaxes;
-        this.tps = tps;
-        this.tvq = tvq;
-        this.montantApresTaxes = montantApresTaxes;
+        this.montantAvantTaxes = setTwoDecimalPlaces(montantAvantTaxes);
+        this.tps = setTwoDecimalPlaces(tps);
+        this.tvq = setTwoDecimalPlaces(tvq);
+        this.montantApresTaxes = setTwoDecimalPlaces(montantApresTaxes);
         this.statut = statut;
     }
 
+    // Getter and Setter Methods
     public String getNumFacture() {
         return numFacture;
     }
@@ -70,16 +67,9 @@ public class Facture {
     }
 
     public void setMontantAvantTaxes(BigDecimal montantAvantTaxes) {
-        this.montantAvantTaxes = montantAvantTaxes;
-        double montantHT = montantAvantTaxes.doubleValue();
-        this.tps = BigDecimal.valueOf(montantHT * 0.05);
-        this.tvq = BigDecimal.valueOf(montantHT * 0.09975);
-        this.montantApresTaxes = BigDecimal.valueOf(montantHT+tps.doubleValue()+tvq.doubleValue());
+        this.montantAvantTaxes = setTwoDecimalPlaces(montantAvantTaxes);
+        updateTaxesAndTotal();
         mettreAJourDB();
-    }
-
-    private void mettreAJourDB() {
-        DBUtils.mettreAJourFacture(this);
     }
 
     public BigDecimal getTps() {
@@ -87,7 +77,7 @@ public class Facture {
     }
 
     public void setTps(BigDecimal tps) {
-        this.tps = tps;
+        this.tps = setTwoDecimalPlaces(tps);
     }
 
     public BigDecimal getTvq() {
@@ -95,7 +85,7 @@ public class Facture {
     }
 
     public void setTvq(BigDecimal tvq) {
-        this.tvq = tvq;
+        this.tvq = setTwoDecimalPlaces(tvq);
     }
 
     public BigDecimal getMontantApresTaxes() {
@@ -103,7 +93,7 @@ public class Facture {
     }
 
     public void setMontantApresTaxes(BigDecimal montantApresTaxes) {
-        this.montantApresTaxes = montantApresTaxes;
+        this.montantApresTaxes = setTwoDecimalPlaces(montantApresTaxes);
     }
 
     public String getStatut() {
@@ -112,6 +102,28 @@ public class Facture {
 
     public void setStatut(String statut) {
         this.statut = statut;
+    }
+
+    public List<Quart> getListeQuarts(){
+        return DBUtils.fetchQuartsByNumFacture(numFacture);
+    }
+
+    private BigDecimal setTwoDecimalPlaces(BigDecimal value) {
+        if (value != null) {
+            return value.setScale(2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO.setScale(2);
+    }
+
+    private void updateTaxesAndTotal() {
+        double montantHT = montantAvantTaxes.doubleValue();
+        this.tps = setTwoDecimalPlaces(BigDecimal.valueOf(montantHT * 0.05));
+        this.tvq = setTwoDecimalPlaces(BigDecimal.valueOf(montantHT * 0.09975));
+        this.montantApresTaxes = setTwoDecimalPlaces(BigDecimal.valueOf(montantHT + tps.doubleValue() + tvq.doubleValue()));
+    }
+
+    private void mettreAJourDB() {
+        DBUtils.mettreAJourFacture(this);
     }
 
     @Override
@@ -127,5 +139,4 @@ public class Facture {
                 ", statut='" + statut + '\'' +
                 '}';
     }
-
 }

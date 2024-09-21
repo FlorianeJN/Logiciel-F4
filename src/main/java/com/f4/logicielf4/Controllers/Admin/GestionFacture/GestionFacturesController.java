@@ -5,6 +5,7 @@ import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
+import com.f4.logicielf4.Utilitaire.IOUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -34,7 +35,7 @@ public class GestionFacturesController implements Initializable {
     private TableView<Facture> factureTable;
 
     @FXML
-    private TableColumn<Facture, Integer> numFactureColumn;
+    private TableColumn<Facture, String> numFactureColumn;
 
     @FXML
     private TableColumn<Facture, String> partenaireColumn;
@@ -69,7 +70,7 @@ public class GestionFacturesController implements Initializable {
         numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numFacture"));
         partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("nomPartenaire"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateFacture"));
-        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantAvantTaxes"));
+        montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
         factureTable.getSortOrder().add(statutColumn); // Sorting by status
@@ -149,9 +150,7 @@ public class GestionFacturesController implements Initializable {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de cliquer sur le bouton Exporter.", "ERREUR EXPORTATION");
         } else {
             Stage stage = (Stage) btnExporter.getScene().getWindow();
-            /*
-             *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE EXPORTER FACTURE
-             * */
+            IOUtils.commencerSauvegarde(factureSelectionnee);
         }
     }
 }

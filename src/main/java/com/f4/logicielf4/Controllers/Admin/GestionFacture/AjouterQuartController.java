@@ -43,6 +43,7 @@ public class AjouterQuartController extends AjouterModifierQuartTemplate impleme
         addListeners();
     }
 
+
     private void actionBtnAjouterQuart() {
         if (validateFields()) {
             try {
@@ -70,6 +71,4 @@ public class AjouterQuartController extends AjouterModifierQuartTemplate impleme
             Dialogs.showMessageDialog("Erreur de validation", "Veuillez vérifier les champs du formulaire.");
         }
     }
-
-
 }
