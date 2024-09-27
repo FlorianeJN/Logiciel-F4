@@ -186,9 +186,9 @@ public class AjouterModifierQuartTemplate {
     protected void updateTauxHoraire(String prestation) {
         if (prestation != null) {
             double tauxHoraireValue = switch (prestation) {
-                case "INF" -> new Inf().obtenirTauxHoraire();
-                case "INF AUX" -> new InfAux().obtenirTauxHoraire();
-                case "INF CL" -> new InfClinic().obtenirTauxHoraire();
+                case "SOINS INFIRMIERS" -> new Inf().obtenirTauxHoraire();
+                case "INFIRMIER(E) AUXILIAIRE" -> new InfAux().obtenirTauxHoraire();
+                case "INF CLINICIEN(NE)" -> new InfClinic().obtenirTauxHoraire();
                 case "PAB" -> new PAB().obtenirTauxHoraire();
                 default -> 0.0;
             };
@@ -204,14 +204,14 @@ public class AjouterModifierQuartTemplate {
         List<Employe> listeEmployes = DBUtils.fetchAllEmployees();
         List<String> listeNomsEmployes = new ArrayList<>();
         for (Employe employe : listeEmployes) {
-            listeNomsEmployes.add(employe.getNom());
+            listeNomsEmployes.add(employe.getPrenom());
         }
         empComboBox.getItems().setAll(listeNomsEmployes);
         empComboBox.setDisable(true);
     }
 
     protected void remplirComboBoxPrestation() {
-        List<String> listeNomsPrestations = Arrays.asList("INF", "INF AUX", "INF CL", "PAB");
+        List<String> listeNomsPrestations = Arrays.asList("SOINS INFIRMIERS", "INFIRMIER(E) AUXILIAIRE", "INF CLINICIEN(NE)", "PAB");
         prestation.getItems().setAll(listeNomsPrestations);
     }
 

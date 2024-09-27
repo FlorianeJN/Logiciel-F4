@@ -26,6 +26,7 @@ public class Quart {
     private String stringPrestation;
     private boolean tempsDouble;
     private boolean tempsDemi;
+    private String lieu;
     /*
     public Quart(String numFacture, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart, LocalTime pause, StrategiePrestation prestation, String nomEmploye) {
         this.numFacture = numFacture;

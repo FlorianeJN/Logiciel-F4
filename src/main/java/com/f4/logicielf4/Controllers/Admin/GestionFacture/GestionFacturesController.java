@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
@@ -137,7 +138,7 @@ public class GestionFacturesController implements Initializable {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de modifier.", "ERREUR MODIFICATION");
         } else {
             Stage stage = (Stage) btnModifier.getScene().getWindow();
-            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getNomPartenaire());
+            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getPartenaire().getNom());
             updateTable();
           //  updateLabels();
         }

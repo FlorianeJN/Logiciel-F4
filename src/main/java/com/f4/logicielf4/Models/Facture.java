@@ -9,32 +9,35 @@ import java.util.List;
 
 public class Facture {
     private String numFacture;
-    private String nomPartenaire;
+    private Partenaire partenaire;
     private LocalDate dateFacture;
     private BigDecimal montantAvantTaxes;
     private BigDecimal tps;
     private BigDecimal tvq;
     private BigDecimal montantApresTaxes;
     private String statut;
+    private String nomPartenaire;
 
-    public Facture(String numFacture, String nomPartenaire, LocalDate dateFacture, String statut) {
+    public Facture(String numFacture, Partenaire partenaire, LocalDate dateFacture, String statut) {
         this.numFacture = numFacture;
-        this.nomPartenaire = nomPartenaire;
+        this.partenaire = partenaire;
         this.dateFacture = dateFacture;
         this.statut = statut;
+        this.nomPartenaire = partenaire.getNom();
     }
 
-    public Facture(String numFacture, String nomPartenaire, LocalDate dateFacture,
+    public Facture(String numFacture, Partenaire partenaire, LocalDate dateFacture,
                    BigDecimal montantAvantTaxes, BigDecimal tps, BigDecimal tvq,
                    BigDecimal montantApresTaxes, String statut) {
         this.numFacture = numFacture;
-        this.nomPartenaire = nomPartenaire;
+        this.partenaire = partenaire;
         this.dateFacture = dateFacture;
         this.montantAvantTaxes = setTwoDecimalPlaces(montantAvantTaxes);
         this.tps = setTwoDecimalPlaces(tps);
         this.tvq = setTwoDecimalPlaces(tvq);
         this.montantApresTaxes = setTwoDecimalPlaces(montantApresTaxes);
         this.statut = statut;
+        this.nomPartenaire = partenaire.getNom();
     }
 
     // Getter and Setter Methods
@@ -44,14 +47,6 @@ public class Facture {
 
     public void setNumFacture(String numFacture) {
         this.numFacture = numFacture;
-    }
-
-    public String getNomPartenaire() {
-        return nomPartenaire;
-    }
-
-    public void setNomPartenaire(String nomPartenaire) {
-        this.nomPartenaire = nomPartenaire;
     }
 
     public LocalDate getDateFacture() {
@@ -126,11 +121,19 @@ public class Facture {
         DBUtils.mettreAJourFacture(this);
     }
 
+    public Partenaire getPartenaire() {
+        return partenaire;
+    }
+
+    public void setPartenaire(Partenaire partenaire) {
+        this.partenaire = partenaire;
+    }
+
     @Override
     public String toString() {
         return "Facture{" +
                 "numFacture=" + numFacture +
-                ", nomPartenaire='" + nomPartenaire + '\'' +
+                ", nomPartenaire='" +partenaire.getNom()+ '\'' +
                 ", dateFacture=" + dateFacture +
                 ", montantAvantTaxes=" + montantAvantTaxes +
                 ", tps=" + tps +
@@ -139,4 +142,9 @@ public class Facture {
                 ", statut='" + statut + '\'' +
                 '}';
     }
+
+    public String getNomPartenaire() {
+        return nomPartenaire;
+    }
+
 }

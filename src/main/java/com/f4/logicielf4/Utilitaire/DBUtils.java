@@ -385,7 +385,7 @@ public class DBUtils {
                 String statut = rs.getString("statut");
 
                 // Assuming your Facture class has an appropriate constructor for these parameters
-                Facture facture = new Facture(numeroFacture, nomPartenaire, dateFacture, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
+                Facture facture = new Facture(numeroFacture, fetchPartner(nomPartenaire), dateFacture, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
                 factures.add(facture);
             }
 
@@ -393,6 +393,39 @@ public class DBUtils {
             e.printStackTrace();
         }
         return factures;
+    }
+
+    public static Partenaire fetchPartner(String nomPartenaire) {
+        Partenaire partner = null;
+
+        String query = "SELECT * FROM partenaire WHERE nom = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query)) {
+
+            psFetch.setString(1, nomPartenaire);  // Set the partner's name in the query
+
+            try (ResultSet rs = psFetch.executeQuery()) {
+                if (rs.next()) {
+                    String numeroCivique = rs.getString("numero_civique");
+                    String rue = rs.getString("rue");
+                    String ville = rs.getString("ville");
+                    String province = rs.getString("province");
+                    String codePostal = rs.getString("code_postal");
+                    String telephone = rs.getString("telephone");
+                    String courriel = rs.getString("courriel");
+                    String status = rs.getString("status");
+
+                    // Create a new Partenaire object with the fetched data
+                    partner = new Partenaire(nomPartenaire, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();  // Log and handle the exception appropriately
+        }
+
+        return partner;  // Return the Partenaire object, or null if not found
     }
 
     public static int obtenirProchainNumFacture() {
