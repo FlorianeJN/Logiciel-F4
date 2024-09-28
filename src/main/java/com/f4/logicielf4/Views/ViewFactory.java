@@ -292,9 +292,9 @@ public class ViewFactory {
         createStageShowAndWait(loader,stage,"Commencer une facture");
     }
 
-    public void showAjouterQuartWindow(Stage stage,String numFacture){
+    public void showAjouterQuartWindow(Stage stage,String numFacture,PresentationFactureController presentationFactureController){
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/AjouterModifierQuart.fxml"));
-        AjouterQuartController controller = new AjouterQuartController(numFacture);
+        AjouterQuartController controller = new AjouterQuartController(numFacture,presentationFactureController);
         loader.setController(controller);
         createStageShowAndWait(loader,stage,"Commencer une facture");
     }

@@ -66,10 +66,12 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
 
     private String numFacture;
     private Quart quart;
+    private PresentationFactureController presentationFactureController;
 
     public ModifierQuartController(Quart quart){
         this.quart = quart;
         this.numFacture = quart.getNumFacture();
+
     }
 
     @Override
@@ -115,6 +117,10 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
         dateQuart.setValue(quart.getDateQuart());
         debutQuart.setText(quart.getDebutQuart().toString());
         finQuart.setText(quart.getFinQuart().toString());
+        if(quart.getPause().toString().equals("00:00"))
+            checkboxPause.setSelected(false);
+        else
+            checkboxPause.setSelected(true);
         pause.setText(quart.getPause().toString());
         notesTextArea.setText(quart.getNotes());
         genererPrestation();
@@ -126,14 +132,14 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
 
     private void genererPrestation(){
         switch (quart.getStringPrestation()){
-            case "INF":
-                prestation.setValue("INF");
+            case "SOINS INFIRMIERS":
+                prestation.setValue("SOINS INFIRMIERS");
                 break;
-            case "INF AUX":
-                prestation.setValue("INF AUX");
+            case "INF AUXILIAIRE":
+                prestation.setValue("INF AUXILIAIRE");
                 break;
-            case "INF CL":
-                prestation.setValue("INF CL");
+            case "INF CLINICIEN(NE)":
+                prestation.setValue("INF CLINICIEN(NE)");
                 break;
             case "PAB":
                 prestation.setValue("PAB");

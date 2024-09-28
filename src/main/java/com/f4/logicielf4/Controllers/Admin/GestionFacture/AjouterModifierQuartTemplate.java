@@ -187,7 +187,7 @@ public class AjouterModifierQuartTemplate {
         if (prestation != null) {
             double tauxHoraireValue = switch (prestation) {
                 case "SOINS INFIRMIERS" -> new Inf().obtenirTauxHoraire();
-                case "INFIRMIER(E) AUXILIAIRE" -> new InfAux().obtenirTauxHoraire();
+                case "INF AUXILIAIRE" -> new InfAux().obtenirTauxHoraire();
                 case "INF CLINICIEN(NE)" -> new InfClinic().obtenirTauxHoraire();
                 case "PAB" -> new PAB().obtenirTauxHoraire();
                 default -> 0.0;
@@ -211,7 +211,7 @@ public class AjouterModifierQuartTemplate {
     }
 
     protected void remplirComboBoxPrestation() {
-        List<String> listeNomsPrestations = Arrays.asList("SOINS INFIRMIERS", "INFIRMIER(E) AUXILIAIRE", "INF CLINICIEN(NE)", "PAB");
+        List<String> listeNomsPrestations = Arrays.asList("SOINS INFIRMIERS", "INF AUXILIAIRE", "INF CLINICIEN(NE)", "PAB");
         prestation.getItems().setAll(listeNomsPrestations);
     }
 

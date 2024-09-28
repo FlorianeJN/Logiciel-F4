@@ -77,14 +77,14 @@ public class PresentationFactureController implements Initializable {
         employeColumn.setCellValueFactory(new PropertyValueFactory<>("nomEmploye"));
     }
 
-    private void updateTable() {
+    public void updateTable() {
         ArrayList<Quart> quarts = (ArrayList<Quart>) DBUtils.fetchQuartsByNumFacture(numFacture);
         this.quartsTable.getItems().setAll(quarts);
     }
 
     private void actionBtnAjouter() {
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
-        Model.getInstance().getViewFactory().showAjouterQuartWindow(stage,numFacture);
+        Model.getInstance().getViewFactory().showAjouterQuartWindow(stage,numFacture,this);
         updateTable();
     }
 

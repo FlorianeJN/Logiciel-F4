@@ -62,7 +62,6 @@ public class IOUtils {
 
         contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
         contentStream = writeContent(document, page, contentStream, facture, customFont, yPosition);
-        writeFooter(contentStream, facture, customFont);
         contentStream.close();
 
         document.save(filePath);
@@ -117,27 +116,31 @@ public class IOUtils {
             Partenaire partenaire = facture.getPartenaire();
             if (partenaire != null) {
                 contentStream.setFont(customFont, 10);
-                float partnerX = PDRectangle.LETTER.getWidth() - margin - 200; // Ajuster la valeur 200 si nécessaire
+                float partnerX = PDRectangle.LETTER.getWidth() - margin - 220; // Largeur ajustée pour agrandir le cadre
                 float partnerY = logoY + spacing; // Aligné avec le logo
 
+                // Placer "Facturé à:" au-dessus du cadre
+                contentStream.beginText();
+                contentStream.newLineAtOffset(partnerX, partnerY + 15); // Positionner au-dessus du cadre
+                contentStream.showText("Facturé à:");
+                contentStream.endText();
+
                 // Dessiner le cadre
-                float cadreWidth = 200;
-                float cadreHeight = 60; // Ajuster en fonction de la hauteur souhaitée
+                float cadreWidth = 220; // Largeur du cadre augmentée
+                float cadreHeight = spacing * 5; // Calculer la hauteur en fonction du nombre de lignes de texte
                 contentStream.setStrokingColor(Color.BLACK);
                 contentStream.setLineWidth(1);
-                contentStream.addRect(partnerX - 5, partnerY - cadreHeight - 10, cadreWidth, cadreHeight);
+                contentStream.addRect(partnerX - 5, partnerY - cadreHeight - 5, cadreWidth, cadreHeight + 5); // Ajuster le cadre
                 contentStream.stroke();
 
+                // Informations du partenaire à l'intérieur du cadre
                 contentStream.beginText();
-                contentStream.newLineAtOffset(partnerX, partnerY);
-                contentStream.showText("Facturé à: ");
-                contentStream.newLineAtOffset(0, -spacing);
-                contentStream.newLineAtOffset(0, -spacing);
+                contentStream.newLineAtOffset(partnerX, partnerY - spacing); // Déplacer légèrement vers le bas
                 contentStream.showText(partenaire.getNom());
                 contentStream.newLineAtOffset(0, -spacing);
                 contentStream.showText(partenaire.getAdresseObj().getNumeroCivique() + " " + partenaire.getAdresseObj().getRue());
                 contentStream.newLineAtOffset(0, -spacing);
-                contentStream.showText(partenaire.getAdresseObj().getVille()+ ","+partenaire.getAdresseObj().getProvince() + " " + partenaire.getAdresseObj().getCodePostal());
+                contentStream.showText(partenaire.getAdresseObj().getVille() + ", " + partenaire.getAdresseObj().getProvince() + " " + partenaire.getAdresseObj().getCodePostal());
                 contentStream.newLineAtOffset(0, -spacing);
                 contentStream.showText("Téléphone : " + partenaire.getTelephone());
                 contentStream.endText();
@@ -164,22 +167,28 @@ public class IOUtils {
     private static PDPageContentStream writeContent(PDDocument document, PDPage page, PDPageContentStream contentStream, Facture facture, PDType0Font customFont, float yStart) throws IOException {
         float yPosition = yStart;
         float margin = 30;
+        float minYPosition = 100; // Minimum y position to switch to a new page
 
-        // Ajustement des largeurs des colonnes
+        // Adjust column widths
         float[] columnWidths = {70, 120, 50, 50, 50, 50, 60, 70};
 
+        // Draw table headers
         drawTableHeaders(contentStream, margin, yPosition, columnWidths, customFont);
-        yPosition -= 30; // Ajustement de la position du tableau après la ligne
+        yPosition -= 30; // Adjust position after the line
 
         List<Quart> quarts = facture.getListeQuarts();
         for (Quart quart : quarts) {
-            if (yPosition < 100) {
+            if (yPosition < minYPosition) { // Check if we need a new page
+                // Draw footer before adding a new page
+                drawFooter(document, contentStream);
+
                 contentStream.close();
                 page = new PDPage(PDRectangle.LETTER);
                 document.addPage(page);
                 contentStream = new PDPageContentStream(document, page);
-                yPosition = yStart;
 
+                // Reset yPosition to start table at the top of the new page
+                yPosition = 750; // Set to a value near the top of the new page
                 drawTableHeaders(contentStream, margin, yPosition, columnWidths, customFont);
                 yPosition -= 30;
             }
@@ -188,42 +197,233 @@ public class IOUtils {
             yPosition -= 20;
         }
 
+        // Add space before the amount section
+        yPosition -= 20;
+
+        // Check if we need a new page before the amounts section
+        if (yPosition < minYPosition) {
+            drawFooter(document, contentStream);
+
+            contentStream.close();
+            page = new PDPage(PDRectangle.LETTER);
+            document.addPage(page);
+            contentStream = new PDPageContentStream(document, page);
+
+            // Reset yPosition to start content at the top of the new page
+            yPosition = 750;
+        }
+
+        // Adjust the position of labels and amounts
+        float labelOffset = 350; // Move labels further left
+        float valueOffset = labelOffset + 120; // Adjust for value position
+
+        contentStream.setFont(customFont, 10); // Reduce font size to 10
+
+        // Montant total HT
+        contentStream.beginText();
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText("Montant total HT : ");
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(formatCurrency(facture.getMontantAvantTaxes()));
+        contentStream.endText();
+        yPosition -= 15;
+
+        // Montant TPS
+        contentStream.beginText();
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText("Montant TPS (5%) : ");
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(formatCurrency(facture.getTps()));
+        contentStream.endText();
+        yPosition -= 15;
+
+        // Montant TVQ
+        contentStream.beginText();
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText("Montant TVQ (9,975%) : ");
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(formatCurrency(facture.getTvq()));
+        contentStream.endText();
+        yPosition -= 15; // Adjusted space
+
+        // Check if we need a new page before the TTC amount
+        if (yPosition < minYPosition) {
+            drawFooter(document, contentStream);
+
+            contentStream.close();
+            page = new PDPage(PDRectangle.LETTER);
+            document.addPage(page);
+            contentStream = new PDPageContentStream(document, page);
+            yPosition = 750; // Reset yPosition for the new page
+        }
+
+        // Montant TTC (en gras)
+        contentStream.setFont(customFont, 12); // Slightly larger font for TTC
+        contentStream.beginText();
+        contentStream.setNonStrokingColor(Color.BLACK); // Text color black
+        contentStream.setLineWidth(1.5f); // Increase line width for bold effect
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText("Montant TTC : ");
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.setLineWidth(1.5f); // Increase line width for bold effect
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(formatCurrency(facture.getMontantApresTaxes()));
+        contentStream.endText();
+        yPosition -= 25; // Slightly reduced space
+
+        // Draw footer at the bottom of the last page
+        drawFooter(document, contentStream);
+
         return contentStream;
     }
 
-    private static void writeFooter(PDPageContentStream contentStream, Facture facture, PDType0Font customFont) {
-        try {
-            // Ligne séparatrice
-            contentStream.setStrokingColor(Color.GRAY);
-            contentStream.setLineWidth(1);
-            contentStream.moveTo(30, 120);
-            contentStream.lineTo(580, 120);
-            contentStream.stroke();
 
-            // Détails du paiement
-            contentStream.beginText();
-            contentStream.setFont(customFont, 12);
-            contentStream.newLineAtOffset(30, 100);
-            contentStream.showText("Montant total HT : " + formatCurrency(facture.getMontantAvantTaxes()));
-            contentStream.newLineAtOffset(0, -15);
-            contentStream.showText("Montant TPS (5%) : " + formatCurrency(facture.getTps()));
-            contentStream.newLineAtOffset(0, -15);
-            contentStream.showText("Montant TVQ (9,975%) : " + formatCurrency(facture.getTvq()));
-            contentStream.newLineAtOffset(0, -15);
-            contentStream.setFont(customFont, 14);
-            contentStream.showText("Montant TTC : " + formatCurrency(facture.getMontantApresTaxes()));
-            contentStream.endText();
+    // Method to draw the footer on each page
+    private static void drawFooter(PDDocument document, PDPageContentStream contentStream) throws IOException {
+        // Draw footer image
+        PDImageXObject footerImage = PDImageXObject.createFromFile("src/main/resources/Images/footerF4.png", document); // Ensure correct image path
+        float footerWidth = PDRectangle.LETTER.getWidth(); // Full page width
+        float footerHeight = 50; // Adjust height if necessary
+        float footerX = 0; // Start from left margin
+        float footerY = 20; // Position near bottom
+        contentStream.drawImage(footerImage, footerX, footerY, footerWidth, footerHeight);
+    }
 
-            // Message de remerciement
-            contentStream.beginText();
-            contentStream.setFont(customFont, 12);
-            contentStream.newLineAtOffset(30, 40);
-            contentStream.showText("Merci pour votre confiance.");
-            contentStream.endText();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    // Call the drawFooter method for each page in the document
+    public static void addFootersToAllPages(PDDocument document) throws IOException {
+        for (PDPage page : document.getPages()) {
+            PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
+            drawFooter(document, contentStream);
+            contentStream.close();
         }
+    }
+
+
+
+
+    // Méthode pour convertir le montant en lettres
+    private static String montantEnLettres(BigDecimal amount) {
+        int dollars = amount.intValue(); // Partie entière des dollars
+        return numberToWords(dollars);
+    }
+
+    // Méthode pour obtenir les cents en lettres
+    private static String getCentsInWords(BigDecimal amount) {
+        BigDecimal cents = amount.remainder(BigDecimal.ONE).multiply(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        return numberToWords(cents.intValue());
+    }
+
+    // Méthode pour convertir un nombre en lettres (gère les grands nombres)
+    private static String numberToWords(int number) {
+        if (number == 0) {
+            return "zéro";
+        }
+
+        String[] units = {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"};
+        String[] teens = {"dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"};
+        String[] tens = {"", "", "vingt", "trente", "quarante", "cinquante", "soixante"};
+        String[] tensSpecial = {"soixante", "quatre-vingt"};
+
+        StringBuilder words = new StringBuilder();
+
+        if (number < 0) {
+            words.append("moins ");
+            number = -number;
+        }
+
+        if (number >= 1000000) {
+            int millions = number / 1000000;
+            words.append(numberToWords(millions)).append(" million");
+            if (millions > 1) {
+                words.append("s");
+            }
+            number %= 1000000;
+            if (number > 0) {
+                words.append(" ");
+            }
+        }
+
+        if (number >= 1000) {
+            int thousands = number / 1000;
+            if (thousands > 1) {
+                words.append(numberToWords(thousands)).append(" ");
+            }
+            words.append("mille");
+            number %= 1000;
+            if (number > 0) {
+                words.append(" ");
+            }
+        }
+
+        if (number >= 100) {
+            int hundreds = number / 100;
+            if (hundreds > 1) {
+                words.append(units[hundreds]).append(" cent");
+            } else {
+                words.append("cent");
+            }
+            number %= 100;
+            if (number > 0) {
+                words.append(" ");
+            } else if (hundreds > 1 && number == 0) {
+                words.append("s");
+            }
+        }
+
+        if (number >= 20) {
+            int tensIndex = number / 10;
+            int unit = number % 10;
+            if (tensIndex <= 6) {
+                words.append(tens[tensIndex]);
+                if (unit == 1) {
+                    words.append(" et un");
+                } else if (unit > 1) {
+                    words.append("-").append(units[unit]);
+                }
+            } else {
+                if (tensIndex == 7) {
+                    words.append(tensSpecial[0]);
+                    if (unit == 1) {
+                        words.append(" et onze");
+                    } else if (unit > 1) {
+                        words.append("-").append(teens[unit]);
+                    } else {
+                        words.append("-dix");
+                    }
+                } else if (tensIndex == 8) {
+                    words.append(tensSpecial[1]);
+                    if (unit > 0) {
+                        words.append("-").append(units[unit]);
+                    }
+                } else if (tensIndex == 9) {
+                    words.append(tensSpecial[1]);
+                    if (unit == 1) {
+                        words.append(" et onze");
+                    } else if (unit > 1) {
+                        words.append("-").append(teens[unit]);
+                    } else {
+                        words.append("-dix");
+                    }
+                }
+            }
+        } else if (number >= 10) {
+            words.append(teens[number - 10]);
+        } else if (number > 0) {
+            words.append(units[number]);
+        }
+
+        return words.toString().trim();
     }
 
     // Méthode pour dessiner les en-têtes du tableau
@@ -233,23 +433,26 @@ public class IOUtils {
         float cellHeight = 20f;
         float textY = yPosition - 15;
 
-        // Dessiner le fond des en-têtes
-        contentStream.setNonStrokingColor(new Color(200, 200, 200)); // Gris clair
+        // Draw header background
+        contentStream.setNonStrokingColor(new Color(200, 200, 200)); // Light gray
         contentStream.addRect(xPosition, yPosition - cellHeight, sum(columnWidths), cellHeight);
         contentStream.fill();
-        contentStream.setNonStrokingColor(Color.BLACK); // Réinitialiser la couleur
+        contentStream.setNonStrokingColor(Color.BLACK); // Reset color
 
-        // Dessiner le texte des en-têtes
+        // Draw header text centered
         contentStream.setFont(customFont, 12);
         float nextX = xPosition;
         for (int i = 0; i < headers.length; i++) {
-            float textX = nextX + 5; // Petite marge à gauche de la cellule
+            String header = headers[i];
+            float textWidth = customFont.getStringWidth(header) / 1000 * 12; // Font size is 12
+            float textX = nextX + (columnWidths[i] - textWidth) / 2; // Center the text within the cell
+
             contentStream.beginText();
             contentStream.newLineAtOffset(textX, textY);
-            contentStream.showText(headers[i]);
+            contentStream.showText(header);
             contentStream.endText();
 
-            // Dessiner les bordures des cellules
+            // Draw cell borders
             contentStream.setStrokingColor(Color.BLACK);
             contentStream.addRect(nextX, yPosition - cellHeight, columnWidths[i], cellHeight);
             contentStream.stroke();
@@ -258,11 +461,12 @@ public class IOUtils {
         }
     }
 
-    // Méthode pour dessiner une ligne du tableau
+
     private static void drawTableRow(PDPageContentStream contentStream, float xPosition, float yPosition, Quart quart, float[] columnWidths, PDType0Font customFont) throws IOException {
         float cellHeight = 20f;
         float textY = yPosition - 15;
 
+        // Get the row data
         String dateQuart = quart.getDateQuart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String prestation = quart.getStringPrestation();
         String debut = quart.getDebutQuart().toString();
@@ -274,23 +478,19 @@ public class IOUtils {
 
         String[] rowData = {dateQuart, prestation, debut, fin, pause, tempsTotal, tauxHoraire, montantHT};
 
-        contentStream.setFont(customFont, 10);
+        contentStream.setFont(customFont, 10); // Font size 10 for table rows
         float nextX = xPosition;
         for (int i = 0; i < rowData.length; i++) {
-            float textX = nextX + 5; // Petite marge à gauche de la cellule
-
-            // Aligner à droite les valeurs numériques
-            if (i >= 5) { // Les colonnes "Temps", "Taux", "Montant HT"
-                float stringWidth = customFont.getStringWidth(rowData[i]) / 1000 * 10; // Taille de police 10
-                textX = nextX + columnWidths[i] - stringWidth - 5; // Ajuster pour aligner à droite
-            }
+            String cellText = rowData[i];
+            float textWidth = customFont.getStringWidth(cellText) / 1000 * 10; // Font size is 10
+            float textX = nextX + (columnWidths[i] - textWidth) / 2; // Center the text within the cell
 
             contentStream.beginText();
             contentStream.newLineAtOffset(textX, textY);
-            contentStream.showText(rowData[i]);
+            contentStream.showText(cellText);
             contentStream.endText();
 
-            // Dessiner les bordures des cellules
+            // Draw cell borders
             contentStream.setStrokingColor(Color.BLACK);
             contentStream.addRect(nextX, yPosition - cellHeight, columnWidths[i], cellHeight);
             contentStream.stroke();
@@ -301,9 +501,13 @@ public class IOUtils {
 
     // Méthode pour formater les montants en devise
     private static String formatCurrency(BigDecimal value) {
-        NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.CANADA_FRENCH);
-        return currencyFormat.format(value);
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance(Locale.CANADA_FRENCH); // Utiliser le format de nombre sans le signe $ par défaut
+        currencyFormat.setMinimumFractionDigits(2); // Toujours afficher deux décimales
+        currencyFormat.setMaximumFractionDigits(2);
+        return currencyFormat.format(value) + " $"; // Ajouter le signe $ à la fin
     }
+
+
 
     // Méthode pour sommer les valeurs d'un tableau de float
     private static float sum(float[] values) {

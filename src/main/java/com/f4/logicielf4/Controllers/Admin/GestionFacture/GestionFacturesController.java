@@ -138,7 +138,7 @@ public class GestionFacturesController implements Initializable {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de modifier.", "ERREUR MODIFICATION");
         } else {
             Stage stage = (Stage) btnModifier.getScene().getWindow();
-            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getPartenaire().getNom());
+            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getNomPartenaire());
             updateTable();
           //  updateLabels();
         }
