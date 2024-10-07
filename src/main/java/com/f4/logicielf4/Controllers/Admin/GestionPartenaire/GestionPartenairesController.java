@@ -1,7 +1,9 @@
 package com.f4.logicielf4.Controllers.Admin.GestionPartenaire;
 
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Partenaire;
+import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
@@ -12,8 +14,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -90,30 +95,91 @@ public class GestionPartenairesController implements Initializable {
         setCellValues();
         updateTable();
         updateLabels();
-        setupQuartsPieChart();      //MÉTHODE À MODIFIER À LA FIN
+        setupQuartsPieChart();
         setupRevenuBarChart();      //MÉTHODE À MODIFIER À LA FIN
     }
 
     private void setupQuartsPieChart() {
+        // Create a new PieChart
         PieChart pieChart = new PieChart();
-        pieChart.getData().add(new PieChart.Data("Employeur 1", 45));
-        pieChart.getData().add(new PieChart.Data("Employeur 2", 30));
-        pieChart.getData().add(new PieChart.Data("Employeur 3", 25));
+
+        // Fetch all shifts (quarts) from the database
+        List<Quart> quarts = DBUtils.fetchAllQuarts();
+
+        // Create a map to store the count of shifts for each partner
+        Map<String, Integer> partnerShiftCount = new HashMap<>();
+
+        // Iterate through the list of quarts
+        for (Quart quart : quarts) {
+            // Retrieve the facture associated with the current quart using num_facture
+            Facture facture = DBUtils.fetchFactureByNumFacture(quart.getNumFacture());
+
+            // Check if the facture exists and get the partner's name
+            if (facture != null) {
+                String partnerName = facture.getNomPartenaire();
+
+                // Increment the count of shifts for this partner
+                partnerShiftCount.put(partnerName, partnerShiftCount.getOrDefault(partnerName, 0) + 1);
+            }
+        }
+
+        // Populate the PieChart with the shift counts
+        for (Map.Entry<String, Integer> entry : partnerShiftCount.entrySet()) {
+            // Display the number of shifts next to the partner's name
+            String label = entry.getKey() + " (" + entry.getValue() + ")";
+            PieChart.Data slice = new PieChart.Data(label, entry.getValue());
+            pieChart.getData().add(slice);
+        }
+
+        // Optionally, set up tooltips for additional details
+        for (PieChart.Data data : pieChart.getData()) {
+            Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
+            Tooltip.install(data.getNode(), tooltip);
+        }
+
+        // Add the PieChart to the VBox in the FXML layout
         quartsGraphBox.getChildren().add(pieChart);
     }
 
+
+
     private void setupRevenuBarChart() {
+        // Create axes for the bar chart
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Montant Total"); // Label for y-axis indicating the total amount
+
+        // Create the BarChart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
 
+        // Create a data series for the bar chart
         XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
-        dataSeries.setName("Revenu 2024");
-        dataSeries.getData().add(new XYChart.Data<>("Employeur 1", 25000));
-        dataSeries.getData().add(new XYChart.Data<>("Employeur 2", 15000));
-        dataSeries.getData().add(new XYChart.Data<>("Employeur 3", 10000));
+        dataSeries.setName("Montant total");
 
+        // Fetch all factures from the database
+        List<Facture> factures = DBUtils.fetchAllFacture();
+
+        // Create a map to store the total amount for each partner
+        Map<String, BigDecimal> partnerTotalAmount = new HashMap<>();
+
+        // Iterate through the list of factures and sum amounts per partner
+        for (Facture facture : factures) {
+            String partnerName = facture.getNomPartenaire();
+            BigDecimal montantApresTaxes = facture.getMontantApresTaxes();
+
+            // Add the montant_apres_taxes to the current total for the partner
+            partnerTotalAmount.put(partnerName, partnerTotalAmount.getOrDefault(partnerName, BigDecimal.ZERO).add(montantApresTaxes));
+        }
+
+        // Populate the data series with the total amounts
+        for (Map.Entry<String, BigDecimal> entry : partnerTotalAmount.entrySet()) {
+            dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+
+        // Add the data series to the bar chart
         barChart.getData().add(dataSeries);
+
+        // Add the bar chart to the VBox in the FXML layout
         revenuGraphBox.getChildren().add(barChart);
     }
 
@@ -187,7 +253,6 @@ public class GestionPartenairesController implements Initializable {
             Dialogs.showMessageDialog("Erreur lors de la mise à jour des partenaires : " + e.getMessage(), "ERREUR");
         }
     }
-
 
     /**
      * Action pour le bouton "Mise à jour". Ouvre la fenêtre de mise à jour pour le partenaire sélectionné.

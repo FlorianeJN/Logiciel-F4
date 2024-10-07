@@ -219,24 +219,58 @@ public class DBUtils {
      * @return true si le partenaire a été marqué comme inactif avec succès, false sinon
      */
     public static boolean deletePartner(Map<String, String> partnerInfo) {
-        String query = "DELETE FROM partenaire WHERE nom = ?";
+        String deleteFactureQuery = "DELETE FROM facture WHERE nom_partenaire = ?";
+        String deletePartnerQuery = "DELETE FROM partenaire WHERE nom = ?";
 
-        try (Connection connection = DriverManager.getConnection(url, user, pass);
-             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+        Connection connection = null;
 
-            // Définir le nom du partenaire à supprimer
-            preparedStatement.setString(1, partnerInfo.get("nom"));
+        try {
+            connection = DriverManager.getConnection(url, user, pass);
 
-            // Exécuter la suppression
-            int rowsAffected = preparedStatement.executeUpdate();
+            // Begin a transaction
+            connection.setAutoCommit(false);
 
-            return rowsAffected > 0; // Retourne true si au moins une ligne a été supprimée
+            // Delete all associated factures first
+            try (PreparedStatement psDeleteFacture = connection.prepareStatement(deleteFactureQuery)) {
+                psDeleteFacture.setString(1, partnerInfo.get("nom"));
+                psDeleteFacture.executeUpdate();
+            }
 
+            // Now delete the partner
+            try (PreparedStatement psDeletePartner = connection.prepareStatement(deletePartnerQuery)) {
+                psDeletePartner.setString(1, partnerInfo.get("nom"));
+                int rowsAffected = psDeletePartner.executeUpdate();
+
+                // Commit the transaction
+                connection.commit();
+
+                return rowsAffected > 0; // Return true if at least one row was deleted
+            }
         } catch (Exception e) {
             e.printStackTrace();
+            if (connection != null) {
+                try {
+                    // Rollback in case of an error
+                    connection.rollback();
+                } catch (SQLException rollbackException) {
+                    rollbackException.printStackTrace();
+                }
+            }
             return false;
+        } finally {
+            if (connection != null) {
+                try {
+                    // Restore auto-commit mode
+                    connection.setAutoCommit(true);
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
+
+
 
     /**
      * Fetches all employees from the database.
@@ -610,6 +644,151 @@ public class DBUtils {
 
             pstmt.executeUpdate();
         }
+    }
+
+    public static List<Quart> fetchAllQuarts() {
+        List<Quart> quarts = new ArrayList<>();
+        String query = "SELECT * FROM Quart";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query);
+             ResultSet rs = psFetch.executeQuery()) {
+
+            while (rs.next()) {
+                // Retrieve values from ResultSet
+                int id = rs.getInt("id");
+                String numFacture = rs.getString("num_facture");
+
+                // Ensure proper handling of null values for Date and Time fields
+                Date dateQuart = rs.getDate("date_quart"); // Can be null
+                Time debutQuart = rs.getTime("debut_quart"); // Can be null
+                Time finQuart = rs.getTime("fin_quart"); // Can be null
+                Time pause = rs.getTime("pause"); // Can be null
+
+                String tempsTotal = rs.getString("temps_total");
+                String prestation = rs.getString("prestation");
+                BigDecimal tauxHoraire = rs.getBigDecimal("taux_horaire");
+                BigDecimal montantTotal = rs.getBigDecimal("montant_total");
+                String notes = rs.getString("notes");
+                String nomEmploye = rs.getString("emp_name");
+                boolean tempsDemi = rs.getInt("tempsDemi") == 1;
+                boolean tempsDouble = rs.getInt("tempsDouble") == 1;
+
+                // Use default values if any field is null
+                if (dateQuart == null) {
+                    dateQuart = Date.valueOf(LocalDate.now()); // Default to current date
+                }
+                if (debutQuart == null) {
+                    debutQuart = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                }
+                if (finQuart == null) {
+                    finQuart = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                }
+                if (pause == null) {
+                    pause = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                }
+
+                // Create a new Quart object using the constructor that matches your class
+                Quart quart = new Quart(
+                        id,
+                        numFacture,
+                        dateQuart,
+                        debutQuart,
+                        finQuart,
+                        pause,
+                        tempsTotal,
+                        prestation,
+                        tauxHoraire,
+                        montantTotal,
+                        notes,
+                        nomEmploye,
+                        tempsDouble,
+                        tempsDemi
+                );
+
+                // Add the object to the list
+                quarts.add(quart);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle exceptions here
+        }
+
+        return quarts; // Return the list of Quart objects
+    }
+
+    public static Facture fetchFactureByNumFacture(String numFacture) {
+        Facture facture = null;
+        String query = "SELECT * FROM Facture WHERE num_facture = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query)) {
+
+            // Set the parameter for the query
+            psFetch.setString(1, numFacture);
+
+            // Execute the query and get the result set
+            ResultSet rs = psFetch.executeQuery();
+
+            // Check if a result is returned
+            if (rs.next()) {
+                // Retrieve data from the result set
+                String num = rs.getString("num_facture");
+                String nomPartenaire = rs.getString("nom_partenaire");
+                LocalDate date = rs.getDate("date").toLocalDate();
+                BigDecimal montantAvantTaxes = rs.getBigDecimal("montant_avant_taxes");
+                BigDecimal tps = rs.getBigDecimal("tps");
+                BigDecimal tvq = rs.getBigDecimal("tvq");
+                BigDecimal montantApresTaxes = rs.getBigDecimal("montant_apres_taxes");
+                String statut = rs.getString("statut");
+
+                // Fetch the Partenaire object using the partner name or ID
+                Partenaire partenaire = fetchPartnerByName(nomPartenaire);
+
+                // Create a new Facture object with the retrieved data
+                facture = new Facture(num, partenaire, date, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle SQL exception
+        }
+
+        return facture; // Return the Facture object, or null if not found
+    }
+
+    public static Partenaire fetchPartnerByName(String nomPartenaire) {
+        Partenaire partner = null;
+        String query = "SELECT * FROM partenaire WHERE nom = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psFetch = connection.prepareStatement(query)) {
+
+            // Set the parameter for the query
+            psFetch.setString(1, nomPartenaire);
+
+            // Execute the query and get the result set
+            ResultSet rs = psFetch.executeQuery();
+
+            // Check if a result is returned
+            if (rs.next()) {
+                String numeroCivique = rs.getString("numero_civique");
+                String rue = rs.getString("rue");
+                String ville = rs.getString("ville");
+                String province = rs.getString("province");
+                String codePostal = rs.getString("code_postal");
+                String telephone = rs.getString("telephone");
+                String courriel = rs.getString("courriel");
+                String status = rs.getString("status");
+
+                // Create a new Partenaire object
+                partner = new Partenaire(nomPartenaire, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle SQL exception
+        }
+
+        return partner; // Return the Partenaire object, or null if not found
     }
 
 

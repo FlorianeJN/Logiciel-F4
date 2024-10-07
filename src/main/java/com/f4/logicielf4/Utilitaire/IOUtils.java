@@ -309,9 +309,6 @@ public class IOUtils {
         }
     }
 
-
-
-
     // Méthode pour convertir le montant en lettres
     private static String montantEnLettres(BigDecimal amount) {
         int dollars = amount.intValue(); // Partie entière des dollars
