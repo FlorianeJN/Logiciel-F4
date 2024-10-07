@@ -225,14 +225,13 @@ public class AjouterModifierQuartTemplate {
         prestation.getSelectionModel().clearSelection();
         debutQuart.clear();
         finQuart.clear();
-        pause.clear();
         tempsTotal.clear();
         tauxHoraire.clear();
         montantHT.clear();
         notesTextArea.clear();
         associerEmpCheckBox.setSelected(false);
         empComboBox.getSelectionModel().clearSelection();
+        checkboxPause.setSelected(false);
+        pause.setText("00:00");
     }
-
-
 }

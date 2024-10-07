@@ -103,6 +103,10 @@ public class GestionPartenairesController implements Initializable {
         // Create a new PieChart
         PieChart pieChart = new PieChart();
 
+        // Create a custom title for the PieChart
+        Label pieChartTitle = new Label("Répartition des quarts par partenaire");
+        pieChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+
         // Fetch all shifts (quarts) from the database
         List<Quart> quarts = DBUtils.fetchAllQuarts();
 
@@ -137,24 +141,25 @@ public class GestionPartenairesController implements Initializable {
             Tooltip.install(data.getNode(), tooltip);
         }
 
-        // Add the PieChart to the VBox in the FXML layout
-        quartsGraphBox.getChildren().add(pieChart);
+        // Add the title and the PieChart to the VBox in the FXML layout
+        quartsGraphBox.getChildren().clear(); // Clear previous content
+        quartsGraphBox.getChildren().addAll(pieChartTitle, pieChart); // Add title and chart
     }
-
-
-
     private void setupRevenuBarChart() {
         // Create axes for the bar chart
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Montant Total"); // Label for y-axis indicating the total amount
+        yAxis.setLabel("Revenus ($)");
+
+        // Create a custom title for the BarChart
+        Label barChartTitle = new Label("Répartition des revenus par partenaire");
+        barChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill:#004d40;");
 
         // Create the BarChart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
 
         // Create a data series for the bar chart
         XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
-        dataSeries.setName("Montant total");
 
         // Fetch all factures from the database
         List<Facture> factures = DBUtils.fetchAllFacture();
@@ -179,8 +184,9 @@ public class GestionPartenairesController implements Initializable {
         // Add the data series to the bar chart
         barChart.getData().add(dataSeries);
 
-        // Add the bar chart to the VBox in the FXML layout
-        revenuGraphBox.getChildren().add(barChart);
+        // Add the title and the BarChart to the VBox in the FXML layout
+        revenuGraphBox.getChildren().clear(); // Clear previous content
+        revenuGraphBox.getChildren().addAll(barChartTitle, barChart); // Add title and chart
     }
 
     /**

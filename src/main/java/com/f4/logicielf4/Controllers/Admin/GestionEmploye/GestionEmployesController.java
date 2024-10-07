@@ -1,19 +1,25 @@
 package com.f4.logicielf4.Controllers.Admin.GestionEmploye;
 
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Employe;
+import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.math.BigDecimal;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -86,59 +92,106 @@ public class GestionEmployesController implements Initializable {
         setCellValues();
         updateTable();
         updateLabels();
-        setupDepartmentChart();
-        setupPositionChart();
+        setupGraphiqueRepartitionQuarts();
+        setupGraphiqueRepartitionRevenus();
     }
-
     /**
-     * Configure le graphique circulaire représentant la répartition des employés par département.
-     * Données fictives utilisées pour la démonstration.
+     * Configure le graphique circulaire représentant la répartition des quarts parmi les employés.
      */
-    private void setupDepartmentChart() {
-        // Créer le graphique circulaire pour les départements
-        PieChart departmentChart = new PieChart();
+    private void setupGraphiqueRepartitionQuarts() {
+        // Create a new PieChart
+        PieChart pieChart = new PieChart();
 
-        // Données fictives pour les départements
-        PieChart.Data slice1 = new PieChart.Data("Ventes", 30);
-        PieChart.Data slice2 = new PieChart.Data("RH", 25);
-        PieChart.Data slice3 = new PieChart.Data("IT", 20);
-        PieChart.Data slice4 = new PieChart.Data("Finance", 15);
-        PieChart.Data slice5 = new PieChart.Data("Marketing", 10);
+        // Create a title label for the chart and align it to the left
+        Label titleLabelQuarts = new Label("Répartition des quarts par employé");
+        titleLabelQuarts.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+        titleLabelQuarts.setAlignment(Pos.BASELINE_LEFT);
 
-        // Ajouter les données au graphique
-        departmentChart.getData().addAll(slice1, slice2, slice3, slice4, slice5);
+        // Fetch all shifts (quarts) from the database
+        List<Quart> quarts = DBUtils.fetchAllQuarts();
 
-        // Ajouter le graphique à la boîte correspondante
-        departmentGraphBox.getChildren().add(departmentChart);
+        // Create a map to store the count of shifts for each employee
+        Map<String, Integer> employeeShiftCount = new HashMap<>();
+
+        // Iterate through the list of quarts
+        for (Quart quart : quarts) {
+            String employeeName = quart.getNomEmploye();
+
+            // Increment the count of shifts for this employee
+            employeeShiftCount.put(employeeName, employeeShiftCount.getOrDefault(employeeName, 0) + 1);
+        }
+
+        // Populate the PieChart with the shift counts
+        for (Map.Entry<String, Integer> entry : employeeShiftCount.entrySet()) {
+            // Display the number of shifts next to the employee's name
+            String label = entry.getKey() + " (" + entry.getValue() + ")";
+            PieChart.Data slice = new PieChart.Data(label, entry.getValue());
+            pieChart.getData().add(slice);
+        }
+
+        // Optionally, set up tooltips for additional details
+        for (PieChart.Data data : pieChart.getData()) {
+            Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
+            Tooltip.install(data.getNode(), tooltip);
+        }
+
+        // Optionally, you can set the size of the pie chart here
+        pieChart.setPrefSize(600, 400);
+
+        // Clear any previous content and add the title and the chart to the VBox
+        departmentGraphBox.getChildren().clear();
+        departmentGraphBox.getChildren().addAll(titleLabelQuarts, pieChart);
     }
-
     /**
-     * Configure le graphique à barres représentant la répartition des employés par poste.
-     * Données fictives utilisées pour la démonstration.
+     * Configure le graphique à barres représentant la répartition des revenus parmi les employés.
      */
-    private void setupPositionChart() {
-        // Créer le graphique à barres pour les postes
+    private void setupGraphiqueRepartitionRevenus() {
+        // Create axes for the bar chart
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        BarChart<String, Number> positionChart = new BarChart<>(xAxis, yAxis);
+        yAxis.setLabel("Montant Total ($)"); // Label for y-axis indicating the total amount
 
-        // Configurer les axes
-        xAxis.setLabel("Poste");
-        yAxis.setLabel("Nombre");
+        // Create the BarChart
+        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
 
-        // Créer la série de données pour les postes
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Postes");
+        // Create a title label for the chart and align it to the left
+        Label titleLabelRevenus = new Label("Répartition des revenus par employé");
+        titleLabelRevenus.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+        titleLabelRevenus.setAlignment(Pos.BASELINE_LEFT);
 
-        // Données fictives pour les postes
-        series.getData().add(new XYChart.Data<>("Manager", 10));
-        series.getData().add(new XYChart.Data<>("Développeur", 20));
-        series.getData().add(new XYChart.Data<>("Analyste", 15));
-        series.getData().add(new XYChart.Data<>("Stagiaire", 5));
+        // Create a data series for the bar chart
+        XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
+        dataSeries.setName("Montant total");
 
-        positionChart.getData().add(series);
+        // Fetch all shifts (quarts) from the database
+        List<Quart> quarts = DBUtils.fetchAllQuarts();
 
-        positionGraphBox.getChildren().add(positionChart);
+        // Create a map to store the total revenue for each employee
+        Map<String, BigDecimal> employeeTotalAmount = new HashMap<>();
+
+        // Iterate through the list of quarts and sum amounts per employee
+        for (Quart quart : quarts) {
+            String employeeName = quart.getNomEmploye();
+            BigDecimal montantTotal = BigDecimal.valueOf(quart.getMontantTotal());
+
+            // Add the total amount to the current total for the employee
+            employeeTotalAmount.put(employeeName, employeeTotalAmount.getOrDefault(employeeName, BigDecimal.ZERO).add(montantTotal));
+        }
+
+        // Populate the data series with the total amounts
+        for (Map.Entry<String, BigDecimal> entry : employeeTotalAmount.entrySet()) {
+            dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+
+        // Add the data series to the bar chart
+        barChart.getData().add(dataSeries);
+
+        // Optionally, you can set the size of the bar chart here
+        barChart.setPrefSize(800, 600);
+
+        // Clear any previous content and add the title and the chart to the VBox
+        positionGraphBox.getChildren().clear();
+        positionGraphBox.getChildren().addAll(titleLabelRevenus, barChart);
     }
 
     /**
