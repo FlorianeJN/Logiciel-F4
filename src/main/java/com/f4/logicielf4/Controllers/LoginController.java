@@ -16,8 +16,9 @@ import java.util.ResourceBundle;
 /**
  * Classe contrôleur pour la gestion de la connexion utilisateur.
  * <p>
- * Ce contrôleur gère l'affichage et la logique de connexion, y compris la gestion du champ de mot de passe
- * visible/masqué et l'authentification des utilisateurs.
+ * Ce contrôleur gère l'authentification de l'utilisateur, ainsi que l'affichage ou le masquage du mot de passe.
+ * Il permet à l'utilisateur de se connecter en fournissant un nom d'utilisateur et un mot de passe,
+ * et propose une fonctionnalité de visibilité du mot de passe.
  * </p>
  */
 public class LoginController implements Initializable {
@@ -38,43 +39,60 @@ public class LoginController implements Initializable {
     private CheckBox showPasswordCheckBox;
 
     /**
-     * Initialise la classe contrôleur. Cette méthode est appelée après que le fichier FXML a été chargé.
-     * <p>
-     * Configure les gestionnaires d'événements pour le bouton de connexion et la case à cocher de visibilité du mot de passe.
-     * </p>
+     * Méthode d'initialisation appelée après le chargement du fichier FXML.
+     * Configure les actions pour le bouton de connexion et la case à cocher pour la visibilité du mot de passe.
      *
-     * @param url l'emplacement utilisé pour résoudre les chemins relatifs pour l'objet racine, ou {@code null} si l'emplacement n'est pas connu
-     * @param resourceBundle les ressources utilisées pour localiser l'objet racine, ou {@code null} si l'objet racine n'a pas été localisé
+     * @param url L'URL de la ressource FXML (non utilisée).
+     * @param resourceBundle Le ResourceBundle utilisé pour localiser les ressources (non utilisé).
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        passwordFieldVisible.textProperty().bind(passwordField.textProperty());
+        // Masquer le champ de mot de passe visible au départ
+        passwordFieldVisible.setVisible(false);
+
+        // Gérer l'affichage/masquage du mot de passe
         showPasswordCheckBox.setOnAction(event -> actionCheckBoxShowPassword());
+
+        // Synchroniser les contenus des champs de mot de passe
+        passwordField.textProperty().addListener((obs, oldText, newText) -> {
+            if (!showPasswordCheckBox.isSelected()) {
+                passwordFieldVisible.setText(newText);
+            }
+        });
+
+        passwordFieldVisible.textProperty().addListener((obs, oldText, newText) -> {
+            if (showPasswordCheckBox.isSelected()) {
+                passwordField.setText(newText);
+            }
+        });
+
+        // Action du bouton de connexion
         loginButton.setOnAction(event -> actionBtnLogin());
     }
 
     /**
-     * Gère l'action de la case à cocher pour afficher/masquer le mot de passe.
+     * Gère l'affichage ou le masquage du mot de passe en fonction de l'état de la case à cocher.
      * <p>
-     * Affiche le mot de passe en clair dans le champ de texte si la case est cochée,
-     * sinon masque le mot de passe dans le champ de mot de passe.
+     * Si la case est cochée, le mot de passe est affiché en clair, sinon il est masqué.
      * </p>
      */
     private void actionCheckBoxShowPassword() {
         if (showPasswordCheckBox.isSelected()) {
             passwordField.setVisible(false);
             passwordFieldVisible.setVisible(true);
+            passwordFieldVisible.setText(passwordField.getText());
         } else {
             passwordField.setVisible(true);
             passwordFieldVisible.setVisible(false);
+            passwordField.setText(passwordFieldVisible.getText());
         }
     }
 
     /**
-     * Gère l'action du bouton de connexion. Vérifie les informations d'identification de l'utilisateur
-     * et redirige vers la fenêtre d'administration si les informations sont valides.
+     * Gère l'action du bouton de connexion. Vérifie les informations d'identification de l'utilisateur.
      * <p>
-     * Si les informations sont incorrectes, les champs de saisie sont réinitialisés.
+     * Si les informations sont correctes, l'utilisateur est redirigé vers la fenêtre d'administration.
+     * Sinon, les champs de saisie sont réinitialisés.
      * </p>
      */
     private void actionBtnLogin() {
@@ -88,12 +106,10 @@ public class LoginController implements Initializable {
         } else {
             clearFields();
         }
-        username = null;
-        password = null;
     }
 
     /**
-     * Réinitialise les champs de saisie de nom d'utilisateur et de mot de passe.
+     * Réinitialise les champs de saisie pour le nom d'utilisateur et le mot de passe.
      */
     private void clearFields() {
         usernameField.clear();

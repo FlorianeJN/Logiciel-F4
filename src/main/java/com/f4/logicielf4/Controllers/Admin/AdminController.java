@@ -2,7 +2,6 @@ package com.f4.logicielf4.Controllers.Admin;
 
 import com.f4.logicielf4.Models.Model;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.BorderPane;
 
@@ -10,22 +9,25 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur principal pour l'administration.
- * Ce contrôleur gère les changements de vue dans la zone centrale du BorderPane
- * en fonction de l'option sélectionnée par l'utilisateur.
+ * Contrôleur principal pour la vue d'administration.
+ * Ce contrôleur gère la mise à jour de la zone centrale du BorderPane
+ * en fonction de l'option sélectionnée par l'utilisateur dans le menu d'administration.
  */
 public class AdminController implements Initializable {
 
     /**
-     * La zone centrale du BorderPane dans la vue d'administration.
+     * Le BorderPane contenant la zone centrale qui sera mise à jour
+     * en fonction de l'option sélectionnée par l'utilisateur.
      */
     public BorderPane admin_parent;
 
     /**
-     * Initialise le contrôleur après le chargement du FXML.
+     * Méthode appelée automatiquement après le chargement du fichier FXML.
+     * Elle initialise le contrôleur et ajoute les écouteurs nécessaires pour
+     * détecter les changements d'option sélectionnée par l'utilisateur.
      *
-     * @param url L'URL de la ressource FXML (non utilisé dans ce contexte).
-     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé dans ce contexte).
+     * @param url L'URL de la ressource FXML utilisée pour résoudre les chemins relatifs.
+     * @param resourceBundle Le ResourceBundle contenant les ressources localisées.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -33,24 +35,25 @@ public class AdminController implements Initializable {
     }
 
     /**
-     * Ajoute un écouteur pour les changements de sélection des options dans le modèle.
-     * Met à jour la vue centrale du BorderPane en fonction de l'option sélectionnée.
-     * Les options disponibles sont : "Factures", "Partenaires", "Employes", "Profil",
-     * et par défaut la vue du tableau de bord d'administration est utilisée.
+     * Ajoute un écouteur pour surveiller les changements de sélection des options dans le modèle.
+     * La vue centrale du BorderPane sera mise à jour en fonction de l'option choisie parmi :
+     * "Factures", "Partenaires", "Employes", "Profil", ou par défaut, le tableau de bord d'administration.
+     * L'écouteur permet de gérer dynamiquement la mise à jour des vues sans recharger l'ensemble de l'interface.
      */
     private void ajouterListeners() {
-        // Obtenez une instance du modèle et de la fabrique de vues
+        // Obtenir une instance du modèle et de la fabrique de vues associée
         Model model = Model.getInstance();
         var viewFactory = model.getViewFactory();
 
-        // Ajoutez un écouteur pour les changements de sélection
+        // Ajouter un écouteur sur la sélection d'options
         viewFactory.getOptionSelectionnee().addListener((ChangeListener<String>) (observableValue, oldVal, newVal) -> {
             if (newVal == null) {
-                // Si newVal est null, utilisez la vue par défaut
+                // Si aucune option n'est sélectionnée, affiche le tableau de bord par défaut
                 admin_parent.setCenter(viewFactory.getAdminDashboardView());
                 return;
             }
 
+            // Mise à jour de la vue centrale selon l'option sélectionnée
             switch (newVal) {
                 case "Factures" -> admin_parent.setCenter(viewFactory.getFacturesView());
                 case "Partenaires" -> admin_parent.setCenter(viewFactory.getPartenairesView());

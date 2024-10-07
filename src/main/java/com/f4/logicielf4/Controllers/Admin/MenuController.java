@@ -11,10 +11,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Classe contrôleur pour gérer le menu dans l'interface Admin.
+ * Contrôleur pour gérer le menu dans l'interface Admin.
  * <p>
- * Ce contrôleur gère les actions pour divers boutons dans le menu, tels que la navigation vers différentes vues,
- * la gestion de la déconnexion de l'utilisateur, et d'autres actions.
+ * Ce contrôleur gère les actions associées aux boutons du menu,
+ * permettant de naviguer vers différentes sections comme le tableau de bord,
+ * la gestion des factures, des partenaires, des employés,
+ * ainsi que les actions de déconnexion.
  * </p>
  */
 public class MenuController implements Initializable {
@@ -41,13 +43,13 @@ public class MenuController implements Initializable {
     private Button btnReport;
 
     /**
-     * Initialise la classe contrôleur. Cette méthode est appelée après que le fichier FXML a été chargé.
+     * Initialise la classe contrôleur après le chargement du FXML.
      * <p>
-     * Configure les gestionnaires d'événements pour les boutons du menu.
+     * Configure les actions à exécuter lorsque chaque bouton est appuyé.
      * </p>
      *
-     * @param url l'emplacement utilisé pour résoudre les chemins relatifs pour l'objet racine, ou {@code null} si l'emplacement n'est pas connu
-     * @param resourceBundle les ressources utilisées pour localiser l'objet racine, ou {@code null} si l'objet racine n'a pas été localisé
+     * @param url L'URL de la ressource FXML (non utilisé dans ce contexte).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé dans ce contexte).
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -61,7 +63,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Dashboard. Définit l'option sélectionnée dans le modèle de vue sur "Dashboard".
+     * Gère l'action du bouton "Dashboard".
+     * Sélectionne l'option "Dashboard" dans le modèle de vue pour afficher le tableau de bord.
      */
     private void actionBtnDashboard() {
         System.out.println("Bouton Dashboard appuyé");
@@ -69,7 +72,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Facture. Définit l'option sélectionnée dans le modèle de vue sur "Factures".
+     * Gère l'action du bouton "Facture".
+     * Sélectionne l'option "Factures" dans le modèle de vue pour afficher la gestion des factures.
      */
     private void actionBtnFacture() {
         System.out.println("Bouton Facture appuyé");
@@ -77,7 +81,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Partenaire. Définit l'option sélectionnée dans le modèle de vue sur "Partenaires".
+     * Gère l'action du bouton "Partenaire".
+     * Sélectionne l'option "Partenaires" dans le modèle de vue pour afficher la gestion des partenaires.
      */
     private void actionBtnPartenaire() {
         System.out.println("Bouton Partenaire appuyé");
@@ -85,7 +90,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Employé. Définit l'option sélectionnée dans le modèle de vue sur "Employes".
+     * Gère l'action du bouton "Employé".
+     * Sélectionne l'option "Employes" dans le modèle de vue pour afficher la gestion des employés.
      */
     private void actionBtnEmploye() {
         System.out.println("Bouton Employé appuyé");
@@ -93,7 +99,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Profil. Définit l'option sélectionnée dans le modèle de vue sur "Profil".
+     * Gère l'action du bouton "Profil".
+     * Sélectionne l'option "Profil" dans le modèle de vue pour afficher la section du profil de l'utilisateur.
      */
     private void actionBtnMonProfil() {
         System.out.println("Bouton Profil appuyé");
@@ -101,8 +108,9 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Déconnexion. Affiche une boîte de dialogue de confirmation avant de fermer la fenêtre
-     * actuelle et de montrer la fenêtre de connexion.
+     * Gère l'action du bouton "Déconnexion".
+     * Affiche une boîte de dialogue pour confirmer la déconnexion. Si confirmée, ferme la fenêtre actuelle
+     * et retourne à la fenêtre de connexion.
      */
     private void actionBtnDeconnexion() {
         System.out.println("Bouton Déconnexion appuyé");
@@ -115,7 +123,8 @@ public class MenuController implements Initializable {
     }
 
     /**
-     * Gère l'action du bouton Report. Actuellement, cette action est non définie.
+     * Gère l'action du bouton "Report".
+     * Cette action n'est pas encore définie et affiche simplement un message.
      */
     private void actionBtnReport() {
         System.out.println("Bouton Report appuyé");

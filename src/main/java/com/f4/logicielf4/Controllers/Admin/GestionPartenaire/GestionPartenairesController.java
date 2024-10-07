@@ -22,8 +22,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur pour l'écran "Gestion Partenaires" de l'admin, qui permet de gérer les partenaires.
- * Il permet l'ajout, la mise à jour et la suppression de partenaires.
+ * Contrôleur pour l'écran de gestion des partenaires dans l'interface d'administration.
+ * Il permet d'ajouter, mettre à jour et supprimer des partenaires, ainsi que d'afficher
+ * des graphiques représentant la répartition des quarts et des revenus par partenaire.
  */
 public class GestionPartenairesController implements Initializable {
 
@@ -37,22 +38,22 @@ public class GestionPartenairesController implements Initializable {
     private Label totalPartnersLabel;
 
     @FXML
-    private TableView partnersTable;
+    private TableView<Partenaire> partnersTable;
 
     @FXML
-    private TableColumn nameColumn;
+    private TableColumn<Partenaire, String> nameColumn;
 
     @FXML
-    private TableColumn addressColumn;
+    private TableColumn<Partenaire, String> addressColumn;
 
     @FXML
-    private TableColumn phoneColumn;
+    private TableColumn<Partenaire, String> phoneColumn;
 
     @FXML
-    private TableColumn emailColumn;
+    private TableColumn<Partenaire, String> emailColumn;
 
     @FXML
-    private TableColumn statusColumn;
+    private TableColumn<Partenaire, String> statusColumn;
 
     @FXML
     private TextField nameField;
@@ -82,10 +83,11 @@ public class GestionPartenairesController implements Initializable {
     private VBox revenuGraphBox;
 
     /**
-     * Initialise le contrôleur. Définit les actions des boutons, les valeurs des cellules et met à jour le tableau et les étiquettes.
+     * Initialise le contrôleur. Définit les actions des boutons, les valeurs des cellules,
+     * et met à jour le tableau des partenaires et les étiquettes affichant les statistiques.
      *
-     * @param url L'emplacement utilisé pour résoudre les chemins relatifs pour l'objet racine, ou null si non connu.
-     * @param resourceBundle Les ressources utilisées pour localiser l'objet racine, ou null si non disponible.
+     * @param url L'emplacement utilisé pour résoudre les chemins relatifs pour l'objet racine.
+     * @param resourceBundle Les ressources utilisées pour localiser l'objet racine.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -96,125 +98,101 @@ public class GestionPartenairesController implements Initializable {
         updateTable();
         updateLabels();
         setupQuartsPieChart();
-        setupRevenuBarChart();      //MÉTHODE À MODIFIER À LA FIN
+        setupRevenuBarChart();  // Affiche les graphiques
     }
 
+    /**
+     * Configure et affiche un graphique en secteurs (PieChart) montrant la répartition des quarts par partenaire.
+     */
     private void setupQuartsPieChart() {
-        // Create a new PieChart
         PieChart pieChart = new PieChart();
-
-        // Create a custom title for the PieChart
         Label pieChartTitle = new Label("Répartition des quarts par partenaire");
         pieChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
 
-        // Fetch all shifts (quarts) from the database
         List<Quart> quarts = DBUtils.fetchAllQuarts();
-
-        // Create a map to store the count of shifts for each partner
         Map<String, Integer> partnerShiftCount = new HashMap<>();
 
-        // Iterate through the list of quarts
         for (Quart quart : quarts) {
-            // Retrieve the facture associated with the current quart using num_facture
             Facture facture = DBUtils.fetchFactureByNumFacture(quart.getNumFacture());
-
-            // Check if the facture exists and get the partner's name
             if (facture != null) {
                 String partnerName = facture.getNomPartenaire();
-
-                // Increment the count of shifts for this partner
                 partnerShiftCount.put(partnerName, partnerShiftCount.getOrDefault(partnerName, 0) + 1);
             }
         }
 
-        // Populate the PieChart with the shift counts
         for (Map.Entry<String, Integer> entry : partnerShiftCount.entrySet()) {
-            // Display the number of shifts next to the partner's name
             String label = entry.getKey() + " (" + entry.getValue() + ")";
             PieChart.Data slice = new PieChart.Data(label, entry.getValue());
             pieChart.getData().add(slice);
         }
 
-        // Optionally, set up tooltips for additional details
         for (PieChart.Data data : pieChart.getData()) {
             Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
             Tooltip.install(data.getNode(), tooltip);
         }
 
-        // Add the title and the PieChart to the VBox in the FXML layout
-        quartsGraphBox.getChildren().clear(); // Clear previous content
-        quartsGraphBox.getChildren().addAll(pieChartTitle, pieChart); // Add title and chart
+        quartsGraphBox.getChildren().clear();
+        quartsGraphBox.getChildren().addAll(pieChartTitle, pieChart);
     }
+
+    /**
+     * Configure et affiche un graphique à barres (BarChart) montrant la répartition des revenus par partenaire.
+     */
     private void setupRevenuBarChart() {
-        // Create axes for the bar chart
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
         yAxis.setLabel("Revenus ($)");
 
-        // Create a custom title for the BarChart
         Label barChartTitle = new Label("Répartition des revenus par partenaire");
         barChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill:#004d40;");
 
-        // Create the BarChart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-
-        // Create a data series for the bar chart
         XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
 
-        // Fetch all factures from the database
         List<Facture> factures = DBUtils.fetchAllFacture();
-
-        // Create a map to store the total amount for each partner
         Map<String, BigDecimal> partnerTotalAmount = new HashMap<>();
 
-        // Iterate through the list of factures and sum amounts per partner
         for (Facture facture : factures) {
             String partnerName = facture.getNomPartenaire();
             BigDecimal montantApresTaxes = facture.getMontantApresTaxes();
-
-            // Add the montant_apres_taxes to the current total for the partner
             partnerTotalAmount.put(partnerName, partnerTotalAmount.getOrDefault(partnerName, BigDecimal.ZERO).add(montantApresTaxes));
         }
 
-        // Populate the data series with the total amounts
         for (Map.Entry<String, BigDecimal> entry : partnerTotalAmount.entrySet()) {
             dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
-        // Add the data series to the bar chart
         barChart.getData().add(dataSeries);
 
-        // Add the title and the BarChart to the VBox in the FXML layout
-        revenuGraphBox.getChildren().clear(); // Clear previous content
-        revenuGraphBox.getChildren().addAll(barChartTitle, barChart); // Add title and chart
+        revenuGraphBox.getChildren().clear();
+        revenuGraphBox.getChildren().addAll(barChartTitle, barChart);
     }
 
     /**
-     * Met à jour les étiquettes des statistiques des partenaires (actifs, inactifs, total) en fonction de la liste actuelle des partenaires.
+     * Met à jour les étiquettes affichant les statistiques des partenaires (actifs, inactifs, total).
      */
-    private void updateLabels(){
+    private void updateLabels() {
         int partenairesActifs = 0;
         int partenairesInactifs = 0;
         int partenairesTotal = 0;
         List<Partenaire> liste = DBUtils.fetchAllPartners();
 
-        // Compter les partenaires actifs et inactifs
         for (Partenaire p : liste) {
-            if(p.getStatus().equals("actif"))
+            if (p.getStatus().equals("actif"))
                 partenairesActifs++;
         }
+
         partenairesTotal = liste.size();
         partenairesInactifs = partenairesTotal - partenairesActifs;
 
-        // Définir les étiquettes
         activePartnersLabel.setText(String.valueOf(partenairesActifs));
         inactivePartnersLabel.setText(String.valueOf(partenairesInactifs));
         totalPartnersLabel.setText(String.valueOf(partenairesTotal));
     }
 
     /**
-     * Définit les valeurs pour les colonnes de la TableView, y compris un comparateur pour la colonne de statut
-     * afin que les partenaires "actifs" soient affichés avant les partenaires "inactifs".
+     * Configure les valeurs des colonnes de la TableView pour les partenaires.
+     * Définit un comparateur pour la colonne de statut afin de trier par statut (actif en premier).
      */
     private void setCellValues() {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
@@ -223,7 +201,6 @@ public class GestionPartenairesController implements Initializable {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("courriel"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        // Trier la colonne de statut : actif en premier, inactif en dessous
         statusColumn.setComparator((status1, status2) -> {
             if (status1.equals("actif") && status2.equals("inactif")) {
                 return -1;
@@ -233,13 +210,14 @@ public class GestionPartenairesController implements Initializable {
                 return 0;
             }
         });
-        partnersTable.getSortOrder().add(statusColumn); // S'assurer du tri par statut
+        partnersTable.getSortOrder().add(statusColumn); // Tri par statut
     }
 
     /**
-     * Action pour le bouton "Ajouter". Ouvre la fenêtre d'ajout de partenaire et met à jour le tableau et les étiquettes.
+     * Action déclenchée lors du clic sur le bouton "Ajouter".
+     * Ouvre la fenêtre d'ajout d'un partenaire et met à jour le tableau et les étiquettes après l'ajout.
      */
-    private void actionBtnAjouter(){
+    private void actionBtnAjouter() {
         System.out.println("Bouton ajouter appuyé");
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
         Model.getInstance().getViewFactory().showAddPartnerWindow(stage);
@@ -248,7 +226,7 @@ public class GestionPartenairesController implements Initializable {
     }
 
     /**
-     * Met à jour la TableView avec la liste actuelle des partenaires et applique le tri.
+     * Met à jour la TableView avec la liste des partenaires actuelle.
      */
     private void updateTable() {
         try {
@@ -261,15 +239,16 @@ public class GestionPartenairesController implements Initializable {
     }
 
     /**
-     * Action pour le bouton "Mise à jour". Ouvre la fenêtre de mise à jour pour le partenaire sélectionné.
-     * Si aucun partenaire n'est sélectionné, un message d'erreur s'affiche.
+     * Action déclenchée lors du clic sur le bouton "Mise à jour".
+     * Ouvre la fenêtre de mise à jour pour le partenaire sélectionné.
+     * Affiche un message d'erreur si aucun partenaire n'est sélectionné.
      */
-    private void actionBtnMAJ(){
+    private void actionBtnMAJ() {
         System.out.println("Bouton MAJ appuyé");
-        Partenaire partenaireSelectionné = (Partenaire) partnersTable.getSelectionModel().getSelectedItem();
+        Partenaire partenaireSelectionné = partnersTable.getSelectionModel().getSelectedItem();
 
-        if(partenaireSelectionné == null){
-            Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de mise à jour.","ERREUR MAJ");
+        if (partenaireSelectionné == null) {
+            Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de mise à jour.", "ERREUR MAJ");
         } else {
             Stage stage = (Stage) btnMAJ.getScene().getWindow();
             Model.getInstance().getViewFactory().showUpdatePartnerWindow(stage, partenaireSelectionné);
@@ -278,15 +257,16 @@ public class GestionPartenairesController implements Initializable {
     }
 
     /**
-     * Action pour le bouton "Supprimer". Ouvre la fenêtre de suppression pour le partenaire sélectionné.
-     * Si aucun partenaire n'est sélectionné, un message d'erreur s'affiche.
+     * Action déclenchée lors du clic sur le bouton "Supprimer".
+     * Ouvre la fenêtre de suppression pour le partenaire sélectionné.
+     * Affiche un message d'erreur si aucun partenaire n'est sélectionné.
      */
-    private void actionBtnSupprimer(){
+    private void actionBtnSupprimer() {
         System.out.println("Bouton Supprimer appuyé");
-        Partenaire partenaireSelectionné = (Partenaire) partnersTable.getSelectionModel().getSelectedItem();
+        Partenaire partenaireSelectionné = partnersTable.getSelectionModel().getSelectedItem();
 
-        if(partenaireSelectionné == null){
-            Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de suppression.","ERREUR SUPPRESSION");
+        if (partenaireSelectionné == null) {
+            Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de suppression.", "ERREUR SUPPRESSION");
         } else {
             Stage stage = (Stage) btnSupprimer.getScene().getWindow();
             Model.getInstance().getViewFactory().showDeletePartnerWindow(stage, partenaireSelectionné);

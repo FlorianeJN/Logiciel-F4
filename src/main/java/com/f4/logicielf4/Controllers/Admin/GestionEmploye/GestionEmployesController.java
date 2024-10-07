@@ -23,15 +23,16 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur pour l'écran de gestion des employés ("Gestion Employés").
- * Il permet d'ajouter, mettre à jour et supprimer des employés.
+ * Contrôleur pour la gestion des employés dans l'interface d'administration.
+ * Il permet d'ajouter, mettre à jour et supprimer des employés, ainsi que de visualiser des graphiques
+ * concernant la répartition des quarts de travail et des revenus parmi les employés.
  *
  * Fonctionnalités principales :
- * - Ajout d'un nouvel employé
- * - Mise à jour d'un employé sélectionné
- * - Suppression d'un employé sélectionné
- * - Affichage de graphiques illustrant la répartition des employés par département et poste
- * - Mise à jour des étiquettes concernant les employés actifs/inactifs et le nombre total d'employés
+ * - Ajouter un nouvel employé
+ * - Mettre à jour les informations d'un employé sélectionné
+ * - Supprimer un employé sélectionné
+ * - Afficher des graphiques sur la répartition des quarts et des revenus par employé
+ * - Mettre à jour les étiquettes concernant le nombre d'employés actifs, inactifs et total
  */
 public class GestionEmployesController implements Initializable {
 
@@ -83,6 +84,9 @@ public class GestionEmployesController implements Initializable {
     /**
      * Méthode appelée lors de l'initialisation du contrôleur.
      * Configure les actions des boutons et initialise les tableaux et graphiques.
+     *
+     * @param url L'URL utilisée pour initialiser l'objet.
+     * @param resourceBundle Les ressources utilisées pour internationaliser l'interface.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -95,113 +99,102 @@ public class GestionEmployesController implements Initializable {
         setupGraphiqueRepartitionQuarts();
         setupGraphiqueRepartitionRevenus();
     }
+
     /**
      * Configure le graphique circulaire représentant la répartition des quarts parmi les employés.
+     * Les quarts sont extraits de la base de données et sont regroupés par employé.
      */
     private void setupGraphiqueRepartitionQuarts() {
-        // Create a new PieChart
         PieChart pieChart = new PieChart();
 
-        // Create a title label for the chart and align it to the left
         Label titleLabelQuarts = new Label("Répartition des quarts par employé");
         titleLabelQuarts.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
         titleLabelQuarts.setAlignment(Pos.BASELINE_LEFT);
 
-        // Fetch all shifts (quarts) from the database
         List<Quart> quarts = DBUtils.fetchAllQuarts();
-
-        // Create a map to store the count of shifts for each employee
         Map<String, Integer> employeeShiftCount = new HashMap<>();
 
-        // Iterate through the list of quarts
         for (Quart quart : quarts) {
             String employeeName = quart.getNomEmploye();
 
-            // Increment the count of shifts for this employee
+            // Vérifie si le nom de l'employé est nul ou vide
+            if (employeeName == null || employeeName.trim().isEmpty()) {
+                continue; // Ignorer les employés sans nom
+            }
+
             employeeShiftCount.put(employeeName, employeeShiftCount.getOrDefault(employeeName, 0) + 1);
         }
 
-        // Populate the PieChart with the shift counts
         for (Map.Entry<String, Integer> entry : employeeShiftCount.entrySet()) {
-            // Display the number of shifts next to the employee's name
             String label = entry.getKey() + " (" + entry.getValue() + ")";
             PieChart.Data slice = new PieChart.Data(label, entry.getValue());
             pieChart.getData().add(slice);
         }
 
-        // Optionally, set up tooltips for additional details
         for (PieChart.Data data : pieChart.getData()) {
             Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
             Tooltip.install(data.getNode(), tooltip);
         }
 
-        // Optionally, you can set the size of the pie chart here
         pieChart.setPrefSize(600, 400);
 
-        // Clear any previous content and add the title and the chart to the VBox
         departmentGraphBox.getChildren().clear();
         departmentGraphBox.getChildren().addAll(titleLabelQuarts, pieChart);
     }
+
     /**
      * Configure le graphique à barres représentant la répartition des revenus parmi les employés.
+     * Les montants totaux des quarts par employé sont extraits et affichés sur le graphique.
      */
     private void setupGraphiqueRepartitionRevenus() {
-        // Create axes for the bar chart
         CategoryAxis xAxis = new CategoryAxis();
         NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Montant Total ($)"); // Label for y-axis indicating the total amount
+        yAxis.setLabel("Revenus ($)");
 
-        // Create the BarChart
         BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
 
-        // Create a title label for the chart and align it to the left
         Label titleLabelRevenus = new Label("Répartition des revenus par employé");
         titleLabelRevenus.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
         titleLabelRevenus.setAlignment(Pos.BASELINE_LEFT);
 
-        // Create a data series for the bar chart
         XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
         dataSeries.setName("Montant total");
 
-        // Fetch all shifts (quarts) from the database
         List<Quart> quarts = DBUtils.fetchAllQuarts();
-
-        // Create a map to store the total revenue for each employee
         Map<String, BigDecimal> employeeTotalAmount = new HashMap<>();
 
-        // Iterate through the list of quarts and sum amounts per employee
         for (Quart quart : quarts) {
             String employeeName = quart.getNomEmploye();
-            BigDecimal montantTotal = BigDecimal.valueOf(quart.getMontantTotal());
 
-            // Add the total amount to the current total for the employee
+            // Vérifie si le nom de l'employé est nul ou vide
+            if (employeeName == null || employeeName.trim().isEmpty()) {
+                continue; // Ignorer les employés sans nom
+            }
+
+            BigDecimal montantTotal = BigDecimal.valueOf(quart.getMontantTotal());
             employeeTotalAmount.put(employeeName, employeeTotalAmount.getOrDefault(employeeName, BigDecimal.ZERO).add(montantTotal));
         }
 
-        // Populate the data series with the total amounts
         for (Map.Entry<String, BigDecimal> entry : employeeTotalAmount.entrySet()) {
             dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
 
-        // Add the data series to the bar chart
         barChart.getData().add(dataSeries);
-
-        // Optionally, you can set the size of the bar chart here
         barChart.setPrefSize(800, 600);
 
-        // Clear any previous content and add the title and the chart to the VBox
         positionGraphBox.getChildren().clear();
         positionGraphBox.getChildren().addAll(titleLabelRevenus, barChart);
     }
 
     /**
      * Met à jour les étiquettes affichant le nombre d'employés actifs, inactifs et total.
+     * Ces valeurs sont extraites de la base de données.
      */
     private void updateLabels() {
         int employeesActifs = 0;
         int employeesInactifs = 0;
         int employeesTotal = 0;
-        List<Employe> liste = DBUtils.fetchAllEmployees(); // Supposons qu'il existe une méthode pour récupérer tous les employés
+        List<Employe> liste = DBUtils.fetchAllEmployees(); // Récupérer tous les employés
 
         for (Employe e : liste) {
             if (e.getStatut().equals("Actif")) employeesActifs++;
@@ -215,7 +208,8 @@ public class GestionEmployesController implements Initializable {
     }
 
     /**
-     * Définit les colonnes de la table avec les valeurs correspondantes des objets Employé.
+     * Définit les valeurs des colonnes du tableau en fonction des propriétés des objets Employe.
+     * Utilise des PropertyValueFactory pour mapper les colonnes aux attributs correspondants des employés.
      */
     private void setCellValues() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -225,6 +219,7 @@ public class GestionEmployesController implements Initializable {
         emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
+        // Comparateur pour trier par statut (Actif/Inactif)
         statusColumn.setComparator((status1, status2) -> {
             if (status1.equals("Actif") && status2.equals("Inactif")) {
                 return -1;
@@ -238,8 +233,8 @@ public class GestionEmployesController implements Initializable {
     }
 
     /**
-     * Action effectuée lors de l'appui sur le bouton "Ajouter".
-     * Ouvre la fenêtre d'ajout d'un nouvel employé.
+     * Action déclenchée lorsque l'utilisateur clique sur le bouton "Ajouter".
+     * Ouvre une nouvelle fenêtre pour ajouter un employé.
      */
     private void actionBtnAjouter() {
         System.out.println("Bouton ajouter appuyé");
@@ -250,8 +245,8 @@ public class GestionEmployesController implements Initializable {
     }
 
     /**
-     * Met à jour la table des employés avec les données actuelles.
-     * Affiche un message d'erreur en cas de problème de mise à jour.
+     * Met à jour la table des employés avec les données actuelles depuis la base de données.
+     * Affiche un message d'erreur en cas de problème lors de la mise à jour.
      */
     private void updateTable() {
         try {
@@ -264,8 +259,8 @@ public class GestionEmployesController implements Initializable {
     }
 
     /**
-     * Action effectuée lors de l'appui sur le bouton "Mise à Jour".
-     * Ouvre la fenêtre de mise à jour de l'employé sélectionné.
+     * Action déclenchée lorsque l'utilisateur clique sur le bouton "Mise à Jour".
+     * Ouvre une nouvelle fenêtre pour mettre à jour les informations de l'employé sélectionné.
      * Affiche un message d'erreur si aucun employé n'est sélectionné.
      */
     private void actionBtnMAJ() {
@@ -282,8 +277,8 @@ public class GestionEmployesController implements Initializable {
     }
 
     /**
-     * Action effectuée lors de l'appui sur le bouton "Supprimer".
-     * Ouvre la fenêtre de suppression de l'employé sélectionné.
+     * Action déclenchée lorsque l'utilisateur clique sur le bouton "Supprimer".
+     * Ouvre une nouvelle fenêtre pour supprimer l'employé sélectionné.
      * Affiche un message d'erreur si aucun employé n'est sélectionné.
      */
     private void actionBtnSupprimer() {

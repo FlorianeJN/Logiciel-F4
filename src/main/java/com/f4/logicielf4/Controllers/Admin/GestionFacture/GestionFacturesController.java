@@ -12,13 +12,16 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour la gestion des factures dans l'interface d'administration.
+ * Ce contrôleur permet de lister, modifier, exporter les factures et d'en commencer de nouvelles.
+ */
 public class GestionFacturesController implements Initializable {
 
     @FXML
@@ -56,6 +59,13 @@ public class GestionFacturesController implements Initializable {
     @FXML
     private Button btnModifier;
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Configure les actions des boutons et initialise les colonnes de la table des factures.
+     *
+     * @param url L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         btnCommencer.setOnAction(event -> actionBtnCommencer());
@@ -64,9 +74,13 @@ public class GestionFacturesController implements Initializable {
 
         setCellValues();
         updateTable();
-       // updateLabels();
+        // updateLabels();
     }
 
+    /**
+     * Définit les valeurs des colonnes de la table en fonction des propriétés des objets Facture.
+     * Utilise des PropertyValueFactory pour mapper les colonnes aux attributs correspondants des factures.
+     */
     private void setCellValues() {
         numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numFacture"));
         partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("nomPartenaire"));
@@ -74,13 +88,17 @@ public class GestionFacturesController implements Initializable {
         montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        factureTable.getSortOrder().add(statutColumn); // Sorting by status
+        factureTable.getSortOrder().add(statutColumn); // Tri par statut
     }
 
+    /**
+     * Met à jour la table des factures avec les données actuelles depuis la base de données.
+     * Calcule également le montant total des factures avant de les afficher.
+     */
     private void updateTable() {
         try {
             List<Facture> factures = DBUtils.fetchAllFacture();
-            for(Facture facture : factures){
+            for (Facture facture : factures) {
                 genererMontantTotal(facture);
             }
             factureTable.getItems().setAll(factures);
@@ -90,46 +108,45 @@ public class GestionFacturesController implements Initializable {
         }
     }
 
+    /**
+     * Génère le montant total d'une facture en additionnant les montants de tous les quarts associés à la facture.
+     *
+     * @param facture La facture pour laquelle calculer le montant total.
+     */
     private void genererMontantTotal(Facture facture) {
         double montant = 0;
         String numFacture = facture.getNumFacture();
-        List<Quart> listeQuarts =  DBUtils.fetchQuartsByNumFacture(numFacture);
-        for(Quart quart : listeQuarts){
-            montant = montant + quart.getMontantTotal();
+        List<Quart> listeQuarts = DBUtils.fetchQuartsByNumFacture(numFacture);
+        for (Quart quart : listeQuarts) {
+            montant += quart.getMontantTotal();
         }
         facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
     }
 
-  /*  private void updateLabels() {
-        int facturesCrees = 0;
-        int facturesPayees = 0;
-        int facturesAttente = 0;
-        List<Facture> facturesInfo = DBUtils.fetchAllFactureInfo();
+    /* private void updateLabels() {
+        // Méthode pour mettre à jour les labels des factures (créées, payées, en attente).
+    } */
 
-        for (Facture f : facturesInfo) {
-           if (f.getStatut().equals("Payée")) facturesPayees++;
-            else if (f.getStatut().equals("En attente")) facturesAttente++;
-        }
-       facturesCrees = facturesInfo.size();
-
-        facturesCreesLabel.setText(String.valueOf(facturesCrees));
-        facturesPayeesLabel.setText(String.valueOf(facturesPayees));
-        factureAttentePaiementLabel.setText(String.valueOf(facturesAttente));
-    }*/
-
+    /**
+     * Action déclenchée lors du clic sur le bouton "Commencer".
+     * Ouvre la fenêtre pour créer une nouvelle facture via le ViewFactory.
+     */
     private void actionBtnCommencer() {
         System.out.println("Commencer nouvelle facture");
         Stage stage = (Stage) btnCommencer.getScene().getWindow();
 
-        /*
-        *   UTILISER VIEWFACTORY POUR AFFICHER FENETRE COMMENCER FACTURE
-        * */
+        // Utilisation de ViewFactory pour afficher la fenêtre de création de facture
         Model.getInstance().getViewFactory().showCommencerFactureWindow(stage);
 
         updateTable();
-     //   updateLabels();
+        //   updateLabels();
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton "Modifier".
+     * Ouvre la fenêtre de modification de la facture sélectionnée.
+     * Affiche un message d'erreur si aucune facture n'est sélectionnée.
+     */
     private void actionBtnModifier() {
         System.out.println("Modifier facture");
         Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
@@ -138,12 +155,17 @@ public class GestionFacturesController implements Initializable {
             Dialogs.showMessageDialog("Veuillez sélectionner une facture avant de modifier.", "ERREUR MODIFICATION");
         } else {
             Stage stage = (Stage) btnModifier.getScene().getWindow();
-            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage,factureSelectionnee.getNumFacture(),factureSelectionnee.getNomPartenaire());
+            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage, factureSelectionnee.getNumFacture(), factureSelectionnee.getNomPartenaire());
             updateTable();
-          //  updateLabels();
+            //  updateLabels();
         }
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton "Exporter".
+     * Exporte les données de la facture sélectionnée dans un fichier.
+     * Affiche un message d'erreur si aucune facture n'est sélectionnée.
+     */
     private void actionBtnExporter() {
         Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
 

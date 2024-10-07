@@ -17,7 +17,7 @@ import java.util.ResourceBundle;
 /**
  * Contrôleur pour la suppression des informations d'un employé.
  * Ce contrôleur est responsable de l'affichage des informations de l'employé en mode lecture seule,
- * de la validation des informations et de la gestion des actions de suppression et d'annulation.
+ * de la validation des informations, et de la gestion des actions de suppression et d'annulation.
  */
 public class SuppressionEmployeController implements Initializable {
 
@@ -67,6 +67,7 @@ public class SuppressionEmployeController implements Initializable {
 
     /**
      * Remplit les champs de texte avec les informations de l'employé.
+     * Cette méthode est utilisée pour afficher les informations de l'employé en mode lecture seule.
      */
     private void remplirTextFields() {
         if (employe != null) {
@@ -79,6 +80,7 @@ public class SuppressionEmployeController implements Initializable {
 
     /**
      * Définit les champs de texte comme étant en lecture seule.
+     * Empêche l'utilisateur de modifier les informations affichées avant la suppression.
      */
     private void setFieldsReadOnly() {
         nomField.setEditable(false);
@@ -95,7 +97,7 @@ public class SuppressionEmployeController implements Initializable {
     private void actionBtnSuppression() {
         Map<String, String> infos = retrieveInfos();
         if (infos != null) {
-            String message = "Vous êtes sur le point de supprimer " + infos.get("nom") + " " + infos.get("prenom") + ". Voulez-vous continuer?";
+            String message = "Vous êtes sur le point de supprimer " + infos.get("nom") + " " + infos.get("prenom") + ". Voulez-vous continuer ?";
             if (Dialogs.showConfirmDialog(message, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC")) {
                 if (DBUtils.deleteEmploye(infos)) {
                     String messageConfirmation = infos.get("nom") + " " + infos.get("prenom") + " a été supprimé avec succès.";
@@ -111,9 +113,9 @@ public class SuppressionEmployeController implements Initializable {
 
     /**
      * Récupère les informations de l'employé à partir des champs de texte,
-     * et les retourne sous forme de carte (Map) après validation.
+     * et les retourne sous forme de Map après validation.
      *
-     * @return Une carte contenant les informations de l'employé si la validation est réussie, sinon null.
+     * @return Une Map contenant les informations de l'employé si la validation est réussie, sinon null.
      */
     private Map<String, String> retrieveInfos() {
         Map<String, String> employeeInfo = new HashMap<>();
@@ -122,7 +124,7 @@ public class SuppressionEmployeController implements Initializable {
         String telephone = telephoneField.getText();
         String email = emailField.getText();
 
-        // Validation
+        // Validation des champs
         if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
             Dialogs.showMessageDialog("Veuillez remplir tous les champs", "ERREUR REMPLISSAGE DES CHAMPS");
             return null;

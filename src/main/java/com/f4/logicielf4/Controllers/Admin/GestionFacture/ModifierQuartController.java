@@ -14,6 +14,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour la modification d'un quart de travail.
+ * Cette classe permet de charger les informations d'un quart existant, les afficher dans le formulaire,
+ * les modifier, et les enregistrer dans la base de données.
+ * Elle hérite de {@link AjouterModifierQuartTemplate} pour réutiliser les fonctionnalités liées au formulaire de quart.
+ */
 public class ModifierQuartController extends AjouterModifierQuartTemplate implements Initializable {
 
     @FXML
@@ -68,12 +74,24 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
     private Quart quart;
     private PresentationFactureController presentationFactureController;
 
-    public ModifierQuartController(Quart quart){
+    /**
+     * Constructeur pour initialiser le contrôleur avec un quart spécifique à modifier.
+     *
+     * @param quart Le quart à modifier.
+     */
+    public ModifierQuartController(Quart quart) {
         this.quart = quart;
         this.numFacture = quart.getNumFacture();
-
     }
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Remplit les champs du formulaire avec les données du quart à modifier,
+     * configure les composants de l'interface utilisateur, et ajoute des listeners.
+     *
+     * @param url            L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         remplirComboBoxPrestation();
@@ -86,8 +104,13 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
         ajouterQuartBtn.setOnAction(e -> actionBtnMaj());
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton pour modifier le quart.
+     * Valide les champs du formulaire, met à jour le quart dans la base de données, et affiche un message de confirmation.
+     * Ferme la fenêtre après succès de l'opération.
+     */
     private void actionBtnMaj() {
-        if(validateFields()){
+        if (validateFields()) {
             LocalDate dateQuartValue = dateQuart.getValue();
             String prestationValue = prestation.getValue();
             LocalTime debutQuartValue = parseTime(debutQuart.getText());
@@ -100,38 +123,50 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
             String empName = associerEmpCheckBox.isSelected() ? empComboBox.getValue() : "";
             boolean tempsDouble = checkBoxTempsDouble.isSelected();
             boolean tempsDemi = checkBoxTempsDemi.isSelected();
-            try{
-                DBUtils.updateQuart(quart.getId(),prestationValue,dateQuartValue,debutQuartValue,finQuartValue,pauseValue,tempsTotalValue,tauxHoraireValue,montantTotalValue,notesValue,empName,tempsDouble,tempsDemi);
-                Dialogs.showMessageDialog("Quart modifié avec succès","SUCCÈS MODIFICATION QUART");
+
+            try {
+                DBUtils.updateQuart(quart.getId(), prestationValue, dateQuartValue, debutQuartValue, finQuartValue, pauseValue,
+                        tempsTotalValue, tauxHoraireValue, montantTotalValue, notesValue, empName, tempsDouble, tempsDemi);
+                Dialogs.showMessageDialog("Quart modifié avec succès", "SUCCÈS MODIFICATION QUART");
                 Stage stage = (Stage) ajouterQuartBtn.getScene().getWindow();
                 stage.close();
             } catch (Exception e) {
-                Dialogs.showMessageDialog(e.getMessage(),"Erreur");
+                Dialogs.showMessageDialog(e.getMessage(), "Erreur");
             }
+        } else {
+            Dialogs.showMessageDialog("Veuillez bien remplir tous les champs", "ERREUR REMPLISSAGE CHAMPS");
         }
-        else
-            Dialogs.showMessageDialog("Veuillez bien remplir tous les champs","ERREUR REMPLISSAGE CHAMPS");
     }
 
-    private void remplirFormulaire(){
+    /**
+     * Remplit le formulaire avec les informations du quart existant.
+     * Cette méthode est utilisée pour pré-remplir les données du quart dans le formulaire.
+     */
+    private void remplirFormulaire() {
         dateQuart.setValue(quart.getDateQuart());
         debutQuart.setText(quart.getDebutQuart().toString());
         finQuart.setText(quart.getFinQuart().toString());
-        if(quart.getPause().toString().equals("00:00"))
+
+        if (quart.getPause().toString().equals("00:00"))
             checkboxPause.setSelected(false);
         else
             checkboxPause.setSelected(true);
+
         pause.setText(quart.getPause().toString());
         notesTextArea.setText(quart.getNotes());
         genererPrestation();
-        if(quart.isTempsDemi())
+
+        if (quart.isTempsDemi())
             checkBoxTempsDemi.setSelected(true);
         if (quart.isTempsDouble())
             checkBoxTempsDouble.setSelected(true);
     }
 
-    private void genererPrestation(){
-        switch (quart.getStringPrestation()){
+    /**
+     * Sélectionne la prestation correspondante au quart dans la comboBox des prestations.
+     */
+    private void genererPrestation() {
+        switch (quart.getStringPrestation()) {
             case "SOINS INFIRMIERS":
                 prestation.setValue("SOINS INFIRMIERS");
                 break;

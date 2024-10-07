@@ -5,7 +5,7 @@ import com.f4.logicielf4.Views.ViewFactory;
 /**
  * Classe de modèle suivant le patron Singleton.
  * <p>
- * Cette classe assure qu'il n'y a qu'une seule instance de `ViewFactory`, qui est utilisée pour gérer les vues de l'application.
+ * Cette classe garantit qu'il n'y a qu'une seule instance de `ViewFactory`, utilisée pour gérer les vues de l'application.
  * </p>
  */
 public class Model {
@@ -15,7 +15,7 @@ public class Model {
     /**
      * Constructeur privé pour empêcher l'instanciation directe.
      * <p>
-     * Initialise la `ViewFactory` pour gérer les vues.
+     * Initialise une instance de `ViewFactory` pour gérer les vues de l'application.
      * </p>
      */
     private Model() {
@@ -23,9 +23,14 @@ public class Model {
     }
 
     /**
-     * Obtient l'instance unique de la classe `Model`.
+     * Retourne l'instance unique de la classe `Model`.
+     * <p>
+     * Si l'instance n'existe pas encore, elle est créée. Sinon, l'instance existante est retournée.
+     * Ce mécanisme permet de suivre le patron de conception Singleton, garantissant qu'une seule instance
+     * de cette classe est utilisée à travers l'application.
+     * </p>
      *
-     * @return l'instance unique de `Model`
+     * @return L'instance unique de `Model`.
      */
     public static synchronized Model getInstance() {
         if (model == null) {
@@ -35,9 +40,12 @@ public class Model {
     }
 
     /**
-     * Obtient l'instance de `ViewFactory` associée au modèle.
+     * Retourne l'instance de `ViewFactory` associée au modèle.
+     * <p>
+     * `ViewFactory` est utilisée pour gérer toutes les vues de l'application.
+     * </p>
      *
-     * @return l'instance de `ViewFactory`
+     * @return L'instance de `ViewFactory`.
      */
     public ViewFactory getViewFactory() {
         return viewFactory;

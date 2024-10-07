@@ -14,8 +14,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur pour l'écran d'ajout d'un nouvel employé.
- * Permet de saisir les informations d'un employé et de les ajouter à la base de données.
+ * Contrôleur pour l'interface d'ajout d'un nouvel employé.
+ * Ce contrôleur gère l'interaction avec les champs de saisie d'informations de l'employé,
+ * valide les données et ajoute un employé dans la base de données si les informations sont valides.
  */
 public class AjouterEmployeController implements Initializable {
 
@@ -38,8 +39,10 @@ public class AjouterEmployeController implements Initializable {
     private Button btnAnnuler;
 
     /**
-     * Méthode appelée lors de l'initialisation du contrôleur.
-     * Configure les actions des boutons.
+     * Initialise le contrôleur et configure les actions des boutons lors de l'initialisation.
+     *
+     * @param url L'URL utilisée pour localiser le fichier FXML.
+     * @param resourceBundle Les ressources à utiliser pour l'internationalisation de l'interface.
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -48,25 +51,27 @@ public class AjouterEmployeController implements Initializable {
     }
 
     /**
-     * Action effectuée lors de l'appui sur le bouton "Ajouter".
-     * Récupère les informations de l'employé, les valide, et les ajoute à la base de données si elles sont valides.
+     * Action déclenchée lorsque l'utilisateur clique sur le bouton "Ajouter".
+     * Récupère les informations des champs, les valide et, si elles sont correctes,
+     * ajoute un nouvel employé dans la base de données.
      */
     private void actionBtnAjouter() {
         Map<String, String> employeeInfo = retrieveInfos();
 
         // Si les informations sont valides, ajout à la base de données
         if (employeeInfo != null) {
-            if (DBUtils.addEmployee(employeeInfo)) { // Supposons qu'il existe une méthode addEmployee dans DBUtils
+            if (DBUtils.addEmployee(employeeInfo)) {
                 Dialogs.showMessageDialog("L'employé a été ajouté avec succès!", "AJOUT EMPLOYÉ TERMINÉ");
             }
         }
     }
 
     /**
-     * Récupère les informations des champs de saisie et les valide.
-     * Si les informations sont valides, elles sont renvoyées sous forme de Map.
+     * Récupère et valide les informations saisies par l'utilisateur.
+     * Cette méthode vérifie que tous les champs sont remplis et que le numéro de téléphone est valide.
      *
-     * @return Une Map contenant les informations de l'employé si la validation est réussie, sinon null.
+     * @return Une Map contenant les informations valides de l'employé (nom, prénom, téléphone, email).
+     *         Si la validation échoue, retourne null.
      */
     public Map<String, String> retrieveInfos() {
         Map<String, String> employeeInfo = new HashMap<>();
@@ -107,7 +112,7 @@ public class AjouterEmployeController implements Initializable {
             Stage stage = (Stage) btnAjouter.getScene().getWindow();
             stage.close();
 
-            return employeeInfo; // Retourne la Map contenant les informations
+            return employeeInfo;
         }
 
         // Si la validation échoue, retourne null
@@ -115,7 +120,8 @@ public class AjouterEmployeController implements Initializable {
     }
 
     /**
-     * Réinitialise les champs de saisie à leur état vide.
+     * Réinitialise les champs de saisie après l'ajout d'un employé.
+     * Les champs sont vidés afin de permettre la saisie d'un nouvel employé.
      */
     private void reinitialiserChamps() {
         nomField.setText("");
@@ -125,8 +131,8 @@ public class AjouterEmployeController implements Initializable {
     }
 
     /**
-     * Action effectuée lors de l'appui sur le bouton "Annuler".
-     * Ferme la fenêtre sans effectuer d'action.
+     * Action déclenchée lorsque l'utilisateur clique sur le bouton "Annuler".
+     * Ferme la fenêtre d'ajout sans enregistrer d'informations.
      */
     private void actionBtnAnnuler() {
         Stage stage = (Stage) btnAnnuler.getScene().getWindow();

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Classe utilitaire pour les opérations de base de données.
+ * Classe utilitaire pour effectuer des opérations sur la base de données relatives aux utilisateurs, partenaires, employés, factures et quarts.
  */
 public class DBUtils {
 
@@ -103,6 +103,11 @@ public class DBUtils {
         return partners;
     }
 
+    /**
+     * Récupère tous les partenaires actifs depuis la base de données.
+     *
+     * @return Liste de tous les partenaires actifs
+     */
     public static List<Partenaire> fetchAllActivePartners() {
         List<Partenaire> partners = new ArrayList<>();
 
@@ -213,13 +218,13 @@ public class DBUtils {
     }
 
     /**
-     * Supprime un partenaire de la base de données en mettant à jour son statut.
+     * Supprime un partenaire et toutes les factures associées de la base de données.
      *
      * @param partnerInfo Informations du partenaire à supprimer
-     * @return true si le partenaire a été marqué comme inactif avec succès, false sinon
+     * @return true si le partenaire et les factures associées ont été supprimés avec succès, false sinon
      */
     public static boolean deletePartner(Map<String, String> partnerInfo) {
-        String deleteFactureQuery = "DELETE FROM facture WHERE nom_partenaire = ?";
+        String deleteFactureQuery = "DELETE FROM Facture WHERE nom_partenaire = ?";
         String deletePartnerQuery = "DELETE FROM partenaire WHERE nom = ?";
 
         Connection connection = null;
@@ -227,30 +232,30 @@ public class DBUtils {
         try {
             connection = DriverManager.getConnection(url, user, pass);
 
-            // Begin a transaction
+            // Démarrer une transaction
             connection.setAutoCommit(false);
 
-            // Delete all associated factures first
+            // Supprimer toutes les factures associées d'abord
             try (PreparedStatement psDeleteFacture = connection.prepareStatement(deleteFactureQuery)) {
                 psDeleteFacture.setString(1, partnerInfo.get("nom"));
                 psDeleteFacture.executeUpdate();
             }
 
-            // Now delete the partner
+            // Maintenant supprimer le partenaire
             try (PreparedStatement psDeletePartner = connection.prepareStatement(deletePartnerQuery)) {
                 psDeletePartner.setString(1, partnerInfo.get("nom"));
                 int rowsAffected = psDeletePartner.executeUpdate();
 
-                // Commit the transaction
+                // Valider la transaction
                 connection.commit();
 
-                return rowsAffected > 0; // Return true if at least one row was deleted
+                return rowsAffected > 0; // Retourne true si au moins une ligne a été supprimée
             }
         } catch (Exception e) {
             e.printStackTrace();
             if (connection != null) {
                 try {
-                    // Rollback in case of an error
+                    // Annuler en cas d'erreur
                     connection.rollback();
                 } catch (SQLException rollbackException) {
                     rollbackException.printStackTrace();
@@ -260,7 +265,7 @@ public class DBUtils {
         } finally {
             if (connection != null) {
                 try {
-                    // Restore auto-commit mode
+                    // Restaurer le mode auto-commit
                     connection.setAutoCommit(true);
                     connection.close();
                 } catch (SQLException e) {
@@ -270,16 +275,14 @@ public class DBUtils {
         }
     }
 
-
-
     /**
-     * Fetches all employees from the database.
+     * Récupère tous les employés depuis la base de données.
      *
-     * @return A list of all employees.
+     * @return Liste de tous les employés
      */
     public static List<Employe> fetchAllEmployees() {
         List<Employe> employes = new ArrayList<>();
-        String query = "SELECT * FROM employes"; // Ensure the table name matches
+        String query = "SELECT * FROM employes"; // Assurez-vous que le nom de la table correspond
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query);
@@ -304,6 +307,12 @@ public class DBUtils {
         return employes;
     }
 
+    /**
+     * Ajoute un nouvel employé dans la base de données.
+     *
+     * @param employeeInfo Informations de l'employé à ajouter
+     * @return true si l'employé a été ajouté avec succès, false sinon
+     */
     public static boolean addEmployee(Map<String, String> employeeInfo) {
         String query = "INSERT INTO employes (nom, prenom, telephone, email, statut) "
                 + "VALUES (?, ?, ?, ?, ?)";
@@ -311,17 +320,17 @@ public class DBUtils {
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            // Set parameters from the employeeInfo map
+            // Définir les paramètres
             preparedStatement.setString(1, employeeInfo.get("nom"));
             preparedStatement.setString(2, employeeInfo.get("prenom"));
             preparedStatement.setString(3, employeeInfo.get("telephone"));
             preparedStatement.setString(4, employeeInfo.get("email"));
-            preparedStatement.setString(5, "Actif"); // Default to 'Actif'
+            preparedStatement.setString(5, "Actif"); // Par défaut 'Actif'
 
-            // Execute the insertion
+            // Exécuter l'insertion
             int rowsAffected = preparedStatement.executeUpdate();
 
-            return rowsAffected > 0; // Returns true if at least one row has been inserted
+            return rowsAffected > 0; // Retourne true si au moins une ligne a été insérée
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -329,8 +338,14 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Met à jour les informations d'un employé existant dans la base de données.
+     *
+     * @param employeeInfo Informations de l'employé à mettre à jour
+     * @return true si l'employé a été mis à jour avec succès, false sinon
+     */
     public static boolean updateEmploye(Map<String, String> employeeInfo) {
-        // First, retrieve the current status of the employee
+        // D'abord, récupérer le statut actuel de l'employé
         String currentStatut = null;
         String selectQuery = "SELECT statut FROM employes WHERE id = ?";
 
@@ -348,30 +363,30 @@ public class DBUtils {
             return false;
         }
 
-        // Now, construct the update query without changing the statut
+        // Construire la requête de mise à jour sans changer le statut
         String updateQuery = "UPDATE employes SET "
                 + "nom = ?, "
                 + "prenom = ?, "
                 + "telephone = ?, "
                 + "email = ?, "
-                + "statut = ? " // Use the current status
+                + "statut = ? "
                 + "WHERE id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
 
-            // Set parameters from the employeeInfo map
+            // Définir les paramètres
             preparedStatement.setString(1, employeeInfo.get("nom"));
             preparedStatement.setString(2, employeeInfo.get("prenom"));
             preparedStatement.setString(3, employeeInfo.get("telephone"));
             preparedStatement.setString(4, employeeInfo.get("email"));
-            preparedStatement.setString(5, currentStatut); // Use the current statut
-            preparedStatement.setInt(6, Integer.parseInt(employeeInfo.get("id"))); // The record to update by ID
+            preparedStatement.setString(5, currentStatut); // Utiliser le statut actuel
+            preparedStatement.setInt(6, Integer.parseInt(employeeInfo.get("id"))); // Le record à mettre à jour par ID
 
-            // Execute the update
+            // Exécuter la mise à jour
             int rowsAffected = preparedStatement.executeUpdate();
 
-            return rowsAffected > 0; // Returns true if at least one row has been updated
+            return rowsAffected > 0; // Retourne true si au moins une ligne a été mise à jour
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -379,19 +394,25 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Supprime un employé de la base de données.
+     *
+     * @param employeeInfo Informations de l'employé à supprimer
+     * @return true si l'employé a été supprimé avec succès, false sinon
+     */
     public static boolean deleteEmploye(Map<String, String> employeeInfo) {
         String query = "DELETE FROM employes WHERE id = ?";
 
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            // Set the employee ID from the employeeInfo map
-            preparedStatement.setInt(1, Integer.parseInt(employeeInfo.get("id"))); // Assuming ID is provided in the map
+            // Définir l'ID de l'employé
+            preparedStatement.setInt(1, Integer.parseInt(employeeInfo.get("id")));
 
-            // Execute the delete
+            // Exécuter la suppression
             int rowsAffected = preparedStatement.executeUpdate();
 
-            return rowsAffected > 0; // Returns true if at least one row has been deleted
+            return rowsAffected > 0; // Retourne true si au moins une ligne a été supprimée
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -399,7 +420,11 @@ public class DBUtils {
         }
     }
 
-
+    /**
+     * Récupère toutes les factures depuis la base de données.
+     *
+     * @return Liste de toutes les factures
+     */
     public static List<Facture> fetchAllFacture() {
         List<Facture> factures = new ArrayList<>();
         String query = "SELECT * FROM Facture";
@@ -409,16 +434,15 @@ public class DBUtils {
              ResultSet rs = psFetch.executeQuery()) {
 
             while (rs.next()) {
-                String numeroFacture = rs.getString("num_facture"); // Integer type for num_facture
+                String numeroFacture = rs.getString("num_facture");
                 String nomPartenaire = rs.getString("nom_partenaire");
                 LocalDate dateFacture = rs.getDate("date").toLocalDate();
-                BigDecimal montantAvantTaxes = rs.getBigDecimal("montant_avant_taxes"); // Handle decimal fields as BigDecimal
+                BigDecimal montantAvantTaxes = rs.getBigDecimal("montant_avant_taxes");
                 BigDecimal tps = rs.getBigDecimal("tps");
                 BigDecimal tvq = rs.getBigDecimal("tvq");
                 BigDecimal montantApresTaxes = rs.getBigDecimal("montant_apres_taxes");
                 String statut = rs.getString("statut");
 
-                // Assuming your Facture class has an appropriate constructor for these parameters
                 Facture facture = new Facture(numeroFacture, fetchPartner(nomPartenaire), dateFacture, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
                 factures.add(facture);
             }
@@ -429,6 +453,12 @@ public class DBUtils {
         return factures;
     }
 
+    /**
+     * Récupère un partenaire depuis la base de données par son nom.
+     *
+     * @param nomPartenaire Nom du partenaire à récupérer
+     * @return Un objet Partenaire si trouvé, sinon null
+     */
     public static Partenaire fetchPartner(String nomPartenaire) {
         Partenaire partner = null;
 
@@ -437,7 +467,7 @@ public class DBUtils {
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query)) {
 
-            psFetch.setString(1, nomPartenaire);  // Set the partner's name in the query
+            psFetch.setString(1, nomPartenaire);
 
             try (ResultSet rs = psFetch.executeQuery()) {
                 if (rs.next()) {
@@ -450,18 +480,22 @@ public class DBUtils {
                     String courriel = rs.getString("courriel");
                     String status = rs.getString("status");
 
-                    // Create a new Partenaire object with the fetched data
                     partner = new Partenaire(nomPartenaire, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();  // Log and handle the exception appropriately
+            e.printStackTrace();
         }
 
-        return partner;  // Return the Partenaire object, or null if not found
+        return partner;
     }
 
+    /**
+     * Obtient le prochain numéro de facture en incrémentant le maximum existant.
+     *
+     * @return Le prochain numéro de facture
+     */
     public static int obtenirProchainNumFacture() {
         int num = 0;
         String selectSql = "SELECT MAX(CAST(SUBSTRING_INDEX(num_facture, '-', 1) AS UNSIGNED)) AS maxNum FROM Facture";
@@ -471,7 +505,6 @@ public class DBUtils {
              ResultSet rs = statement.executeQuery()) {
 
             if (rs.next()) {
-                // Get the maximum number from the result set
                 num = rs.getInt("maxNum");
             }
 
@@ -479,10 +512,18 @@ public class DBUtils {
             e.printStackTrace();
         }
 
-        // Increment the number for the next invoice
         return num + 1;
     }
 
+    /**
+     * Crée une nouvelle facture dans la base de données.
+     *
+     * @param numFacture  Numéro de la facture
+     * @param partner     Nom du partenaire associé à la facture
+     * @param invoiceDate Date de la facture
+     * @param status      Statut de la facture
+     * @return true si la facture a été créée avec succès, false sinon
+     */
     public static boolean createNewInvoice(String numFacture, String partner, LocalDate invoiceDate, String status) {
         String insertSql = "INSERT INTO Facture (num_facture, nom_partenaire, date, montant_avant_taxes, tps, tvq, montant_apres_taxes, statut) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -490,29 +531,46 @@ public class DBUtils {
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement statement = connection.prepareStatement(insertSql)) {
 
-            // Set parameters for the SQL statement
-            statement.setString(1, numFacture);  // num_facture
-            statement.setString(2, partner);     // nom_partenaire
-            statement.setDate(3, java.sql.Date.valueOf(invoiceDate)); // date
+            // Définir les paramètres
+            statement.setString(1, numFacture);
+            statement.setString(2, partner);
+            statement.setDate(3, java.sql.Date.valueOf(invoiceDate));
 
-            // Set the remaining parameters to null
-            statement.setNull(4, java.sql.Types.DECIMAL); // montant_avant_taxes
-            statement.setNull(5, java.sql.Types.DECIMAL); // tps
-            statement.setNull(6, java.sql.Types.DECIMAL); // tvq
-            statement.setNull(7, java.sql.Types.DECIMAL); // montant_apres_taxes
-            statement.setString(8, status);    // statut
+            // Définir les autres paramètres à null
+            statement.setNull(4, java.sql.Types.DECIMAL);
+            statement.setNull(5, java.sql.Types.DECIMAL);
+            statement.setNull(6, java.sql.Types.DECIMAL);
+            statement.setNull(7, java.sql.Types.DECIMAL);
+            statement.setString(8, status);
 
-            // Execute the update
+            // Exécuter la mise à jour
             int rowsAffected = statement.executeUpdate();
 
-            // Return true if at least one row was affected
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
-            return false; // Return false if an exception occurs
+            return false;
         }
     }
 
+    /**
+     * Ajoute un nouveau quart dans la base de données.
+     *
+     * @param numFacture   Numéro de facture associé au quart
+     * @param prestation   Prestation effectuée pendant le quart
+     * @param dateQuart    Date du quart
+     * @param debutQuart   Heure de début du quart
+     * @param finQuart     Heure de fin du quart
+     * @param pause        Durée de la pause pendant le quart
+     * @param tempsTotal   Temps total travaillé pendant le quart
+     * @param tauxHoraire  Taux horaire
+     * @param montantTotal Montant total pour le quart
+     * @param notes        Notes associées au quart
+     * @param empName      Nom de l'employé ayant travaillé le quart
+     * @param tempsDouble  Indique si le quart est payé en double
+     * @param tempsDemi    Indique si le quart est payé en temps et demi
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     public static void ajouterQuart(String numFacture, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
                                     LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
                                     boolean tempsDouble, boolean tempsDemi) throws SQLException {
@@ -540,6 +598,12 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Récupère tous les quarts associés à un numéro de facture spécifique.
+     *
+     * @param numFacture Numéro de facture
+     * @return Liste des quarts associés à la facture
+     */
     public static List<Quart> fetchQuartsByNumFacture(String numFacture) {
         List<Quart> quarts = new ArrayList<>();
 
@@ -558,65 +622,91 @@ public class DBUtils {
                 Time debutQuart = rs.getTime("debut_quart");
                 Time finQuart = rs.getTime("fin_quart");
                 Time pause = rs.getTime("pause");
-                String tempsTotal = rs.getString("temps_total"); // Changed from BigDecimal to double
+                String tempsTotal = rs.getString("temps_total");
                 String prestation = rs.getString("prestation");
                 BigDecimal tauxHoraire = rs.getBigDecimal("taux_horaire");
                 BigDecimal montantTotal = rs.getBigDecimal("montant_total");
                 String notes = rs.getString("notes");
                 String nomEmp = rs.getString("emp_name");
-                boolean tempsDemi = rs.getInt("tempsDemi") == 1;  // Converts 1 to true and 0 to false
-                boolean tempsDouble = rs.getInt("tempsDouble") == 1;  // Converts 1 to true and 0 to false
+                boolean tempsDemi = rs.getInt("tempsDemi") == 1;
+                boolean tempsDouble = rs.getInt("tempsDouble") == 1;
 
                 Quart quart = new Quart(id, numFactureResult, dateQuart, debutQuart, finQuart, pause,
-                        tempsTotal, prestation, tauxHoraire, montantTotal, notes,nomEmp,tempsDouble,tempsDemi);
+                        tempsTotal, prestation, tauxHoraire, montantTotal, notes, nomEmp, tempsDouble, tempsDemi);
                 quarts.add(quart);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exception
+            e.printStackTrace();
         }
 
         return quarts;
     }
 
-    public static void mettreAJourFacture(Facture facture){
-// SQL query to update the Facture table
+    /**
+     * Met à jour une facture dans la base de données avec les informations fournies.
+     *
+     * @param facture Objet Facture contenant les informations mises à jour
+     */
+    public static void mettreAJourFacture(Facture facture) {
         String updateQuery = "UPDATE Facture SET montant_avant_taxes = ?, tps = ?, tvq = ?, montant_apres_taxes = ? WHERE num_facture = ?";
 
-        try (Connection conn = DriverManager.getConnection(url, user, pass);PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
-            // Set parameters from the Facture object
+        try (Connection conn = DriverManager.getConnection(url, user, pass);
+             PreparedStatement pstmt = conn.prepareStatement(updateQuery)) {
+
             pstmt.setBigDecimal(1, facture.getMontantAvantTaxes());
             pstmt.setBigDecimal(2, facture.getTps());
             pstmt.setBigDecimal(3, facture.getTvq());
             pstmt.setBigDecimal(4, facture.getMontantApresTaxes());
             pstmt.setString(5, facture.getNumFacture());
 
-            // Execute the update
             int rowsAffected = pstmt.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected);
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exception
+            e.printStackTrace();
         }
     }
 
+    /**
+     * Supprime un quart de la base de données par son identifiant.
+     *
+     * @param id Identifiant du quart à supprimer
+     * @return true si le quart a été supprimé avec succès, false sinon
+     */
     public static boolean supprimerQuart(int id) {
         String sql = "DELETE FROM Quart WHERE id = ?";
 
         try (Connection conn = DriverManager.getConnection(url, user, pass);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, id);  // Set the ID of the quart to be deleted
-            int rowsAffected = pstmt.executeUpdate(); // Execute the delete operation
+            pstmt.setInt(1, id);
+            int rowsAffected = pstmt.executeUpdate();
 
-            // Return true if at least one row was deleted
             return rowsAffected > 0;
         } catch (SQLException e) {
-            // Log the exception (you could use a logging framework)
             System.err.println("Error while deleting quart: " + e.getMessage());
-            return false; // Return false if an exception occurs
+            return false;
         }
     }
 
+    /**
+     * Met à jour un quart dans la base de données avec les informations fournies.
+     *
+     * @param id            Identifiant du quart à mettre à jour
+     * @param prestation    Prestation mise à jour effectuée pendant le quart
+     * @param dateQuart     Date mise à jour du quart
+     * @param debutQuart    Heure de début mise à jour du quart
+     * @param finQuart      Heure de fin mise à jour du quart
+     * @param pause         Durée de la pause mise à jour pendant le quart
+     * @param tempsTotal    Temps total travaillé mis à jour pendant le quart
+     * @param tauxHoraire   Taux horaire mis à jour
+     * @param montantTotal  Montant total mis à jour pour le quart
+     * @param notes         Notes mises à jour associées au quart
+     * @param empName       Nom mis à jour de l'employé ayant travaillé le quart
+     * @param tempsDouble   Indique si le quart est payé en double
+     * @param tempsDemi     Indique si le quart est payé en temps et demi
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     public static void updateQuart(int id, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
                                    LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
                                    boolean tempsDouble, boolean tempsDemi) throws SQLException {
@@ -638,14 +728,17 @@ public class DBUtils {
             pstmt.setString(9, empName);
             pstmt.setInt(10, tempsDemi ? 1 : 0);
             pstmt.setInt(11, tempsDouble ? 1 : 0);
-
-            // Use the id to find the correct record to update
             pstmt.setInt(12, id);
 
             pstmt.executeUpdate();
         }
     }
 
+    /**
+     * Récupère tous les quarts depuis la base de données.
+     *
+     * @return Liste de tous les quarts
+     */
     public static List<Quart> fetchAllQuarts() {
         List<Quart> quarts = new ArrayList<>();
         String query = "SELECT * FROM Quart";
@@ -655,15 +748,13 @@ public class DBUtils {
              ResultSet rs = psFetch.executeQuery()) {
 
             while (rs.next()) {
-                // Retrieve values from ResultSet
                 int id = rs.getInt("id");
                 String numFacture = rs.getString("num_facture");
 
-                // Ensure proper handling of null values for Date and Time fields
-                Date dateQuart = rs.getDate("date_quart"); // Can be null
-                Time debutQuart = rs.getTime("debut_quart"); // Can be null
-                Time finQuart = rs.getTime("fin_quart"); // Can be null
-                Time pause = rs.getTime("pause"); // Can be null
+                Date dateQuart = rs.getDate("date_quart");
+                Time debutQuart = rs.getTime("debut_quart");
+                Time finQuart = rs.getTime("fin_quart");
+                Time pause = rs.getTime("pause");
 
                 String tempsTotal = rs.getString("temps_total");
                 String prestation = rs.getString("prestation");
@@ -674,21 +765,19 @@ public class DBUtils {
                 boolean tempsDemi = rs.getInt("tempsDemi") == 1;
                 boolean tempsDouble = rs.getInt("tempsDouble") == 1;
 
-                // Use default values if any field is null
                 if (dateQuart == null) {
-                    dateQuart = Date.valueOf(LocalDate.now()); // Default to current date
+                    dateQuart = Date.valueOf(LocalDate.now());
                 }
                 if (debutQuart == null) {
-                    debutQuart = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                    debutQuart = Time.valueOf(LocalTime.of(0, 0));
                 }
                 if (finQuart == null) {
-                    finQuart = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                    finQuart = Time.valueOf(LocalTime.of(0, 0));
                 }
                 if (pause == null) {
-                    pause = Time.valueOf(LocalTime.of(0, 0)); // Default to 00:00
+                    pause = Time.valueOf(LocalTime.of(0, 0));
                 }
 
-                // Create a new Quart object using the constructor that matches your class
                 Quart quart = new Quart(
                         id,
                         numFacture,
@@ -706,17 +795,22 @@ public class DBUtils {
                         tempsDemi
                 );
 
-                // Add the object to the list
                 quarts.add(quart);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle exceptions here
+            e.printStackTrace();
         }
 
-        return quarts; // Return the list of Quart objects
+        return quarts;
     }
 
+    /**
+     * Récupère une facture depuis la base de données par son numéro de facture.
+     *
+     * @param numFacture Numéro de la facture
+     * @return Un objet Facture si trouvé, sinon null
+     */
     public static Facture fetchFactureByNumFacture(String numFacture) {
         Facture facture = null;
         String query = "SELECT * FROM Facture WHERE num_facture = ?";
@@ -724,15 +818,11 @@ public class DBUtils {
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query)) {
 
-            // Set the parameter for the query
             psFetch.setString(1, numFacture);
 
-            // Execute the query and get the result set
             ResultSet rs = psFetch.executeQuery();
 
-            // Check if a result is returned
             if (rs.next()) {
-                // Retrieve data from the result set
                 String num = rs.getString("num_facture");
                 String nomPartenaire = rs.getString("nom_partenaire");
                 LocalDate date = rs.getDate("date").toLocalDate();
@@ -742,20 +832,24 @@ public class DBUtils {
                 BigDecimal montantApresTaxes = rs.getBigDecimal("montant_apres_taxes");
                 String statut = rs.getString("statut");
 
-                // Fetch the Partenaire object using the partner name or ID
                 Partenaire partenaire = fetchPartnerByName(nomPartenaire);
 
-                // Create a new Facture object with the retrieved data
                 facture = new Facture(num, partenaire, date, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle SQL exception
+            e.printStackTrace();
         }
 
-        return facture; // Return the Facture object, or null if not found
+        return facture;
     }
 
+    /**
+     * Récupère un partenaire depuis la base de données par son nom.
+     *
+     * @param nomPartenaire Nom du partenaire à récupérer
+     * @return Un objet Partenaire si trouvé, sinon null
+     */
     public static Partenaire fetchPartnerByName(String nomPartenaire) {
         Partenaire partner = null;
         String query = "SELECT * FROM partenaire WHERE nom = ?";
@@ -763,13 +857,10 @@ public class DBUtils {
         try (Connection connection = DriverManager.getConnection(url, user, pass);
              PreparedStatement psFetch = connection.prepareStatement(query)) {
 
-            // Set the parameter for the query
             psFetch.setString(1, nomPartenaire);
 
-            // Execute the query and get the result set
             ResultSet rs = psFetch.executeQuery();
 
-            // Check if a result is returned
             if (rs.next()) {
                 String numeroCivique = rs.getString("numero_civique");
                 String rue = rs.getString("rue");
@@ -780,19 +871,14 @@ public class DBUtils {
                 String courriel = rs.getString("courriel");
                 String status = rs.getString("status");
 
-                // Create a new Partenaire object
                 partner = new Partenaire(nomPartenaire, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
             }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle SQL exception
+            e.printStackTrace();
         }
 
-        return partner; // Return the Partenaire object, or null if not found
+        return partner;
     }
 
-
-
 }
-
-

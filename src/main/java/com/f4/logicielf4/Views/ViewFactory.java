@@ -224,9 +224,9 @@ public class ViewFactory {
     /**
      * Crée et affiche un stage en mode modal avec le contenu du loader donné.
      *
-     * @param loader le loader FXML
+     * @param loader        le loader FXML
      * @param originalStage le stage parent
-     * @param titre le titre de la fenêtre
+     * @param titre         le titre de la fenêtre
      */
     private void createStageShowAndWait(FXMLLoader loader, Stage originalStage, String titre) {
         try {
@@ -247,7 +247,7 @@ public class ViewFactory {
     /**
      * Affiche la fenêtre de suppression d'un partenaire.
      *
-     * @param stage le stage parent
+     * @param stage      le stage parent
      * @param partenaire le partenaire à supprimer
      */
     public void showDeletePartnerWindow(Stage stage, Partenaire partenaire) {
@@ -260,7 +260,7 @@ public class ViewFactory {
     /**
      * Affiche la fenêtre de suppression d'un employé.
      *
-     * @param stage le stage parent
+     * @param stage   le stage parent
      * @param employe l'employé à supprimer
      */
     public void showDeleteEmployeeWindow(Stage stage, Employe employe) {
@@ -280,30 +280,54 @@ public class ViewFactory {
         stage.getIcons().add(icon);
     }
 
-    public void showCommencerFactureWindow(Stage stage){
+    /**
+     * Affiche la fenêtre pour commencer une nouvelle facture.
+     *
+     * @param stage le stage parent
+     */
+    public void showCommencerFactureWindow(Stage stage) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/CommencerFacture.fxml"));
-        createStageShowAndWait(loader,stage,"Commencer une facture");
+        createStageShowAndWait(loader, stage, "Commencer une facture");
     }
 
-    public void showPresentationFactureWindow(Stage stage, String numFacture,String nomPartenaire){
+    /**
+     * Affiche la fenêtre de présentation d'une facture.
+     *
+     * @param stage        le stage parent
+     * @param numFacture   le numéro de la facture à présenter
+     * @param nomPartenaire le nom du partenaire associé à la facture
+     */
+    public void showPresentationFactureWindow(Stage stage, String numFacture, String nomPartenaire) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/PresentationFacture.fxml"));
-        PresentationFactureController controller = new PresentationFactureController(numFacture,nomPartenaire);
+        PresentationFactureController controller = new PresentationFactureController(numFacture, nomPartenaire);
         loader.setController(controller);
-        createStageShowAndWait(loader,stage,"Commencer une facture");
+        createStageShowAndWait(loader, stage, "Présentation d'une facture");
     }
 
-    public void showAjouterQuartWindow(Stage stage,String numFacture,PresentationFactureController presentationFactureController){
+    /**
+     * Affiche la fenêtre pour ajouter un quart à une facture.
+     *
+     * @param stage                         le stage parent
+     * @param numFacture                    le numéro de la facture
+     * @param presentationFactureController le contrôleur de la présentation de la facture
+     */
+    public void showAjouterQuartWindow(Stage stage, String numFacture, PresentationFactureController presentationFactureController) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/AjouterModifierQuart.fxml"));
-        AjouterQuartController controller = new AjouterQuartController(numFacture,presentationFactureController);
+        AjouterQuartController controller = new AjouterQuartController(numFacture, presentationFactureController);
         loader.setController(controller);
-        createStageShowAndWait(loader,stage,"Commencer une facture");
+        createStageShowAndWait(loader, stage, "Ajouter un quart");
     }
 
-    public void showModifierQuartWindow(Stage stage, Quart quart){
+    /**
+     * Affiche la fenêtre pour modifier un quart.
+     *
+     * @param stage le stage parent
+     * @param quart le quart à modifier
+     */
+    public void showModifierQuartWindow(Stage stage, Quart quart) {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/GestionFacture/AjouterModifierQuart.fxml"));
         ModifierQuartController controller = new ModifierQuartController(quart);
         loader.setController(controller);
-        createStageShowAndWait(loader,stage,"Modifier un quart");
+        createStageShowAndWait(loader, stage, "Modifier un quart");
     }
-
 }

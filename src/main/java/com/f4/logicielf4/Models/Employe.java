@@ -16,13 +16,16 @@ public class Employe {
 
     /**
      * Constructeur de la classe Employe.
+     * <p>
+     * Ce constructeur permet de créer un employé avec tous les attributs nécessaires.
+     * </p>
      *
      * @param id l'identifiant de l'employé
      * @param nom le nom de l'employé
      * @param prenom le prénom de l'employé
      * @param telephone le numéro de téléphone de l'employé
      * @param email l'email de l'employé
-     * @param statut le statut de l'employé
+     * @param statut le statut de l'employé (par exemple, actif/inactif)
      */
     public Employe(int id, String nom, String prenom, String telephone, String email, String statut) {
         this.id = id;
@@ -124,7 +127,7 @@ public class Employe {
     }
 
     /**
-     * Obtient le statut de l'employé.
+     * Obtient le statut de l'employé (par exemple, actif ou inactif).
      *
      * @return le statut de l'employé
      */

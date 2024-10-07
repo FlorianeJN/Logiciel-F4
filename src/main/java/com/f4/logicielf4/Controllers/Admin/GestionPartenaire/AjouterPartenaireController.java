@@ -62,10 +62,10 @@ public class AjouterPartenaireController implements Initializable {
      * ajoute le partenaire à la base de données et affiche un message de succès.
      */
     private void actionBtnAjouter() {
-        // Handle the "Ajouter" button action here
-        System.out.println("Add Partner button clicked");
+        // Gestion de l'action du bouton "Ajouter"
+        System.out.println("Bouton Ajouter partenaire cliqué");
 
-        // Retrieve the information
+        // Récupère les informations du partenaire
         Map<String, String> partnerInfo = retrieveInfos();
 
         if (partnerInfo != null) {
@@ -83,10 +83,10 @@ public class AjouterPartenaireController implements Initializable {
      * @return Une carte contenant les informations du partenaire si la validation est réussie, sinon null.
      */
     public Map<String, String> retrieveInfos() {
-        // Initialize a map to store the retrieved information
+        // Initialisation de la carte pour stocker les informations récupérées
         Map<String, String> partnerInfo = new HashMap<>();
 
-        // Retrieve information from each field
+        // Récupère les informations de chaque champ
         String nom = nomField.getText();
         String numeroCiviqueStr = numeroCiviqueField.getText();
         String rue = rueField.getText();
@@ -96,10 +96,10 @@ public class AjouterPartenaireController implements Initializable {
         String telephone = telephoneField.getText();
         String email = emailField.getText();
 
-        // Initialize a flag for validation
+        // Initialisation d'un indicateur de validation
         boolean valid = true;
 
-        // Validate numero civique
+        // Valide le numéro civique
         int numeroCivique = -1;
         try {
             numeroCivique = Integer.parseInt(numeroCiviqueStr);
@@ -108,13 +108,13 @@ public class AjouterPartenaireController implements Initializable {
             valid = false;
         }
 
-        // Validate telephone number
+        // Valide le numéro de téléphone
         if (telephone == null || !telephone.matches("\\d{10}")) {
             Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
             valid = false;
         }
 
-        // Check if all fields are filled
+        // Vérifie si tous les champs sont remplis
         if (nom == null || nom.isEmpty() ||
                 numeroCiviqueStr == null || numeroCiviqueStr.isEmpty() ||
                 rue == null || rue.isEmpty() ||
@@ -127,7 +127,7 @@ public class AjouterPartenaireController implements Initializable {
             valid = false;
         }
 
-        // If validation passes, add the retrieved values to the map
+        // Si la validation est réussie, ajoute les valeurs récupérées à la carte
         if (valid) {
             partnerInfo.put("nom", nom);
             partnerInfo.put("numeroCivique", String.valueOf(numeroCivique));
@@ -138,15 +138,15 @@ public class AjouterPartenaireController implements Initializable {
             partnerInfo.put("telephone", telephone);
             partnerInfo.put("email", email);
 
-            // Reset fields and close window
+            // Réinitialise les champs et ferme la fenêtre
             reinitialiserChamps();
             Stage stage = (Stage) btnAjouter.getScene().getWindow();
             stage.close();
 
-            return partnerInfo; // Return the map with all the information
+            return partnerInfo; // Retourne la carte contenant les informations
         }
 
-        // If validation fails, return null to indicate failure
+        // Si la validation échoue, retourne null pour indiquer l'échec
         return null;
     }
 

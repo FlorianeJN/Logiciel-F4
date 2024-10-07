@@ -16,8 +16,8 @@ import java.util.ResourceBundle;
 
 /**
  * Contrôleur pour la mise à jour des informations d'un employé.
- * Ce contrôleur est responsable de l'initialisation des champs de texte avec les données de l'employé,
- * de la validation des informations saisies, et de la gestion des actions des boutons de mise à jour et d'annulation.
+ * Ce contrôleur gère l'initialisation des champs de texte avec les données d'un employé spécifique,
+ * la validation des informations saisies, ainsi que la gestion des actions des boutons de mise à jour et d'annulation.
  */
 public class MiseAJourEmployeController implements Initializable {
 
@@ -51,7 +51,7 @@ public class MiseAJourEmployeController implements Initializable {
 
     /**
      * Méthode appelée lors de l'initialisation du contrôleur.
-     * Initialise les actions des boutons et remplit les champs de texte avec les informations de l'employé.
+     * Configure les actions des boutons et remplit les champs de texte avec les informations de l'employé.
      *
      * @param url L'URL de la ressource FXML (non utilisé).
      * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
@@ -64,7 +64,8 @@ public class MiseAJourEmployeController implements Initializable {
     }
 
     /**
-     * Remplit les champs de texte avec les informations de l'employé.
+     * Remplit les champs de texte avec les informations de l'employé à mettre à jour.
+     * Cette méthode est utilisée pour pré-remplir les données de l'employé sélectionné.
      */
     private void remplirTextFields() {
         if (employe != null) {
@@ -77,9 +78,9 @@ public class MiseAJourEmployeController implements Initializable {
 
     /**
      * Récupère les informations saisies par l'utilisateur dans les champs de texte,
-     * valide ces informations et les retourne sous forme de carte (Map).
+     * valide ces informations et les retourne sous forme de Map.
      *
-     * @return Une carte contenant les informations de l'employé si la validation est réussie, sinon null.
+     * @return Une Map contenant les informations valides de l'employé, sinon null si la validation échoue.
      */
     public Map<String, String> retrieveInfos() {
         Map<String, String> employeInfo = new HashMap<>();
@@ -91,7 +92,7 @@ public class MiseAJourEmployeController implements Initializable {
 
         boolean valid = true;
 
-        // Valide le numéro de téléphone
+        // Valide le numéro de téléphone (doit contenir exactement 10 chiffres)
         if (telephone == null || !telephone.matches("\\d{10}")) {
             Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
             valid = false;
@@ -108,12 +109,12 @@ public class MiseAJourEmployeController implements Initializable {
             return null;
         }
 
-        // Si la validation réussit, ajoute les valeurs récupérées à la carte
+        // Si la validation réussit, ajoute les valeurs récupérées à la Map
         employeInfo.put("nom", nom);
         employeInfo.put("prenom", prenom);
         employeInfo.put("telephone", telephone);
         employeInfo.put("email", email);
-        employeInfo.put("id", String.valueOf(employeId)); // Ajoute l'ID de l'employé à la carte
+        employeInfo.put("id", String.valueOf(employeId)); // Ajoute l'ID de l'employé à la Map
 
         Stage stage = (Stage) btnUpdate.getScene().getWindow();
         stage.close();
@@ -123,8 +124,8 @@ public class MiseAJourEmployeController implements Initializable {
 
     /**
      * Action déclenchée lors du clic sur le bouton de mise à jour.
-     * Récupère les informations de l'employé, met à jour l'employé dans la base de données
-     * et affiche un message de succès si la mise à jour est réussie.
+     * Récupère les informations saisies, met à jour l'employé dans la base de données,
+     * et affiche un message de confirmation si la mise à jour est réussie.
      */
     private void actionBtnUpdate() {
         Map<String, String> infos = retrieveInfos();

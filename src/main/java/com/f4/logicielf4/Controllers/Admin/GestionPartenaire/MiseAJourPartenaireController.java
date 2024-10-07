@@ -107,10 +107,10 @@ public class MiseAJourPartenaireController implements Initializable {
      * @return Une carte contenant les informations du partenaire modifiées si la validation est réussie, sinon null.
      */
     public Map<String, String> retrieveInfos() {
-        // Initialize a map to store the retrieved information
+        // Initialisation d'une carte pour stocker les informations récupérées
         Map<String, String> partnerInfo = new HashMap<>();
 
-        // Retrieve information from each field
+        // Récupère les informations de chaque champ
         String nom = nomField.getText();
         String numeroCiviqueStr = numeroCiviqueField.getText();
         String rue = rueField.getText();
@@ -120,10 +120,10 @@ public class MiseAJourPartenaireController implements Initializable {
         String telephone = telephoneField.getText();
         String email = emailField.getText();
 
-        // Initialize a flag for validation
+        // Initialisation d'un indicateur de validation
         boolean valid = true;
 
-        // Validate numero civique
+        // Validation du numéro civique
         int numeroCivique = -1;
         try {
             numeroCivique = Integer.parseInt(numeroCiviqueStr);
@@ -132,18 +132,18 @@ public class MiseAJourPartenaireController implements Initializable {
             valid = false;
         }
 
-        // Validate telephone number
+        // Validation du numéro de téléphone
         if (telephone == null || !telephone.matches("\\d{10}")) {
             Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
             valid = false;
         }
 
-        // Check if all fields are filled
+        // Vérifie que tous les champs sont remplis
         if (nom == null || nom.isEmpty() ||
                 numeroCiviqueStr == null || numeroCiviqueStr.isEmpty() ||
                 rue == null || rue.isEmpty() ||
                 ville == null || ville.isEmpty() ||
-                province == null || province.isEmpty() || // Check if province is null or empty
+                province == null || province.isEmpty() ||
                 codePostal == null || codePostal.isEmpty() ||
                 telephone == null || telephone.isEmpty() ||
                 email == null || email.isEmpty()) {
@@ -151,12 +151,12 @@ public class MiseAJourPartenaireController implements Initializable {
             valid = false;
         }
 
-        // If validation fails, return null
+        // Si la validation échoue, retourne null
         if (!valid) {
             return null;
         }
 
-        // If validation passes, add the retrieved values to the map
+        // Si la validation réussit, ajoute les valeurs récupérées à la carte
         partnerInfo.put("nom", nom);
         partnerInfo.put("numeroCivique", String.valueOf(numeroCivique));
         partnerInfo.put("rue", rue);
@@ -166,6 +166,7 @@ public class MiseAJourPartenaireController implements Initializable {
         partnerInfo.put("telephone", telephone);
         partnerInfo.put("email", email);
 
+        // Ferme la fenêtre après la mise à jour
         Stage stage = (Stage) btnUpdate.getScene().getWindow();
         stage.close();
 
@@ -173,7 +174,7 @@ public class MiseAJourPartenaireController implements Initializable {
     }
 
     /**
-     * Action déclenchée lors du clic sur le bouton "Update".
+     * Action déclenchée lors du clic sur le bouton "Mettre à jour".
      * Récupère les informations modifiées et met à jour les informations du partenaire dans la base de données.
      */
     private void actionBtnUpdate() {
@@ -187,7 +188,7 @@ public class MiseAJourPartenaireController implements Initializable {
     }
 
     /**
-     * Action déclenchée lors du clic sur le bouton "Cancel".
+     * Action déclenchée lors du clic sur le bouton "Annuler".
      * Ferme la fenêtre sans effectuer de mise à jour.
      */
     private void actionBtnCancel() {

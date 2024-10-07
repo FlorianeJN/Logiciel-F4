@@ -2,7 +2,6 @@ package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Controllers.Strategie.StrategiePrestation;
 import com.f4.logicielf4.Models.Employe;
-import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
@@ -20,9 +19,12 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.ResourceBundle;
 
+/**
+ * Contrôleur pour l'affichage des détails d'une facture spécifique, y compris la gestion des quarts associés.
+ * Ce contrôleur permet d'ajouter, de modifier et de supprimer des quarts associés à une facture donnée.
+ */
 public class PresentationFactureController implements Initializable {
 
     private String numFacture;
@@ -30,6 +32,7 @@ public class PresentationFactureController implements Initializable {
 
     @FXML
     private Label factureLabel;
+
     @FXML
     private TableView<Quart> quartsTable;
 
@@ -52,7 +55,6 @@ public class PresentationFactureController implements Initializable {
     @FXML
     private TableColumn<Quart, Employe> employeColumn;
 
-
     @FXML
     private Button btnAjouter;
     @FXML
@@ -60,11 +62,21 @@ public class PresentationFactureController implements Initializable {
     @FXML
     private Button btnSupprimer;
 
-    public PresentationFactureController(String numFacture,String nomPartenaire) {
+    /**
+     * Constructeur pour initialiser le contrôleur avec une facture spécifique.
+     *
+     * @param numFacture    Le numéro de la facture.
+     * @param nomPartenaire Le nom du partenaire associé à la facture.
+     */
+    public PresentationFactureController(String numFacture, String nomPartenaire) {
         this.numFacture = numFacture;
         this.nomPartenaire = nomPartenaire;
     }
 
+    /**
+     * Configure les colonnes de la table des quarts en fonction des propriétés des objets Quart.
+     * Utilise des PropertyValueFactory pour lier les colonnes aux attributs correspondants des quarts.
+     */
     private void setCellValues() {
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateQuart"));
         prestationColumn.setCellValueFactory(new PropertyValueFactory<>("stringPrestation"));
@@ -77,48 +89,72 @@ public class PresentationFactureController implements Initializable {
         employeColumn.setCellValueFactory(new PropertyValueFactory<>("nomEmploye"));
     }
 
+    /**
+     * Met à jour la table des quarts avec les données actuelles pour la facture donnée.
+     * Récupère les quarts associés à la facture à partir de la base de données.
+     */
     public void updateTable() {
         ArrayList<Quart> quarts = (ArrayList<Quart>) DBUtils.fetchQuartsByNumFacture(numFacture);
         this.quartsTable.getItems().setAll(quarts);
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton "Ajouter".
+     * Ouvre la fenêtre pour ajouter un nouveau quart à la facture actuelle et met à jour la table après l'ajout.
+     */
     private void actionBtnAjouter() {
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
-        Model.getInstance().getViewFactory().showAjouterQuartWindow(stage,numFacture,this);
+        Model.getInstance().getViewFactory().showAjouterQuartWindow(stage, numFacture, this);
         updateTable();
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton "Modifier".
+     * Ouvre la fenêtre pour modifier le quart sélectionné.
+     * Affiche un message d'erreur si aucun quart n'est sélectionné.
+     */
     private void actionBtnMAJ() {
         Quart quartSelectionne = quartsTable.getSelectionModel().getSelectedItem();
-        if(quartSelectionne != null) {
+        if (quartSelectionne != null) {
             Stage stage = (Stage) btnMAJ.getScene().getWindow();
-            Model.getInstance().getViewFactory().showModifierQuartWindow(stage,quartSelectionne);
+            Model.getInstance().getViewFactory().showModifierQuartWindow(stage, quartSelectionne);
             updateTable();
-        }
-        else
+        } else {
             Dialogs.showMessageDialog("Veuillez sélectionner un quart avant de cliquer sur le bouton Modifier.", "ERREUR MODIFICATION");
+        }
     }
 
+    /**
+     * Action déclenchée lors du clic sur le bouton "Supprimer".
+     * Supprime le quart sélectionné de la base de données après confirmation de l'utilisateur.
+     * Affiche un message d'erreur si aucun quart n'est sélectionné.
+     */
     private void actionBtnSupprimer() {
         Quart quartSelectionne = quartsTable.getSelectionModel().getSelectedItem();
-        if(quartSelectionne != null){
+        if (quartSelectionne != null) {
             Stage stage = (Stage) btnSupprimer.getScene().getWindow();
-            Dialogs.showConfirmDialog("Vous êtes sur le point de supprimer un quart. Souhaitez-vous continuer?","CONFIRMATION SUPPRESSION QUART");
-            //CALL DBUTIL POUR SUPPRIMER LE QUART
-            if(DBUtils.supprimerQuart(quartSelectionne.getId())){
-                Dialogs.showMessageDialog("Quart supprimé","CONFIRMATION SUPPRESSION QUART");
+            Dialogs.showConfirmDialog("Vous êtes sur le point de supprimer un quart. Souhaitez-vous continuer?", "CONFIRMATION SUPPRESSION QUART");
+            if (DBUtils.supprimerQuart(quartSelectionne.getId())) {
+                Dialogs.showMessageDialog("Quart supprimé", "CONFIRMATION SUPPRESSION QUART");
                 updateTable();
-            }else
-                Dialogs.showMessageDialog("Problème de suppression","ERREUR SUPPRESSION");
-
-        }
-        else
+            } else {
+                Dialogs.showMessageDialog("Problème de suppression", "ERREUR SUPPRESSION");
+            }
+        } else {
             Dialogs.showMessageDialog("Veuillez sélectionner un quart avant de cliquer sur le bouton Supprimer.", "ERREUR SUPPRESSION");
+        }
     }
 
+    /**
+     * Méthode appelée lors de l'initialisation du contrôleur.
+     * Configure les colonnes de la table, met à jour la table des quarts, et lie les actions des boutons.
+     *
+     * @param url            L'URL de la ressource FXML (non utilisé).
+     * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
+     */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        factureLabel.setText("Facture # " + numFacture+" - " + nomPartenaire);
+        factureLabel.setText("Facture # " + numFacture + " - " + nomPartenaire);
         setCellValues();
         updateTable();
 

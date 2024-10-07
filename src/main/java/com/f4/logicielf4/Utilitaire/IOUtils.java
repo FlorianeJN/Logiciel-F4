@@ -20,8 +20,18 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Classe utilitaire pour la gestion des fichiers d'exportation, en particulier pour la création et la génération
+ * de factures au format PDF.
+ */
 public class IOUtils {
 
+    /**
+     * Lance une boîte de dialogue permettant à l'utilisateur de sélectionner l'emplacement de sauvegarde du fichier PDF.
+     * Une facture est générée à l'emplacement choisi.
+     *
+     * @param facture La facture à exporter en PDF.
+     */
     public static void commencerSauvegarde(Facture facture) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Enregistrer la facture en PDF");
@@ -49,6 +59,13 @@ public class IOUtils {
         }
     }
 
+    /**
+     * Crée un fichier PDF à l'emplacement spécifié contenant les informations d'une facture.
+     *
+     * @param filePath Le chemin du fichier PDF à créer.
+     * @param facture  La facture à inclure dans le PDF.
+     * @throws IOException En cas d'erreur lors de la création du fichier PDF.
+     */
     public static void createPDF(String filePath, Facture facture) throws IOException {
         PDDocument document = new PDDocument();
         PDPage page = new PDPage(PDRectangle.LETTER);
@@ -68,388 +85,381 @@ public class IOUtils {
         document.close();
     }
 
+    /**
+     * Écrit l'en-tête du PDF, incluant le logo de l'entreprise et les informations sur la facture et le partenaire.
+     *
+     * @param document      Le document PDF en cours de création.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param facture       La facture pour laquelle l'en-tête est généré.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @return La position Y après l'écriture de l'en-tête pour continuer le contenu.
+     */
     private static float writeHeader(PDDocument document, PDPageContentStream contentStream, Facture facture, PDType0Font customFont) {
-        float yPosition = 0;
+        float yPosition = 750;
+        float margin = 50;
+        float spacing = 12;
+
         try {
-            // Variables pour les positions
-            float margin = 50;
-            yPosition = 750;
-            float spacing = 12;
-
-            // Logo à gauche
-            PDImageXObject logo = PDImageXObject.createFromFile("src/main/resources/Images/logo.jpg", document);
-            float logoWidth = 100;
-            float logoHeight = 100;
-            float logoX = margin;
-            float logoY = yPosition - logoHeight + 30; // Ajuster si nécessaire
-            contentStream.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
-
-            // Titre de la facture centré (incluant le numéro de facture)
-            String titreFacture = "FACTURE N° " + facture.getNumFacture();
-            contentStream.setFont(customFont, 18);
-            float titreWidth = customFont.getStringWidth(titreFacture) / 1000 * 18;
-            float titreX = (PDRectangle.LETTER.getWidth() - titreWidth) / 2;
-            float titreY = yPosition;
-            contentStream.beginText();
-            contentStream.newLineAtOffset(titreX, titreY);
-            contentStream.showText(titreFacture);
-            contentStream.endText();
-
-            // Informations de l'entreprise à gauche, sous le logo
-            contentStream.setFont(customFont, 10);
-            float infoEntrepriseX = margin;
-            float infoEntrepriseY = logoY - spacing;
-            contentStream.beginText();
-            contentStream.newLineAtOffset(infoEntrepriseX, infoEntrepriseY);
-            contentStream.showText("F4 SANTÉ INC.");
-            contentStream.newLineAtOffset(0, -spacing);
-            contentStream.showText("215 Rue Laure-Conan");
-            contentStream.newLineAtOffset(0, -spacing);
-            contentStream.showText("Varennes, Québec J3X 1W9");
-            contentStream.newLineAtOffset(0, -spacing);
-            contentStream.showText("Téléphone : 514-797-6357");
-            contentStream.newLineAtOffset(0, -spacing);
-            contentStream.showText("Email : info@f4santeinc.com");
-            contentStream.endText();
-
-            // Informations du partenaire encadrées et alignées à droite
-            Partenaire partenaire = facture.getPartenaire();
-            if (partenaire != null) {
-                contentStream.setFont(customFont, 10);
-                float partnerX = PDRectangle.LETTER.getWidth() - margin - 220; // Largeur ajustée pour agrandir le cadre
-                float partnerY = logoY + spacing; // Aligné avec le logo
-
-                // Placer "Facturé à:" au-dessus du cadre
-                contentStream.beginText();
-                contentStream.newLineAtOffset(partnerX, partnerY + 15); // Positionner au-dessus du cadre
-                contentStream.showText("Facturé à:");
-                contentStream.endText();
-
-                // Dessiner le cadre
-                float cadreWidth = 220; // Largeur du cadre augmentée
-                float cadreHeight = spacing * 5; // Calculer la hauteur en fonction du nombre de lignes de texte
-                contentStream.setStrokingColor(Color.BLACK);
-                contentStream.setLineWidth(1);
-                contentStream.addRect(partnerX - 5, partnerY - cadreHeight - 5, cadreWidth, cadreHeight + 5); // Ajuster le cadre
-                contentStream.stroke();
-
-                // Informations du partenaire à l'intérieur du cadre
-                contentStream.beginText();
-                contentStream.newLineAtOffset(partnerX, partnerY - spacing); // Déplacer légèrement vers le bas
-                contentStream.showText(partenaire.getNom());
-                contentStream.newLineAtOffset(0, -spacing);
-                contentStream.showText(partenaire.getAdresseObj().getNumeroCivique() + " " + partenaire.getAdresseObj().getRue());
-                contentStream.newLineAtOffset(0, -spacing);
-                contentStream.showText(partenaire.getAdresseObj().getVille() + ", " + partenaire.getAdresseObj().getProvince() + " " + partenaire.getAdresseObj().getCodePostal());
-                contentStream.newLineAtOffset(0, -spacing);
-                contentStream.showText("Téléphone : " + partenaire.getTelephone());
-                contentStream.endText();
-            }
-
-            // Ligne séparatrice
-            yPosition = infoEntrepriseY - spacing * 6; // Plus bas pour dégager le contenu
-            contentStream.setStrokingColor(Color.GRAY);
-            contentStream.setLineWidth(1);
-            contentStream.moveTo(margin, yPosition);
-            contentStream.lineTo(PDRectangle.LETTER.getWidth() - margin, yPosition);
-            contentStream.stroke();
-
-            yPosition -= spacing;
-
-            return yPosition;
-
+            yPosition = drawLogo(document, contentStream, yPosition, margin);
+            writeTitle(contentStream, facture, customFont, yPosition);
+            float infoEntrepriseY = writeCompanyInfo(contentStream, customFont, margin, yPosition, spacing);
+            writePartnerInfo(contentStream, facture, customFont, margin, yPosition, spacing);
+            yPosition = drawSeparatorLine(contentStream, infoEntrepriseY, spacing);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return yPosition;
     }
 
+    /**
+     * Dessine le logo de l'entreprise dans l'en-tête du PDF.
+     *
+     * @param document      Le document PDF.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param yPosition     La position Y actuelle.
+     * @param margin        La marge pour positionner le logo.
+     * @return La nouvelle position Y après avoir dessiné le logo.
+     * @throws IOException En cas d'erreur lors de l'écriture du logo.
+     */
+    private static float drawLogo(PDDocument document, PDPageContentStream contentStream, float yPosition, float margin) throws IOException {
+        PDImageXObject logo = PDImageXObject.createFromFile("src/main/resources/Images/logo.jpg", document);
+        float logoWidth = 100;
+        float logoHeight = 100;
+        float logoX = margin;
+        float logoY = yPosition - logoHeight + 30; // Ajuster si nécessaire
+        contentStream.drawImage(logo, logoX, logoY, logoWidth, logoHeight);
+        return yPosition;
+    }
+
+    /**
+     * Écrit le titre de la facture centré dans l'en-tête.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param facture       La facture pour laquelle le titre est généré.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param yPosition     La position Y actuelle.
+     * @throws IOException En cas d'erreur lors de l'écriture du texte.
+     */
+    private static void writeTitle(PDPageContentStream contentStream, Facture facture, PDType0Font customFont, float yPosition) throws IOException {
+        String titreFacture = "FACTURE N° " + facture.getNumFacture();
+        contentStream.setFont(customFont, 18);
+        float titreWidth = customFont.getStringWidth(titreFacture) / 1000 * 18;
+        float titreX = (PDRectangle.LETTER.getWidth() - titreWidth) / 2;
+        contentStream.beginText();
+        contentStream.newLineAtOffset(titreX, yPosition);
+        contentStream.showText(titreFacture);
+        contentStream.endText();
+    }
+
+    /**
+     * Écrit les informations de l'entreprise dans l'en-tête sous le logo.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param margin        La marge à gauche pour positionner le texte.
+     * @param yPosition     La position Y actuelle.
+     * @param spacing       L'espacement entre les lignes de texte.
+     * @return La nouvelle position Y après avoir écrit les informations de l'entreprise.
+     * @throws IOException En cas d'erreur lors de l'écriture du texte.
+     */
+    private static float writeCompanyInfo(PDPageContentStream contentStream, PDType0Font customFont, float margin, float yPosition, float spacing) throws IOException {
+        contentStream.setFont(customFont, 10);
+        float logoY = yPosition - 100 + 30; // Même ajustement que drawLogo
+        float infoEntrepriseY = logoY - spacing;
+        contentStream.beginText();
+        contentStream.newLineAtOffset(margin, infoEntrepriseY);
+        contentStream.showText("F4 SANTÉ INC.");
+        contentStream.newLineAtOffset(0, -spacing);
+        contentStream.showText("215 Rue Laure-Conan");
+        contentStream.newLineAtOffset(0, -spacing);
+        contentStream.showText("Varennes, Québec J3X 1W9");
+        contentStream.newLineAtOffset(0, -spacing);
+        contentStream.showText("Téléphone : 514-797-6357");
+        contentStream.newLineAtOffset(0, -spacing);
+        contentStream.showText("Email : info@f4santeinc.com");
+        contentStream.endText();
+        return infoEntrepriseY;
+    }
+
+    /**
+     * Écrit les informations du partenaire dans l'en-tête, à droite.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param facture       La facture avec les informations du partenaire.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param margin        La marge à droite pour positionner le texte.
+     * @param yPosition     La position Y actuelle.
+     * @param spacing       L'espacement entre les lignes de texte.
+     * @throws IOException En cas d'erreur lors de l'écriture du texte ou du dessin du cadre.
+     */
+    private static void writePartnerInfo(PDPageContentStream contentStream, Facture facture, PDType0Font customFont, float margin, float yPosition, float spacing) throws IOException {
+        Partenaire partenaire = facture.getPartenaire();
+        if (partenaire != null) {
+            contentStream.setFont(customFont, 10);
+            float partnerX = PDRectangle.LETTER.getWidth() - margin - 220;
+            float logoY = yPosition - 100 + 30; // Même ajustement que drawLogo
+            float partnerY = logoY + spacing;
+
+            // Placer "Facturé à:" au-dessus du cadre
+            contentStream.beginText();
+            contentStream.newLineAtOffset(partnerX, partnerY + 15);
+            contentStream.showText("Facturé à:");
+            contentStream.endText();
+
+            // Dessiner le cadre
+            float cadreWidth = 220;
+            float cadreHeight = spacing * 5;
+            contentStream.setStrokingColor(Color.BLACK);
+            contentStream.setLineWidth(1);
+            contentStream.addRect(partnerX - 5, partnerY - cadreHeight - 5, cadreWidth, cadreHeight + 5);
+            contentStream.stroke();
+
+            // Informations du partenaire à l'intérieur du cadre
+            contentStream.beginText();
+            contentStream.newLineAtOffset(partnerX, partnerY - spacing);
+            contentStream.showText(partenaire.getNom());
+            contentStream.newLineAtOffset(0, -spacing);
+            contentStream.showText(partenaire.getAdresseObj().getNumeroCivique() + " " + partenaire.getAdresseObj().getRue());
+            contentStream.newLineAtOffset(0, -spacing);
+            contentStream.showText(partenaire.getAdresseObj().getVille() + ", " + partenaire.getAdresseObj().getProvince() + " " + partenaire.getAdresseObj().getCodePostal());
+            contentStream.newLineAtOffset(0, -spacing);
+            contentStream.showText("Téléphone : " + partenaire.getTelephone());
+            contentStream.endText();
+        }
+    }
+
+    /**
+     * Dessine une ligne séparatrice grise dans l'en-tête après les informations.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param yPosition     La position Y actuelle.
+     * @param spacing       L'espacement entre la ligne et le texte précédent.
+     * @return La nouvelle position Y après avoir dessiné la ligne.
+     * @throws IOException En cas d'erreur lors du dessin de la ligne.
+     */
+    private static float drawSeparatorLine(PDPageContentStream contentStream, float yPosition, float spacing) throws IOException {
+        yPosition -= spacing * 6;
+        contentStream.setStrokingColor(Color.GRAY);
+        contentStream.setLineWidth(1);
+        contentStream.moveTo(50, yPosition);
+        contentStream.lineTo(PDRectangle.LETTER.getWidth() - 50, yPosition);
+        contentStream.stroke();
+        yPosition -= spacing;
+        return yPosition;
+    }
+
+    /**
+     * Écrit le contenu de la facture dans le PDF, incluant les informations sur les quarts et les montants.
+     *
+     * @param document      Le document PDF en cours de création.
+     * @param page          La page actuelle du PDF.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param facture       La facture pour laquelle le contenu est généré.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param yStart        La position Y où commencer l'écriture du contenu.
+     * @return Le flux de contenu mis à jour après l'écriture du contenu.
+     * @throws IOException En cas d'erreur lors de l'écriture du contenu.
+     */
     private static PDPageContentStream writeContent(PDDocument document, PDPage page, PDPageContentStream contentStream, Facture facture, PDType0Font customFont, float yStart) throws IOException {
         float yPosition = yStart;
         float margin = 30;
-        float minYPosition = 100; // Minimum y position to switch to a new page
+        float minYPosition = 100; // Position Y minimale avant d'ajouter une nouvelle page
 
-        // Adjust column widths
+        // Ajuster les largeurs des colonnes
         float[] columnWidths = {70, 120, 50, 50, 50, 50, 60, 70};
 
-        // Draw table headers
+        // Dessiner les en-têtes du tableau
         drawTableHeaders(contentStream, margin, yPosition, columnWidths, customFont);
-        yPosition -= 30; // Adjust position after the line
+        yPosition -= 30; // Ajuster la position après la ligne
 
         List<Quart> quarts = facture.getListeQuarts();
         for (Quart quart : quarts) {
-            if (yPosition < minYPosition) { // Check if we need a new page
-                // Draw footer before adding a new page
-                drawFooter(document, contentStream);
-
-                contentStream.close();
-                page = new PDPage(PDRectangle.LETTER);
-                document.addPage(page);
-                contentStream = new PDPageContentStream(document, page);
-
-                // Reset yPosition to start table at the top of the new page
-                yPosition = 750; // Set to a value near the top of the new page
-                drawTableHeaders(contentStream, margin, yPosition, columnWidths, customFont);
-                yPosition -= 30;
+            if (yPosition < minYPosition) {
+                contentStream = addNewPageWithHeaders(document, contentStream, customFont, columnWidths);
+                yPosition = 750 - 30; // Réinitialiser la position Y après les en-têtes
             }
 
             drawTableRow(contentStream, margin, yPosition, quart, columnWidths, customFont);
             yPosition -= 20;
         }
 
-        // Add space before the amount section
+        // Ajouter un espace avant la section des montants
         yPosition -= 20;
 
-        // Check if we need a new page before the amounts section
         if (yPosition < minYPosition) {
-            drawFooter(document, contentStream);
-
-            contentStream.close();
-            page = new PDPage(PDRectangle.LETTER);
-            document.addPage(page);
-            contentStream = new PDPageContentStream(document, page);
-
-            // Reset yPosition to start content at the top of the new page
+            contentStream = addNewPage(document, contentStream);
             yPosition = 750;
         }
 
-        // Adjust the position of labels and amounts
-        float labelOffset = 350; // Move labels further left
-        float valueOffset = labelOffset + 120; // Adjust for value position
+        // Dessiner la section des montants
+        yPosition = drawMontantSection(document, contentStream, facture, customFont, yPosition, minYPosition);
 
-        contentStream.setFont(customFont, 10); // Reduce font size to 10
-
-        // Montant total HT
-        contentStream.beginText();
-        contentStream.newLineAtOffset(labelOffset, yPosition);
-        contentStream.showText("Montant total HT : ");
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(valueOffset, yPosition);
-        contentStream.showText(formatCurrency(facture.getMontantAvantTaxes()));
-        contentStream.endText();
-        yPosition -= 15;
-
-        // Montant TPS
-        contentStream.beginText();
-        contentStream.newLineAtOffset(labelOffset, yPosition);
-        contentStream.showText("Montant TPS (5%) : ");
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(valueOffset, yPosition);
-        contentStream.showText(formatCurrency(facture.getTps()));
-        contentStream.endText();
-        yPosition -= 15;
-
-        // Montant TVQ
-        contentStream.beginText();
-        contentStream.newLineAtOffset(labelOffset, yPosition);
-        contentStream.showText("Montant TVQ (9,975%) : ");
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.newLineAtOffset(valueOffset, yPosition);
-        contentStream.showText(formatCurrency(facture.getTvq()));
-        contentStream.endText();
-        yPosition -= 15; // Adjusted space
-
-        // Check if we need a new page before the TTC amount
-        if (yPosition < minYPosition) {
-            drawFooter(document, contentStream);
-
-            contentStream.close();
-            page = new PDPage(PDRectangle.LETTER);
-            document.addPage(page);
-            contentStream = new PDPageContentStream(document, page);
-            yPosition = 750; // Reset yPosition for the new page
-        }
-
-        // Montant TTC (en gras)
-        contentStream.setFont(customFont, 12); // Slightly larger font for TTC
-        contentStream.beginText();
-        contentStream.setNonStrokingColor(Color.BLACK); // Text color black
-        contentStream.setLineWidth(1.5f); // Increase line width for bold effect
-        contentStream.newLineAtOffset(labelOffset, yPosition);
-        contentStream.showText("Montant TTC : ");
-        contentStream.endText();
-
-        contentStream.beginText();
-        contentStream.setLineWidth(1.5f); // Increase line width for bold effect
-        contentStream.newLineAtOffset(valueOffset, yPosition);
-        contentStream.showText(formatCurrency(facture.getMontantApresTaxes()));
-        contentStream.endText();
-        yPosition -= 25; // Slightly reduced space
-
-        // Draw footer at the bottom of the last page
+        // Dessiner le pied de page en bas de la dernière page
         drawFooter(document, contentStream);
 
         return contentStream;
     }
 
+    /**
+     * Ajoute une nouvelle page avec les en-têtes des tableaux.
+     *
+     * @param document      Le document PDF.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param columnWidths  Les largeurs des colonnes pour le tableau.
+     * @return Le flux de contenu mis à jour après l'ajout de la nouvelle page.
+     * @throws IOException En cas d'erreur lors de l'ajout de la nouvelle page.
+     */
+    private static PDPageContentStream addNewPageWithHeaders(PDDocument document, PDPageContentStream contentStream, PDType0Font customFont, float[] columnWidths) throws IOException {
+        contentStream.close();
+        PDPage newPage = new PDPage(PDRectangle.LETTER);
+        document.addPage(newPage);
+        contentStream = new PDPageContentStream(document, newPage);
+        float yPosition = 750;
+        float margin = 30;
+        drawTableHeaders(contentStream, margin, yPosition, columnWidths, customFont);
+        return contentStream;
+    }
 
-    // Method to draw the footer on each page
+    /**
+     * Ajoute une nouvelle page vide au document PDF.
+     *
+     * @param document      Le document PDF.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @return Le flux de contenu mis à jour après l'ajout de la nouvelle page.
+     * @throws IOException En cas d'erreur lors de l'ajout de la nouvelle page.
+     */
+    private static PDPageContentStream addNewPage(PDDocument document, PDPageContentStream contentStream) throws IOException {
+        contentStream.close();
+        PDPage newPage = new PDPage(PDRectangle.LETTER);
+        document.addPage(newPage);
+        return new PDPageContentStream(document, newPage);
+    }
+
+    /**
+     * Écrit la section des montants dans le PDF.
+     *
+     * @param document      Le document PDF en cours de création.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param facture       La facture avec les montants.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @param yPosition     La position Y actuelle.
+     * @param minYPosition  La position Y minimale avant d'ajouter une nouvelle page.
+     * @return La position Y après avoir écrit la section des montants.
+     * @throws IOException En cas d'erreur lors de l'écriture du contenu.
+     */
+    private static float drawMontantSection(PDDocument document, PDPageContentStream contentStream, Facture facture, PDType0Font customFont, float yPosition, float minYPosition) throws IOException {
+        float labelOffset = 350;
+        float valueOffset = labelOffset + 120;
+        contentStream.setFont(customFont, 10);
+
+        // Montant total HT
+        yPosition = writeMontantLine(contentStream, "Montant total HT : ", formatCurrency(facture.getMontantAvantTaxes()), labelOffset, valueOffset, yPosition);
+        // Montant TPS
+        yPosition = writeMontantLine(contentStream, "Montant TPS (5%) : ", formatCurrency(facture.getTps()), labelOffset, valueOffset, yPosition);
+        // Montant TVQ
+        yPosition = writeMontantLine(contentStream, "Montant TVQ (9,975%) : ", formatCurrency(facture.getTvq()), labelOffset, valueOffset, yPosition);
+
+        // Vérifier si nous devons ajouter une nouvelle page avant le montant TTC
+        if (yPosition < minYPosition) {
+            contentStream = addNewPage(document, contentStream);
+            yPosition = 750;
+        }
+
+        // Montant TTC (en gras)
+        contentStream.setFont(customFont, 12);
+        contentStream.beginText();
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText("Montant TTC : ");
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(formatCurrency(facture.getMontantApresTaxes()));
+        contentStream.endText();
+        yPosition -= 25;
+
+        return yPosition;
+    }
+
+    /**
+     * Écrit une ligne pour la section des montants.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param label         Le texte du label.
+     * @param value         Le texte du montant.
+     * @param labelOffset   Le décalage X pour le label.
+     * @param valueOffset   Le décalage X pour le montant.
+     * @param yPosition     La position Y actuelle.
+     * @return La nouvelle position Y après avoir écrit la ligne.
+     * @throws IOException En cas d'erreur lors de l'écriture du texte.
+     */
+    private static float writeMontantLine(PDPageContentStream contentStream, String label, String value, float labelOffset, float valueOffset, float yPosition) throws IOException {
+        contentStream.beginText();
+        contentStream.newLineAtOffset(labelOffset, yPosition);
+        contentStream.showText(label);
+        contentStream.endText();
+
+        contentStream.beginText();
+        contentStream.newLineAtOffset(valueOffset, yPosition);
+        contentStream.showText(value);
+        contentStream.endText();
+        return yPosition - 15;
+    }
+
+    /**
+     * Dessine le pied de page sur chaque page du document PDF.
+     *
+     * @param document      Le document PDF en cours de création.
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @throws IOException En cas d'erreur lors du dessin du pied de page.
+     */
     private static void drawFooter(PDDocument document, PDPageContentStream contentStream) throws IOException {
-        // Draw footer image
-        PDImageXObject footerImage = PDImageXObject.createFromFile("src/main/resources/Images/footerF4.png", document); // Ensure correct image path
-        float footerWidth = PDRectangle.LETTER.getWidth(); // Full page width
-        float footerHeight = 50; // Adjust height if necessary
-        float footerX = 0; // Start from left margin
-        float footerY = 20; // Position near bottom
+        PDImageXObject footerImage = PDImageXObject.createFromFile("src/main/resources/Images/footerF4.png", document);
+        float footerWidth = PDRectangle.LETTER.getWidth();
+        float footerHeight = 50;
+        float footerX = 0;
+        float footerY = 20;
         contentStream.drawImage(footerImage, footerX, footerY, footerWidth, footerHeight);
     }
 
-    // Call the drawFooter method for each page in the document
-    public static void addFootersToAllPages(PDDocument document) throws IOException {
-        for (PDPage page : document.getPages()) {
-            PDPageContentStream contentStream = new PDPageContentStream(document, page, PDPageContentStream.AppendMode.APPEND, true);
-            drawFooter(document, contentStream);
-            contentStream.close();
-        }
-    }
-
-    // Méthode pour convertir le montant en lettres
-    private static String montantEnLettres(BigDecimal amount) {
-        int dollars = amount.intValue(); // Partie entière des dollars
-        return numberToWords(dollars);
-    }
-
-    // Méthode pour obtenir les cents en lettres
-    private static String getCentsInWords(BigDecimal amount) {
-        BigDecimal cents = amount.remainder(BigDecimal.ONE).multiply(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-        return numberToWords(cents.intValue());
-    }
-
-    // Méthode pour convertir un nombre en lettres (gère les grands nombres)
-    private static String numberToWords(int number) {
-        if (number == 0) {
-            return "zéro";
-        }
-
-        String[] units = {"", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"};
-        String[] teens = {"dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"};
-        String[] tens = {"", "", "vingt", "trente", "quarante", "cinquante", "soixante"};
-        String[] tensSpecial = {"soixante", "quatre-vingt"};
-
-        StringBuilder words = new StringBuilder();
-
-        if (number < 0) {
-            words.append("moins ");
-            number = -number;
-        }
-
-        if (number >= 1000000) {
-            int millions = number / 1000000;
-            words.append(numberToWords(millions)).append(" million");
-            if (millions > 1) {
-                words.append("s");
-            }
-            number %= 1000000;
-            if (number > 0) {
-                words.append(" ");
-            }
-        }
-
-        if (number >= 1000) {
-            int thousands = number / 1000;
-            if (thousands > 1) {
-                words.append(numberToWords(thousands)).append(" ");
-            }
-            words.append("mille");
-            number %= 1000;
-            if (number > 0) {
-                words.append(" ");
-            }
-        }
-
-        if (number >= 100) {
-            int hundreds = number / 100;
-            if (hundreds > 1) {
-                words.append(units[hundreds]).append(" cent");
-            } else {
-                words.append("cent");
-            }
-            number %= 100;
-            if (number > 0) {
-                words.append(" ");
-            } else if (hundreds > 1 && number == 0) {
-                words.append("s");
-            }
-        }
-
-        if (number >= 20) {
-            int tensIndex = number / 10;
-            int unit = number % 10;
-            if (tensIndex <= 6) {
-                words.append(tens[tensIndex]);
-                if (unit == 1) {
-                    words.append(" et un");
-                } else if (unit > 1) {
-                    words.append("-").append(units[unit]);
-                }
-            } else {
-                if (tensIndex == 7) {
-                    words.append(tensSpecial[0]);
-                    if (unit == 1) {
-                        words.append(" et onze");
-                    } else if (unit > 1) {
-                        words.append("-").append(teens[unit]);
-                    } else {
-                        words.append("-dix");
-                    }
-                } else if (tensIndex == 8) {
-                    words.append(tensSpecial[1]);
-                    if (unit > 0) {
-                        words.append("-").append(units[unit]);
-                    }
-                } else if (tensIndex == 9) {
-                    words.append(tensSpecial[1]);
-                    if (unit == 1) {
-                        words.append(" et onze");
-                    } else if (unit > 1) {
-                        words.append("-").append(teens[unit]);
-                    } else {
-                        words.append("-dix");
-                    }
-                }
-            }
-        } else if (number >= 10) {
-            words.append(teens[number - 10]);
-        } else if (number > 0) {
-            words.append(units[number]);
-        }
-
-        return words.toString().trim();
-    }
-
-    // Méthode pour dessiner les en-têtes du tableau
+    /**
+     * Dessine les en-têtes du tableau dans le PDF.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param xPosition     La position X où commencer l'écriture des en-têtes.
+     * @param yPosition     La position Y où commencer l'écriture des en-têtes.
+     * @param columnWidths  Les largeurs des colonnes.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @throws IOException En cas d'erreur lors du dessin des en-têtes.
+     */
     private static void drawTableHeaders(PDPageContentStream contentStream, float xPosition, float yPosition, float[] columnWidths, PDType0Font customFont) throws IOException {
         String[] headers = {"Date", "Prestation", "Début", "Fin", "Pause", "Temps", "Taux", "Montant HT"};
 
         float cellHeight = 20f;
         float textY = yPosition - 15;
 
-        // Draw header background
-        contentStream.setNonStrokingColor(new Color(200, 200, 200)); // Light gray
+        // Dessiner l'arrière-plan de l'en-tête
+        contentStream.setNonStrokingColor(new Color(200, 200, 200)); // Gris clair
         contentStream.addRect(xPosition, yPosition - cellHeight, sum(columnWidths), cellHeight);
         contentStream.fill();
-        contentStream.setNonStrokingColor(Color.BLACK); // Reset color
+        contentStream.setNonStrokingColor(Color.BLACK); // Réinitialiser la couleur
 
-        // Draw header text centered
+        // Dessiner le texte de l'en-tête centré
         contentStream.setFont(customFont, 12);
         float nextX = xPosition;
         for (int i = 0; i < headers.length; i++) {
             String header = headers[i];
-            float textWidth = customFont.getStringWidth(header) / 1000 * 12; // Font size is 12
-            float textX = nextX + (columnWidths[i] - textWidth) / 2; // Center the text within the cell
+            float textWidth = customFont.getStringWidth(header) / 1000 * 12;
+            float textX = nextX + (columnWidths[i] - textWidth) / 2;
 
             contentStream.beginText();
             contentStream.newLineAtOffset(textX, textY);
             contentStream.showText(header);
             contentStream.endText();
 
-            // Draw cell borders
+            // Dessiner les bordures des cellules
             contentStream.setStrokingColor(Color.BLACK);
             contentStream.addRect(nextX, yPosition - cellHeight, columnWidths[i], cellHeight);
             contentStream.stroke();
@@ -458,12 +468,22 @@ public class IOUtils {
         }
     }
 
-
+    /**
+     * Dessine une ligne du tableau avec les informations d'un quart.
+     *
+     * @param contentStream Le flux de contenu pour écrire dans le PDF.
+     * @param xPosition     La position X où commencer l'écriture de la ligne.
+     * @param yPosition     La position Y où commencer l'écriture de la ligne.
+     * @param quart         Les informations du quart à afficher.
+     * @param columnWidths  Les largeurs des colonnes.
+     * @param customFont    La police personnalisée utilisée dans le document.
+     * @throws IOException En cas d'erreur lors du dessin de la ligne.
+     */
     private static void drawTableRow(PDPageContentStream contentStream, float xPosition, float yPosition, Quart quart, float[] columnWidths, PDType0Font customFont) throws IOException {
         float cellHeight = 20f;
         float textY = yPosition - 15;
 
-        // Get the row data
+        // Obtenir les données de la ligne
         String dateQuart = quart.getDateQuart().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         String prestation = quart.getStringPrestation();
         String debut = quart.getDebutQuart().toString();
@@ -475,19 +495,19 @@ public class IOUtils {
 
         String[] rowData = {dateQuart, prestation, debut, fin, pause, tempsTotal, tauxHoraire, montantHT};
 
-        contentStream.setFont(customFont, 10); // Font size 10 for table rows
+        contentStream.setFont(customFont, 10);
         float nextX = xPosition;
         for (int i = 0; i < rowData.length; i++) {
             String cellText = rowData[i];
-            float textWidth = customFont.getStringWidth(cellText) / 1000 * 10; // Font size is 10
-            float textX = nextX + (columnWidths[i] - textWidth) / 2; // Center the text within the cell
+            float textWidth = customFont.getStringWidth(cellText) / 1000 * 10;
+            float textX = nextX + (columnWidths[i] - textWidth) / 2;
 
             contentStream.beginText();
             contentStream.newLineAtOffset(textX, textY);
             contentStream.showText(cellText);
             contentStream.endText();
 
-            // Draw cell borders
+            // Dessiner les bordures des cellules
             contentStream.setStrokingColor(Color.BLACK);
             contentStream.addRect(nextX, yPosition - cellHeight, columnWidths[i], cellHeight);
             contentStream.stroke();
@@ -496,17 +516,25 @@ public class IOUtils {
         }
     }
 
-    // Méthode pour formater les montants en devise
+    /**
+     * Formate un montant en devise.
+     *
+     * @param value Le montant à formater.
+     * @return Le montant formaté avec deux décimales.
+     */
     private static String formatCurrency(BigDecimal value) {
-        NumberFormat currencyFormat = NumberFormat.getNumberInstance(Locale.CANADA_FRENCH); // Utiliser le format de nombre sans le signe $ par défaut
-        currencyFormat.setMinimumFractionDigits(2); // Toujours afficher deux décimales
+        NumberFormat currencyFormat = NumberFormat.getNumberInstance(Locale.CANADA_FRENCH);
+        currencyFormat.setMinimumFractionDigits(2);
         currencyFormat.setMaximumFractionDigits(2);
-        return currencyFormat.format(value) + " $"; // Ajouter le signe $ à la fin
+        return currencyFormat.format(value) + " $";
     }
 
-
-
-    // Méthode pour sommer les valeurs d'un tableau de float
+    /**
+     * Calcule la somme des valeurs d'un tableau de float.
+     *
+     * @param values Un tableau de valeurs float.
+     * @return La somme des valeurs.
+     */
     private static float sum(float[] values) {
         float total = 0;
         for (float value : values) {
