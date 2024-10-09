@@ -2,16 +2,16 @@ package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Controllers.Strategie.StrategiePrestation;
 import com.f4.logicielf4.Models.Employe;
+import com.f4.logicielf4.Models.Facture;
 import com.f4.logicielf4.Models.Model;
 import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
@@ -19,6 +19,8 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
 /**
@@ -61,6 +63,8 @@ public class PresentationFactureController implements Initializable {
     private Button btnMAJ;
     @FXML
     private Button btnSupprimer;
+    @FXML
+    private ComboBox comboBoxStatut;
 
     /**
      * Constructeur pour initialiser le contrôleur avec une facture spécifique.
@@ -146,6 +150,59 @@ public class PresentationFactureController implements Initializable {
     }
 
     /**
+     * Rempli la liste déroulante contenant les statuts possibles d'une facture.
+     * Grâce à cette liste déroulante, on peut changer le statut d'une facture.
+     */
+    private void remplirComboBoxStatut(){
+        List<String> listeStatut = Arrays.asList("À compléter", "Prête", "Envoyée", "Payée");
+        comboBoxStatut.getItems().setAll(listeStatut);
+    }
+
+    /**
+     * Permet de préselectionner la bonne option de la liste déroulante des statuts
+     * afin d'afficher le bon statut de la facture à l'ouverture de la fenêtre.
+     */
+    private void preremplirComboBoxStatut(){
+        Facture facture = DBUtils.fetchFactureByNumFacture(numFacture);
+        if(facture != null){
+            String statut = facture.getStatut();
+            switch (statut) {
+                case "À compléter":
+                    this.comboBoxStatut.setValue("À compléter");
+                    break;
+                case "Prête":
+                    this.comboBoxStatut.setValue("Prête");
+                    break;
+                case "Envoyée":
+                    this.comboBoxStatut.setValue("Envoyée");
+                    break;
+                case "Payée":
+                    this.comboBoxStatut.setValue("Payée");
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Ajoute un listener au ComboBox `comboBoxStatut` pour surveiller les changements de valeur.
+     * Lorsque la valeur change, le statut de la facture est mis à jour dans la base de données
+     * via `DBUtils.updateStatus`. Si la mise à jour est réussie, un message de succès est affiché.
+     *
+     * @see DBUtils#updateStatus(String, String)
+     */
+    private void ajouterListenerComboBoxStatut() {
+        comboBoxStatut.valueProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                System.out.println(comboBoxStatut.getValue());
+                if(DBUtils.updateStatus(numFacture, (String) comboBoxStatut.getValue())) {
+                    Dialogs.showMessageDialog("Le nouveau statut de la facture " + numFacture + " est " + (String) comboBoxStatut.getValue(), "Succès changement de statut");
+                }
+            }
+        });
+    }
+
+    /**
      * Méthode appelée lors de l'initialisation du contrôleur.
      * Configure les colonnes de la table, met à jour la table des quarts, et lie les actions des boutons.
      *
@@ -157,7 +214,9 @@ public class PresentationFactureController implements Initializable {
         factureLabel.setText("Facture # " + numFacture + " - " + nomPartenaire);
         setCellValues();
         updateTable();
-
+        remplirComboBoxStatut();
+        preremplirComboBoxStatut();
+        ajouterListenerComboBoxStatut();
         btnAjouter.setOnAction(event -> actionBtnAjouter());
         btnMAJ.setOnAction(event -> actionBtnMAJ());
         btnSupprimer.setOnAction(event -> actionBtnSupprimer());

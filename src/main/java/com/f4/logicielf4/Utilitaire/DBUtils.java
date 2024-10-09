@@ -881,4 +881,30 @@ public class DBUtils {
         return partner;
     }
 
+    /**
+     * Met à jour le statut d'une facture dans la base de données.
+     *
+     * @param numFacture Numéro de la facture à mettre à jour
+     * @param statut Nouveau statut de la facture
+     * @return true si la mise à jour a réussi, false sinon
+     */
+    public static boolean updateStatus(String numFacture, String statut) {
+        String updateQuery = "UPDATE Facture SET statut = ? WHERE num_facture = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement psUpdate = connection.prepareStatement(updateQuery)) {
+
+            psUpdate.setString(1, statut);  // Nouveau statut
+            psUpdate.setString(2, numFacture);  // Numéro de facture à mettre à jour
+
+            int rowsAffected = psUpdate.executeUpdate();
+
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

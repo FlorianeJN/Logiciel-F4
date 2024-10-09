@@ -48,9 +48,9 @@ public class CommencerFacture {
      * Remplit la comboBox des partenaires avec les noms des partenaires actifs extraits de la base de données.
      */
     private void setupParterComboxBox() {
-        List<Partenaire> listePartentaires = DBUtils.fetchAllActivePartners();
+        List<Partenaire> listePartenaires = DBUtils.fetchAllActivePartners();
         List<String> listeNomsPartenaires = new ArrayList<>();
-        for (Partenaire partenaire : listePartentaires) {
+        for (Partenaire partenaire : listePartenaires) {
             listeNomsPartenaires.add(partenaire.getNom());
         }
         partnerComboBox.getItems().clear();
@@ -69,7 +69,7 @@ public class CommencerFacture {
 
         if (partner != null && !partner.isEmpty()) {
             String numFacture = genererNumFacture();
-            if (DBUtils.createNewInvoice(numFacture, partner, invoiceDate, "à compléter")) {
+            if (DBUtils.createNewInvoice(numFacture, partner, invoiceDate, "À compléter")) {
                 Stage stage = (Stage) btnContinuer.getScene().getWindow();
                 stage.close();
                 if (Dialogs.showConfirmDialog("La facture " + numFacture + " a été créée! Voulez-vous y ajouter des quarts ?", "MESSAGE CONFIRMATION + AJOUTS DE QUARTS")) {
