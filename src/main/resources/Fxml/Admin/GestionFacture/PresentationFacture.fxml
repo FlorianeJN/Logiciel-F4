@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1245.0" stylesheets="@../../../Styles/GestionEmploye/AdminGestionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="716.0" prefWidth="1245.0" stylesheets="@../../../Styles/GestionEmploye/AdminGestionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <!-- Main Title -->
         <Label fx:id="factureLabel" alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Facture" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
@@ -32,7 +32,7 @@
             </columns>
         </TableView>
 
-        <HBox layoutX="81.0" layoutY="624.0" spacing="20" styleClass="buttons-container">
+        <HBox layoutX="227.0" layoutY="612.0" spacing="20" styleClass="buttons-container">
             <Button fx:id="btnAjouter" prefWidth="200.0" styleClass="action-button" text="Ajouter des quarts">
                 <tooltip>
                     <Tooltip text="Cliquez pour ajouter des quarts" />
@@ -49,7 +49,7 @@
                 </tooltip>
             </Button>
         </HBox>
-      <Label fx:id="labelStatut" layoutX="904.0" layoutY="634.0" text="Statut de la facture" />
-      <ComboBox fx:id="comboBoxStatut" layoutX="1047.0" layoutY="624.0" prefWidth="150.0" />
+      <Label fx:id="labelStatut" layoutX="908.0" layoutY="674.0" text="Statut de la facture" />
+      <ComboBox fx:id="comboBoxStatut" layoutX="1063.0" layoutY="664.0" prefWidth="150.0" />
     </children>
 </AnchorPane>

@@ -14,7 +14,6 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -27,13 +26,16 @@ public class GestionFacturesController implements Initializable {
     @FXML
     private Button btnExporter;
     @FXML
-    private Label facturesCreesLabel;
+    private Label labelValueFactureACompleter;
 
     @FXML
-    private Label facturesPayeesLabel;
+    private Label labelValueFacturePrete;
 
     @FXML
-    private Label factureAttentePaiementLabel;
+    private Label labelValueFactureEnvoyee;
+
+    @FXML
+    private Label labelValuePaiement;
 
     @FXML
     private TableView<Facture> factureTable;
@@ -48,7 +50,7 @@ public class GestionFacturesController implements Initializable {
     private TableColumn<Facture, String> dateColumn;
 
     @FXML
-    private TableColumn<Facture, Double> montantColumn;
+    private TableColumn<Facture, BigDecimal> montantColumn;
 
     @FXML
     private TableColumn<Facture, String> statutColumn;
@@ -63,7 +65,7 @@ public class GestionFacturesController implements Initializable {
      * Méthode appelée lors de l'initialisation du contrôleur.
      * Configure les actions des boutons et initialise les colonnes de la table des factures.
      *
-     * @param url L'URL de la ressource FXML (non utilisé).
+     * @param url            L'URL de la ressource FXML (non utilisé).
      * @param resourceBundle Le ResourceBundle associé à la ressource FXML (non utilisé).
      */
     @Override
@@ -74,21 +76,69 @@ public class GestionFacturesController implements Initializable {
 
         setCellValues();
         updateTable();
-        // updateLabels();
+        updateLabels();
     }
 
     /**
      * Définit les valeurs des colonnes de la table en fonction des propriétés des objets Facture.
      * Utilise des PropertyValueFactory pour mapper les colonnes aux attributs correspondants des factures.
+     * Configure également un comparateur personnalisé pour trier les factures par numéro décroissant.
+     * Personnalise l'affichage du montant avec le symbole "$".
      */
     private void setCellValues() {
         numFactureColumn.setCellValueFactory(new PropertyValueFactory<>("numFacture"));
+        // Comparateur personnalisé pour trier en fonction du numéro avant le premier tiret
+        numFactureColumn.setComparator((s1, s2) -> {
+            int num1 = extractNumFromNumFacture(s1);
+            int num2 = extractNumFromNumFacture(s2);
+            // Comparaison en ordre naturel (ascendant)
+            return Integer.compare(num1, num2);
+        });
+        numFactureColumn.setSortType(TableColumn.SortType.DESCENDING); // Tri en ordre décroissant
+
         partenaireColumn.setCellValueFactory(new PropertyValueFactory<>("nomPartenaire"));
         dateColumn.setCellValueFactory(new PropertyValueFactory<>("dateFacture"));
+
+        // Mettre à jour pour utiliser montantApresTaxes
         montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
+        // Personnalisation de l'affichage du montant avec le symbole "$"
+        montantColumn.setCellFactory(column -> {
+            return new TableCell<Facture, BigDecimal>() {
+                @Override
+                protected void updateItem(BigDecimal item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                    } else {
+                        setText(String.format("%.2f $", item));
+                    }
+                }
+            };
+        });
+
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
 
-        factureTable.getSortOrder().add(statutColumn); // Tri par statut
+        // Ajouter numFactureColumn à l'ordre de tri
+        factureTable.getSortOrder().clear();
+        factureTable.getSortOrder().add(numFactureColumn);
+    }
+
+    /**
+     * Extrait le numéro de facture avant le premier tiret pour le tri personnalisé.
+     *
+     * @param numFacture Le numéro de facture sous la forme "num-MM-YYYY".
+     * @return Le numéro de facture en tant qu'entier.
+     */
+    private int extractNumFromNumFacture(String numFacture) {
+        try {
+            String[] parts = numFacture.split("-");
+            if (parts.length > 0) {
+                return Integer.parseInt(parts[0]);
+            }
+        } catch (NumberFormatException e) {
+            // Gérer l'exception si le format n'est pas valide
+        }
+        return 0; // Valeur par défaut si l'extraction échoue
     }
 
     /**
@@ -102,14 +152,32 @@ public class GestionFacturesController implements Initializable {
                 genererMontantTotal(facture);
             }
             factureTable.getItems().setAll(factures);
-            factureTable.sort();
+            factureTable.sort(); // Appliquer le tri
         } catch (Exception e) {
             Dialogs.showMessageDialog("Erreur lors de la mise à jour des factures : " + e.getMessage(), "ERREUR");
         }
     }
 
     /**
+     * Met à jour les labels contenant les informations sur les factures.
+     * Affiche également le montant total des paiements en attente.
+     */
+    private void updateLabels(){
+        int facturesACompleter = DBUtils.ObtenirNombreDeFactureParStatut("À compléter");
+        int facturesPrete = DBUtils.ObtenirNombreDeFactureParStatut("Prête");
+        int facturesEnvoyee  = DBUtils.ObtenirNombreDeFactureParStatut("Envoyée");
+
+        labelValueFactureACompleter.setText(String.valueOf(facturesACompleter));
+        labelValueFacturePrete.setText(String.valueOf(facturesPrete));
+        labelValueFactureEnvoyee.setText(String.valueOf(facturesEnvoyee ));
+
+        BigDecimal montantPaiementEnAttente = DBUtils.getMontantPaiementEnAttente();
+        labelValuePaiement.setText(String.valueOf(montantPaiementEnAttente) + " $");
+    }
+
+    /**
      * Génère le montant total d'une facture en additionnant les montants de tous les quarts associés à la facture.
+     * Calcule également le montant après taxes.
      *
      * @param facture La facture pour laquelle calculer le montant total.
      */
@@ -123,10 +191,6 @@ public class GestionFacturesController implements Initializable {
         facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
     }
 
-    /* private void updateLabels() {
-        // Méthode pour mettre à jour les labels des factures (créées, payées, en attente).
-    } */
-
     /**
      * Action déclenchée lors du clic sur le bouton "Commencer".
      * Ouvre la fenêtre pour créer une nouvelle facture via le ViewFactory.
@@ -139,7 +203,7 @@ public class GestionFacturesController implements Initializable {
         Model.getInstance().getViewFactory().showCommencerFactureWindow(stage);
 
         updateTable();
-        //   updateLabels();
+        updateLabels();
     }
 
     /**
@@ -157,7 +221,7 @@ public class GestionFacturesController implements Initializable {
             Stage stage = (Stage) btnModifier.getScene().getWindow();
             Model.getInstance().getViewFactory().showPresentationFactureWindow(stage, factureSelectionnee.getNumFacture(), factureSelectionnee.getNomPartenaire());
             updateTable();
-            //  updateLabels();
+            updateLabels();
         }
     }
 

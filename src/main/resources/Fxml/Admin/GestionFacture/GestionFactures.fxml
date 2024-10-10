@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -20,27 +19,21 @@
         <!-- Stats Info -->
         <HBox layoutX="30.0" layoutY="80.0" prefHeight="98.0" prefWidth="1007.0" spacing="40">
             <VBox alignment="center" spacing="10" styleClass="stat-box">
-                <Label styleClass="stat-title" text="Factures crées" />
-                <Label fx:id="facturesCreesLabel" styleClass="stat-value" text="0" />
+                <Label styleClass="stat-title" text="Factures à compléter" />
+                <Label fx:id="labelValueFactureACompleter" styleClass="stat-value" text="0" />
             </VBox>
             <VBox alignment="center" prefHeight="98.0" prefWidth="199.0" spacing="10" styleClass="stat-box">
-                <Label styleClass="stat-title" text="Factures à compléter" />
-                <Label fx:id="facturesACompleterLabel" styleClass="stat-value" text="0" />
+                <Label styleClass="stat-title" text="Factures prêtes" />
+                <Label fx:id="labelValueFacturePrete" styleClass="stat-value" text="0" />
             </VBox>
             <VBox alignment="center" spacing="10" styleClass="stat-box">
-                <Label styleClass="stat-title" text="Factures prêtes" />
-                <Label fx:id="facturesPretesLabel" styleClass="stat-value" text="0" />
+                <Label styleClass="stat-title" text="Factures envoyées" />
+                <Label fx:id="labelValueFactureEnvoyee" styleClass="stat-value" text="0" />
             </VBox>
          <VBox alignment="center" layoutX="424.0" layoutY="10.0" spacing="10" styleClass="stat-box">
             <children>
-               <Label styleClass="stat-title" text="Factures envoyées" />
-               <Label fx:id="factureEnvoyeesLabel" styleClass="stat-value" text="0" />
-            </children>
-         </VBox>
-         <VBox alignment="center" layoutX="621.0" layoutY="10.0" prefHeight="98.0" prefWidth="160.0" spacing="10" styleClass="stat-box">
-            <children>
-               <Label styleClass="stat-title" text="Factures payées" />
-               <Label fx:id="facturePayeesLabel" styleClass="stat-value" text="0" />
+               <Label styleClass="stat-title" text="Paiement en attente" />
+               <Label fx:id="labelValuePaiement" styleClass="stat-value" text="0" />
             </children>
          </VBox>
         </HBox>

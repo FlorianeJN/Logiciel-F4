@@ -34,10 +34,8 @@ public class PresentationFactureController implements Initializable {
 
     @FXML
     private Label factureLabel;
-
     @FXML
     private TableView<Quart> quartsTable;
-
     @FXML
     private TableColumn<Quart, StrategiePrestation> prestationColumn;
     @FXML

@@ -160,6 +160,12 @@ public class ModifierQuartController extends AjouterModifierQuartTemplate implem
             checkBoxTempsDemi.setSelected(true);
         if (quart.isTempsDouble())
             checkBoxTempsDouble.setSelected(true);
+
+        if(quart.getNomEmploye() != null){
+            associerEmpCheckBox.setSelected(true);
+            empComboBox.setValue(quart.getNomEmploye());
+        }
+
     }
 
     /**

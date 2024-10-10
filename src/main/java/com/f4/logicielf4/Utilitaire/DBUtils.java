@@ -907,4 +907,56 @@ public class DBUtils {
         }
     }
 
+    /**
+     * Récupère le nombre total de factures ayant un statut spécifique.
+     *
+     * @param statut Le statut des factures à compter (par exemple, "payée", "en attente", etc.).
+     * @return Le nombre de factures avec le statut donné.
+     */
+    public static int ObtenirNombreDeFactureParStatut(String statut) {
+        int count = 0;
+        String query = "SELECT COUNT(*) FROM Facture WHERE statut = ?";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement ps = connection.prepareStatement(query)) {
+
+            ps.setString(1, statut);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    /**
+     * Calcule le montant total des factures en attente de paiement (statut "Envoyée").
+     *
+     * @return Le montant total des factures avec le statut "Envoyée".
+     */
+    public static BigDecimal getMontantPaiementEnAttente() {
+        BigDecimal totalMontant = BigDecimal.ZERO;
+        String query = "SELECT SUM(montant_apres_taxes) AS total FROM Facture WHERE statut = 'Envoyée'";
+
+        try (Connection connection = DriverManager.getConnection(url, user, pass);
+             PreparedStatement ps = connection.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                totalMontant = rs.getBigDecimal("total");
+                if (totalMontant == null) {
+                    totalMontant = BigDecimal.ZERO;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return totalMontant;
+    }
+
 }
