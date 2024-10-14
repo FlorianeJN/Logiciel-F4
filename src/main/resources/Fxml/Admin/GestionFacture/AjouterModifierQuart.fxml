@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="555.0" prefWidth="680.0" stylesheets="@../../../Styles/GestionFacture/AjouterQuart.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="555.0" prefWidth="680.0" stylesheets="@../../../Styles/GestionFacture/AjouterModifierQuart.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <!-- Title -->
       <Label fx:id="titreLabel" layoutX="266.0" layoutY="14.0" style="-fx-font-size: 18px;" text="Ajouter Quart" />

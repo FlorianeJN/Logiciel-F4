@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 
 <?import java.lang.String?>
-<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionEmploye/MiseAJourEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionEmploye/MiseAJourSuppressionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <!-- Title -->
         <Label layoutX="220.0" layoutY="20.0" styleClass="main-title" text="Mettre à jour un employé" />
