@@ -6,6 +6,10 @@ import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -17,22 +21,15 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Contrôleur pour la gestion des employés dans l'interface d'administration.
  * Il permet d'ajouter, mettre à jour et supprimer des employés, ainsi que de visualiser des graphiques
  * concernant la répartition des quarts de travail et des revenus parmi les employés.
- *
- * Fonctionnalités principales :
- * - Ajouter un nouvel employé
- * - Mettre à jour les informations d'un employé sélectionné
- * - Supprimer un employé sélectionné
- * - Afficher des graphiques sur la répartition des quarts et des revenus par employé
- * - Mettre à jour les étiquettes concernant le nombre d'employés actifs, inactifs et total
  */
 public class GestionEmployesController implements Initializable {
 
@@ -81,6 +78,8 @@ public class GestionEmployesController implements Initializable {
     @FXML
     private VBox positionGraphBox;
 
+    private static final Logger LOGGER = Logger.getLogger(GestionEmployesController.class.getName());
+
     /**
      * Méthode appelée lors de l'initialisation du contrôleur.
      * Configure les actions des boutons et initialise les tableaux et graphiques.
@@ -102,109 +101,152 @@ public class GestionEmployesController implements Initializable {
 
     /**
      * Configure le graphique circulaire représentant la répartition des quarts parmi les employés.
-     * Les quarts sont extraits de la base de données et sont regroupés par employé.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void setupGraphiqueRepartitionQuarts() {
-        PieChart pieChart = new PieChart();
+        Task<PieChart> task = new Task<PieChart>() {
+            @Override
+            protected PieChart call() throws Exception {
+                List<Quart> quarts = DBUtils.fetchAllQuarts();
 
-        Label titleLabelQuarts = new Label("Répartition des quarts par employé");
-        titleLabelQuarts.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
-        titleLabelQuarts.setAlignment(Pos.BASELINE_LEFT);
+                Map<String, Long> employeeShiftCount = quarts.stream()
+                        .filter(quart -> quart.getNomEmploye() != null && !quart.getNomEmploye().trim().isEmpty())
+                        .collect(Collectors.groupingBy(Quart::getNomEmploye, Collectors.counting()));
 
-        List<Quart> quarts = DBUtils.fetchAllQuarts();
-        Map<String, Integer> employeeShiftCount = new HashMap<>();
+                PieChart pieChart = new PieChart();
+                for (Map.Entry<String, Long> entry : employeeShiftCount.entrySet()) {
+                    String label = entry.getKey() + " (" + entry.getValue() + ")";
+                    PieChart.Data slice = new PieChart.Data(label, entry.getValue());
+                    pieChart.getData().add(slice);
+                }
 
-        for (Quart quart : quarts) {
-            String employeeName = quart.getNomEmploye();
+                return pieChart;
+            }
+        };
 
-            // Vérifie si le nom de l'employé est nul ou vide
-            if (employeeName == null || employeeName.trim().isEmpty()) {
-                continue; // Ignorer les employés sans nom
+        task.setOnSucceeded(event -> {
+            PieChart pieChart = task.getValue();
+            Label titleLabelQuarts = new Label("Répartition des quarts par employé");
+            titleLabelQuarts.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+            titleLabelQuarts.setAlignment(Pos.BASELINE_LEFT);
+
+            for (PieChart.Data data : pieChart.getData()) {
+                Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
+                Tooltip.install(data.getNode(), tooltip);
             }
 
-            employeeShiftCount.put(employeeName, employeeShiftCount.getOrDefault(employeeName, 0) + 1);
-        }
+            pieChart.setPrefSize(600, 400);
 
-        for (Map.Entry<String, Integer> entry : employeeShiftCount.entrySet()) {
-            String label = entry.getKey() + " (" + entry.getValue() + ")";
-            PieChart.Data slice = new PieChart.Data(label, entry.getValue());
-            pieChart.getData().add(slice);
-        }
+            departmentGraphBox.getChildren().clear();
+            departmentGraphBox.getChildren().addAll(titleLabelQuarts, pieChart);
+        });
 
-        for (PieChart.Data data : pieChart.getData()) {
-            Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
-            Tooltip.install(data.getNode(), tooltip);
-        }
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la création du graphique des quarts.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la création du graphique des quarts", ex);
+        });
 
-        pieChart.setPrefSize(600, 400);
-
-        departmentGraphBox.getChildren().clear();
-        departmentGraphBox.getChildren().addAll(titleLabelQuarts, pieChart);
+        new Thread(task).start();
     }
 
     /**
      * Configure le graphique à barres représentant la répartition des revenus parmi les employés.
-     * Les montants totaux des quarts par employé sont extraits et affichés sur le graphique.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void setupGraphiqueRepartitionRevenus() {
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Revenus ($)");
+        Task<BarChart<String, Number>> task = new Task<BarChart<String, Number>>() {
+            @Override
+            protected BarChart<String, Number> call() throws Exception {
+                List<Quart> quarts = DBUtils.fetchAllQuarts();
 
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+                Map<String, BigDecimal> employeeTotalAmount = quarts.stream()
+                        .filter(quart -> quart.getNomEmploye() != null && !quart.getNomEmploye().trim().isEmpty())
+                        .collect(Collectors.groupingBy(Quart::getNomEmploye,
+                                Collectors.mapping(
+                                        quart -> BigDecimal.valueOf(quart.getMontantTotal()),
+                                        Collectors.reducing(BigDecimal.ZERO, BigDecimal::add)
+                                )
+                        ));
 
-        Label titleLabelRevenus = new Label("Répartition des revenus par employé");
-        titleLabelRevenus.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
-        titleLabelRevenus.setAlignment(Pos.BASELINE_LEFT);
+                CategoryAxis xAxis = new CategoryAxis();
+                NumberAxis yAxis = new NumberAxis();
+                yAxis.setLabel("Revenus ($)");
 
-        XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
-        dataSeries.setName("Montant total");
+                BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+                XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
+                dataSeries.setName("Montant total");
 
-        List<Quart> quarts = DBUtils.fetchAllQuarts();
-        Map<String, BigDecimal> employeeTotalAmount = new HashMap<>();
+                for (Map.Entry<String, BigDecimal> entry : employeeTotalAmount.entrySet()) {
+                    dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+                }
 
-        for (Quart quart : quarts) {
-            String employeeName = quart.getNomEmploye();
+                barChart.getData().add(dataSeries);
+                barChart.setPrefSize(800, 600);
 
-            // Vérifie si le nom de l'employé est nul ou vide
-            if (employeeName == null || employeeName.trim().isEmpty()) {
-                continue; // Ignorer les employés sans nom
+                return barChart;
             }
+        };
 
-            BigDecimal montantTotal = BigDecimal.valueOf(quart.getMontantTotal());
-            employeeTotalAmount.put(employeeName, employeeTotalAmount.getOrDefault(employeeName, BigDecimal.ZERO).add(montantTotal));
-        }
+        task.setOnSucceeded(event -> {
+            BarChart<String, Number> barChart = task.getValue();
+            Label titleLabelRevenus = new Label("Répartition des revenus par employé");
+            titleLabelRevenus.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+            titleLabelRevenus.setAlignment(Pos.BASELINE_LEFT);
 
-        for (Map.Entry<String, BigDecimal> entry : employeeTotalAmount.entrySet()) {
-            dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-        }
+            positionGraphBox.getChildren().clear();
+            positionGraphBox.getChildren().addAll(titleLabelRevenus, barChart);
+        });
 
-        barChart.getData().add(dataSeries);
-        barChart.setPrefSize(800, 600);
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la création du graphique des revenus.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la création du graphique des revenus", ex);
+        });
 
-        positionGraphBox.getChildren().clear();
-        positionGraphBox.getChildren().addAll(titleLabelRevenus, barChart);
+        new Thread(task).start();
     }
 
     /**
      * Met à jour les étiquettes affichant le nombre d'employés actifs, inactifs et total.
-     * Ces valeurs sont extraites de la base de données.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void updateLabels() {
-        int employeesActifs = 0;
-        int employeesInactifs = 0;
-        int employeesTotal = 0;
-        List<Employe> liste = DBUtils.fetchAllEmployees(); // Récupérer tous les employés
+        Task<Void> task = new Task<Void>() {
+            private int employeesActifs;
+            private int employeesInactifs;
+            private int employeesTotal;
 
-        for (Employe e : liste) {
-            if (e.getStatut().equals("Actif")) employeesActifs++;
-        }
-        employeesTotal = liste.size();
-        employeesInactifs = employeesTotal - employeesActifs;
+            @Override
+            protected Void call() throws Exception {
+                List<Employe> liste = DBUtils.fetchAllEmployees();
 
-        activeEmployeesLabel.setText(String.valueOf(employeesActifs));
-        inactiveEmployeesLabel.setText(String.valueOf(employeesInactifs));
-        totalEmployeesLabel.setText(String.valueOf(employeesTotal));
+                employeesActifs = (int) liste.stream()
+                        .filter(e -> "Actif".equalsIgnoreCase(e.getStatut()))
+                        .count();
+
+                employeesTotal = liste.size();
+                employeesInactifs = employeesTotal - employeesActifs;
+
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                activeEmployeesLabel.setText(String.valueOf(employeesActifs));
+                inactiveEmployeesLabel.setText(String.valueOf(employeesInactifs));
+                totalEmployeesLabel.setText(String.valueOf(employeesTotal));
+            }
+
+            @Override
+            protected void failed() {
+                Throwable ex = getException();
+                Dialogs.showMessageDialog("Erreur lors de la mise à jour des statistiques des employés.", "ERREUR");
+                LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des statistiques des employés", ex);
+            }
+        };
+
+        new Thread(task).start();
     }
 
     /**
@@ -221,12 +263,12 @@ public class GestionEmployesController implements Initializable {
 
         // Comparateur pour trier par statut (Actif/Inactif)
         statusColumn.setComparator((status1, status2) -> {
-            if (status1.equals("Actif") && status2.equals("Inactif")) {
+            if ("Actif".equalsIgnoreCase(status1) && "Inactif".equalsIgnoreCase(status2)) {
                 return -1;
-            } else if (status1.equals("Inactif") && status2.equals("Actif")) {
+            } else if ("Inactif".equalsIgnoreCase(status1) && "Actif".equalsIgnoreCase(status2)) {
                 return 1;
             } else {
-                return 0;
+                return status1.compareToIgnoreCase(status2);
             }
         });
         employeesTable.getSortOrder().add(statusColumn); // Tri par statut
@@ -237,25 +279,39 @@ public class GestionEmployesController implements Initializable {
      * Ouvre une nouvelle fenêtre pour ajouter un employé.
      */
     private void actionBtnAjouter() {
-        System.out.println("Bouton ajouter appuyé");
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
         Model.getInstance().getViewFactory().showAddEmployeeWindow(stage);
         updateTable();
         updateLabels();
+        setupGraphiqueRepartitionQuarts();
+        setupGraphiqueRepartitionRevenus();
     }
 
     /**
      * Met à jour la table des employés avec les données actuelles depuis la base de données.
-     * Affiche un message d'erreur en cas de problème lors de la mise à jour.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void updateTable() {
-        try {
-            List<Employe> employees = DBUtils.fetchAllEmployees();
-            employeesTable.getItems().setAll(employees);
+        Task<ObservableList<Employe>> task = new Task<ObservableList<Employe>>() {
+            @Override
+            protected ObservableList<Employe> call() throws Exception {
+                List<Employe> employees = DBUtils.fetchAllEmployees();
+                return FXCollections.observableArrayList(employees);
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            employeesTable.getItems().setAll(task.getValue());
             employeesTable.sort();
-        } catch (Exception e) {
-            Dialogs.showMessageDialog("Erreur lors de la mise à jour des employés : " + e.getMessage(), "ERREUR");
-        }
+        });
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la mise à jour des employés.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des employés", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
@@ -264,15 +320,17 @@ public class GestionEmployesController implements Initializable {
      * Affiche un message d'erreur si aucun employé n'est sélectionné.
      */
     private void actionBtnMAJ() {
-        System.out.println("Bouton MAJ appuyé");
-        Employe employeSelectionné = employeesTable.getSelectionModel().getSelectedItem();
+        Employe employeSelectionne = employeesTable.getSelectionModel().getSelectedItem();
 
-        if (employeSelectionné == null) {
+        if (employeSelectionne == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner un employé avant de cliquer le bouton de mise à jour.", "ERREUR MAJ");
         } else {
             Stage stage = (Stage) btnMAJ.getScene().getWindow();
-            Model.getInstance().getViewFactory().showUpdateEmployeeWindow(stage, employeSelectionné);
+            Model.getInstance().getViewFactory().showUpdateEmployeeWindow(stage, employeSelectionne);
             updateTable();
+            updateLabels();
+            setupGraphiqueRepartitionQuarts();
+            setupGraphiqueRepartitionRevenus();
         }
     }
 
@@ -282,16 +340,17 @@ public class GestionEmployesController implements Initializable {
      * Affiche un message d'erreur si aucun employé n'est sélectionné.
      */
     private void actionBtnSupprimer() {
-        System.out.println("Bouton Supprimer appuyé");
-        Employe employeSelectionné = employeesTable.getSelectionModel().getSelectedItem();
+        Employe employeSelectionne = employeesTable.getSelectionModel().getSelectedItem();
 
-        if (employeSelectionné == null) {
+        if (employeSelectionne == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner un employé avant de cliquer le bouton de suppression.", "ERREUR SUPPRESSION");
         } else {
             Stage stage = (Stage) btnSupprimer.getScene().getWindow();
-            Model.getInstance().getViewFactory().showDeleteEmployeeWindow(stage, employeSelectionné);
+            Model.getInstance().getViewFactory().showDeleteEmployeeWindow(stage, employeSelectionne);
             updateTable();
             updateLabels();
+            setupGraphiqueRepartitionQuarts();
+            setupGraphiqueRepartitionRevenus();
         }
     }
 }

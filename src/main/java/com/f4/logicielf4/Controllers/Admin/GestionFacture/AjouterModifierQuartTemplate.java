@@ -6,6 +6,8 @@ import com.f4.logicielf4.Controllers.Strategie.InfClinic;
 import com.f4.logicielf4.Controllers.Strategie.PAB;
 import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Utilitaire.DBUtils;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -16,10 +18,9 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Template pour l'ajout et la modification d'un quart de travail.
@@ -77,6 +78,8 @@ public class AjouterModifierQuartTemplate {
     @FXML
     protected TextArea notesTextArea;
 
+    private static final Logger LOGGER = Logger.getLogger(AjouterModifierQuartTemplate.class.getName());
+
     /**
      * Définit les champs de texte comme étant en lecture seule.
      * Utilisé pour empêcher la modification des champs calculés automatiquement (temps total, taux horaire, montant HT).
@@ -128,7 +131,7 @@ public class AjouterModifierQuartTemplate {
             BigDecimal tauxHoraireValue = new BigDecimal(tauxHoraire.getText().replace(',', '.'));
 
             if (totalMinutes != null && tauxHoraireValue != null) {
-                BigDecimal montantHTValue = totalMinutes.multiply(tauxHoraireValue).divide(BigDecimal.valueOf(60), BigDecimal.ROUND_HALF_UP);
+                BigDecimal montantHTValue = totalMinutes.multiply(tauxHoraireValue).divide(BigDecimal.valueOf(60), 2, BigDecimal.ROUND_HALF_UP);
 
                 DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
                 DecimalFormat decimalFormat = new DecimalFormat("#.##", symbols);
@@ -139,6 +142,7 @@ public class AjouterModifierQuartTemplate {
             }
         } catch (NumberFormatException e) {
             montantHT.setText("Erreur de calcul");
+            LOGGER.log(Level.WARNING, "Erreur de calcul du montant HT", e);
         }
     }
 
@@ -168,6 +172,7 @@ public class AjouterModifierQuartTemplate {
             }
         } catch (Exception e) {
             tempsTotal.setText("Erreur de calcul");
+            LOGGER.log(Level.WARNING, "Erreur de calcul du temps total", e);
         }
     }
 
@@ -194,7 +199,7 @@ public class AjouterModifierQuartTemplate {
             try {
                 return LocalTime.parse(timeText, DateTimeFormatter.ofPattern("HH:mm"));
             } catch (DateTimeParseException e) {
-                System.out.println(e.getMessage());
+                LOGGER.log(Level.WARNING, "Format d'heure invalide: " + timeText, e);
             }
         }
         return null;
@@ -212,7 +217,7 @@ public class AjouterModifierQuartTemplate {
                 LocalTime duration = LocalTime.parse(durationText, DateTimeFormatter.ofPattern("HH:mm"));
                 return Duration.ofHours(duration.getHour()).plusMinutes(duration.getMinute());
             } catch (DateTimeParseException e) {
-                System.out.println(e.getMessage());
+                LOGGER.log(Level.WARNING, "Format de durée invalide: " + durationText, e);
             }
         }
         return Duration.ZERO;
@@ -254,19 +259,38 @@ public class AjouterModifierQuartTemplate {
 
     /**
      * Remplit la comboBox des employés avec les noms des employés extraits de la base de données.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     protected void remplirComboBoxEmployes() {
-        List<Employe> listeEmployes = DBUtils.fetchAllEmployees();
-        List<String> listeNomsEmployes = new ArrayList<>();
-        for (Employe employe : listeEmployes) {
-            listeNomsEmployes.add(employe.getPrenom());
-        }
-        empComboBox.getItems().setAll(listeNomsEmployes);
-        empComboBox.setDisable(true);
+        Task<List<String>> task = new Task<List<String>>() {
+            @Override
+            protected List<String> call() throws Exception {
+                List<Employe> listeEmployes = DBUtils.fetchAllEmployees();
+                List<String> listeNomsEmployes = new ArrayList<>();
+                for (Employe employe : listeEmployes) {
+                    listeNomsEmployes.add(employe.getPrenom());
+                }
+                return listeNomsEmployes;
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            empComboBox.getItems().setAll(task.getValue());
+            empComboBox.setDisable(true);
+        });
+
+        task.setOnFailed(event -> {
+            Throwable e = task.getException();
+            LOGGER.log(Level.SEVERE, "Erreur lors du remplissage de la ComboBox des employés", e);
+            empComboBox.setDisable(true);
+        });
+
+        new Thread(task).start();
     }
 
     /**
      * Remplit la comboBox des prestations avec les prestations disponibles.
+     * Puisque les données sont locales, pas besoin de thread séparé.
      */
     protected void remplirComboBoxPrestation() {
         List<String> listeNomsPrestations = Arrays.asList("SOINS INFIRMIERS", "INF AUXILIAIRE", "INF CLINICIEN(NE)", "PAB");
@@ -280,7 +304,12 @@ public class AjouterModifierQuartTemplate {
      */
     protected boolean validateFields() {
         return !tempsTotal.getText().equals("Entrées de temps invalides") &&
-                !montantHT.getText().equals("Données incomplètes");
+                !montantHT.getText().equals("Données incomplètes") &&
+                !montantHT.getText().equals("Erreur de calcul") &&
+                dateQuart.getValue() != null &&
+                prestation.getValue() != null &&
+                !debutQuart.getText().isEmpty() &&
+                !finQuart.getText().isEmpty();
     }
 
     /**

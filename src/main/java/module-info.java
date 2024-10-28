@@ -10,9 +10,6 @@ module com.f4.logicielf4 {
     requires com.zaxxer.hikari;
     requires java.sql;
 
-    // Requires PDFBox for PDF operations
-   // requires org.apache.pdfbox;
-
     // Opens packages for reflection access by JavaFX FXML loader
     opens com.f4.logicielf4.Controllers to javafx.fxml;
     opens com.f4.logicielf4.Controllers.Admin to javafx.fxml;
