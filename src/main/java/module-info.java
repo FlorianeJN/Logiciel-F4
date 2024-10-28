@@ -5,9 +5,10 @@ module com.f4.logicielf4 {
 
     // Requires additional libraries for icons and database access
     requires de.jensd.fx.glyphs.fontawesome;
-    requires java.sql;
     requires java.desktop;
     requires org.apache.pdfbox;
+    requires com.zaxxer.hikari;
+    requires java.sql;
 
     // Requires PDFBox for PDF operations
    // requires org.apache.pdfbox;

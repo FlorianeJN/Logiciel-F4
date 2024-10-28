@@ -58,7 +58,14 @@
             <artifactId>pdfbox</artifactId>
             <version>3.0.3</version>
         </dependency>
-             
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.1</version>
+        </dependency>
+
+
         <dependency>
             <groupId>com.gluonhq</groupId>
             <artifactId>gluonfx-maven-plugin</artifactId>

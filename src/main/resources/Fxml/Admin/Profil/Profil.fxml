@@ -1,57 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Line?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Circle?>
 
 <AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/Profil/Profil.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.Profil.ProfilController">
    <children>
-      <!-- Main Title -->
-      <Label alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Profil Utilisateur" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <!-- Conteneur principal -->
+      <VBox alignment="TOP_CENTER" spacing="20" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets top="30" right="30" bottom="30" left="30"/>
+         </padding>
 
-      <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
+         <!-- Titre principal -->
+         <Label styleClass="main-title" text="Mon Profil" />
 
-      <!-- Section Title for User Information -->
-      <Label layoutX="30.0" layoutY="90.0" styleClass="section-title" text="Informations Personnelles" />
-
-      <!-- User Info Section -->
-      <VBox layoutX="30.0" layoutY="130.0" prefWidth="1000.0" spacing="30">
-         <HBox alignment="CENTER_LEFT" spacing="60">
-            <!-- Left Column -->
-            <VBox alignment="CENTER_LEFT" spacing="20">
-               <Label styleClass="info-title" text="Nom d'utilisateur" />
-               <TextField fx:id="usernameField" prefWidth="400.0" promptText="Entrez votre nom d'utilisateur" />
-
-               <Label styleClass="info-title" text="Nom" />
-               <TextField fx:id="nomField" prefWidth="400.0" promptText="Entrez votre nom" />
-            </VBox>
-
-            <!-- Right Column -->
-            <VBox alignment="CENTER_LEFT" spacing="20">
-               <Label styleClass="info-title" text="Prénom" />
-               <TextField fx:id="prenomField" prefWidth="400.0" promptText="Entrez votre prénom" />
-
-               <Label styleClass="info-title" text="Numéro de téléphone" />
-               <TextField fx:id="phoneField" prefWidth="400.0" promptText="Entrez votre numéro de téléphone" />
-            </VBox>
-         </HBox>
-
-         <!-- Full-Width Field for Email -->
-         <VBox alignment="CENTER_LEFT" spacing="20">
-            <Label styleClass="info-title" text="Courriel" />
-            <TextField fx:id="emailField" prefWidth="860.0" promptText="Entrez votre courriel" />
+         <!-- Section de la photo de profil -->
+         <VBox alignment="CENTER" spacing="10">
+            <ImageView fx:id="profileImage" fitHeight="120" fitWidth="120" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../Images/TOODDEEEYYYY.jpg" />
+               </image>
+               <clip>
+                  <Circle centerX="60" centerY="60" radius="60" />
+               </clip>
+               <effect>
+                  <DropShadow radius="5" offsetX="0" offsetY="2" color="rgba(0,0,0,0.25)" />
+               </effect>
+            </ImageView>
+            <Button text="Changer la photo" styleClass="link-button"  />
          </VBox>
+
+         <!-- Conteneur des informations personnelles -->
+         <VBox alignment="CENTER_LEFT" spacing="20" styleClass="info-container" prefWidth="800">
+            <!-- Titre de la section -->
+            <Label styleClass="section-title" text="Informations Personnelles" />
+
+            <!-- GridPane pour les champs -->
+            <GridPane hgap="20" vgap="15">
+               <children>
+                  <!-- Première ligne -->
+                  <Label text="Nom d'utilisateur" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                  <TextField fx:id="usernameField" styleClass="text-field" promptText="Entrez votre nom d'utilisateur" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                  <Label text="Prénom" styleClass="info-label" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                  <TextField fx:id="prenomField" styleClass="text-field" promptText="Entrez votre prénom" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+
+                  <!-- Deuxième ligne -->
+                  <Label text="Nom" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                  <TextField fx:id="nomField" styleClass="text-field" promptText="Entrez votre nom" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                  <Label text="Courriel" styleClass="info-label" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                  <TextField fx:id="emailField" styleClass="text-field" promptText="Entrez votre courriel" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+
+                  <!-- Troisième ligne -->
+                  <Label text="Numéro de téléphone" styleClass="info-label" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                  <TextField fx:id="phoneField" styleClass="text-field" promptText="Entrez votre numéro de téléphone" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+               </children>
+            </GridPane>
+         </VBox>
+
+         <!-- Boutons d'action -->
+         <HBox alignment="CENTER" spacing="20">
+            <padding>
+               <Insets top="20" right="0" bottom="0" left="0"/>
+            </padding>
+            <children>
+               <Button fx:id="btnSauvegarder" styleClass="action-button" text="Sauvegarder les modifications" />
+               <Button fx:id="btnModifierMotDePasse" styleClass="action-button-secondary" text="Modifier le mot de passe" />
+            </children>
+         </HBox>
       </VBox>
-
-      <!-- Actions Section: Centered Buttons -->
-      <HBox alignment="CENTER" layoutX="0.0" layoutY="550.0" prefWidth="1065.0" spacing="30">
-         <Button fx:id="btnSauvegarder" prefWidth="200.0" styleClass="action-button" text="Sauvegarder" />
-         <Button fx:id="btnModifierMotDePasse" prefWidth="240.0" styleClass="action-button" text="Modifier le mot de passe" />
-      </HBox>
-
    </children>
 </AnchorPane>

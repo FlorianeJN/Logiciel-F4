@@ -6,6 +6,9 @@ import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
 import com.f4.logicielf4.Utilitaire.IOUtils;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -14,8 +17,9 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contrôleur pour la gestion des factures dans l'interface d'administration.
@@ -61,6 +65,8 @@ public class GestionFacturesController implements Initializable {
     @FXML
     private Button btnModifier;
 
+    private static final Logger LOGGER = Logger.getLogger(GestionFacturesController.class.getName());
+
     /**
      * Méthode appelée lors de l'initialisation du contrôleur.
      * Configure les actions des boutons et initialise les colonnes de la table des factures.
@@ -102,18 +108,16 @@ public class GestionFacturesController implements Initializable {
         // Mettre à jour pour utiliser montantApresTaxes
         montantColumn.setCellValueFactory(new PropertyValueFactory<>("montantApresTaxes"));
         // Personnalisation de l'affichage du montant avec le symbole "$"
-        montantColumn.setCellFactory(column -> {
-            return new TableCell<Facture, BigDecimal>() {
-                @Override
-                protected void updateItem(BigDecimal item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(String.format("%.2f $", item));
-                    }
+        montantColumn.setCellFactory(column -> new TableCell<Facture, BigDecimal>() {
+            @Override
+            protected void updateItem(BigDecimal item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(String.format("%.2f $", item));
                 }
-            };
+            }
         });
 
         statutColumn.setCellValueFactory(new PropertyValueFactory<>("statut"));
@@ -136,43 +140,74 @@ public class GestionFacturesController implements Initializable {
                 return Integer.parseInt(parts[0]);
             }
         } catch (NumberFormatException e) {
-            // Gérer l'exception si le format n'est pas valide
+            LOGGER.log(Level.WARNING, "Numéro de facture invalide: " + numFacture, e);
         }
         return 0; // Valeur par défaut si l'extraction échoue
     }
 
     /**
      * Met à jour la table des factures avec les données actuelles depuis la base de données.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      * Calcule également le montant total des factures avant de les afficher.
      */
     private void updateTable() {
-        try {
-            List<Facture> factures = DBUtils.fetchAllFacture();
-            for (Facture facture : factures) {
-                genererMontantTotal(facture);
+        Task<ObservableList<Facture>> task = new Task<ObservableList<Facture>>() {
+            @Override
+            protected ObservableList<Facture> call() throws Exception {
+                List<Facture> factures = DBUtils.fetchAllFacture();
+                for (Facture facture : factures) {
+                    genererMontantTotal(facture);
+                }
+                return FXCollections.observableArrayList(factures);
             }
-            factureTable.getItems().setAll(factures);
+        };
+
+        task.setOnSucceeded(event -> {
+            factureTable.getItems().setAll(task.getValue());
             factureTable.sort(); // Appliquer le tri
-        } catch (Exception e) {
-            Dialogs.showMessageDialog("Erreur lors de la mise à jour des factures : " + e.getMessage(), "ERREUR");
-        }
+        });
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la mise à jour des factures.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des factures", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
      * Met à jour les labels contenant les informations sur les factures.
-     * Affiche également le montant total des paiements en attente.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
-    private void updateLabels(){
-        int facturesACompleter = DBUtils.ObtenirNombreDeFactureParStatut("À compléter");
-        int facturesPrete = DBUtils.ObtenirNombreDeFactureParStatut("Prête");
-        int facturesEnvoyee  = DBUtils.ObtenirNombreDeFactureParStatut("Envoyée");
+    private void updateLabels() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                int facturesACompleter = DBUtils.ObtenirNombreDeFactureParStatut("À compléter");
+                int facturesPrete = DBUtils.ObtenirNombreDeFactureParStatut("Prête");
+                int facturesEnvoyee = DBUtils.ObtenirNombreDeFactureParStatut("Envoyée");
+                BigDecimal montantPaiementEnAttente = DBUtils.getMontantPaiementEnAttente();
 
-        labelValueFactureACompleter.setText(String.valueOf(facturesACompleter));
-        labelValueFacturePrete.setText(String.valueOf(facturesPrete));
-        labelValueFactureEnvoyee.setText(String.valueOf(facturesEnvoyee ));
+                // Mise à jour des labels sur le thread JavaFX
+                javafx.application.Platform.runLater(() -> {
+                    labelValueFactureACompleter.setText(String.valueOf(facturesACompleter));
+                    labelValueFacturePrete.setText(String.valueOf(facturesPrete));
+                    labelValueFactureEnvoyee.setText(String.valueOf(facturesEnvoyee));
+                    labelValuePaiement.setText(String.format("%.2f $", montantPaiementEnAttente));
+                });
 
-        BigDecimal montantPaiementEnAttente = DBUtils.getMontantPaiementEnAttente();
-        labelValuePaiement.setText(String.valueOf(montantPaiementEnAttente) + " $");
+                return null;
+            }
+        };
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la mise à jour des statistiques.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des statistiques", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
@@ -182,13 +217,17 @@ public class GestionFacturesController implements Initializable {
      * @param facture La facture pour laquelle calculer le montant total.
      */
     private void genererMontantTotal(Facture facture) {
-        double montant = 0;
-        String numFacture = facture.getNumFacture();
-        List<Quart> listeQuarts = DBUtils.fetchQuartsByNumFacture(numFacture);
-        for (Quart quart : listeQuarts) {
-            montant += quart.getMontantTotal();
+        try {
+            double montant = 0;
+            String numFacture = facture.getNumFacture();
+            List<Quart> listeQuarts = DBUtils.fetchQuartsByNumFacture(numFacture);
+            for (Quart quart : listeQuarts) {
+                montant += quart.getMontantTotal();
+            }
+            facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erreur lors du calcul du montant total pour la facture " + facture.getNumFacture(), e);
         }
-        facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
     }
 
     /**
@@ -196,7 +235,6 @@ public class GestionFacturesController implements Initializable {
      * Ouvre la fenêtre pour créer une nouvelle facture via le ViewFactory.
      */
     private void actionBtnCommencer() {
-        System.out.println("Commencer nouvelle facture");
         Stage stage = (Stage) btnCommencer.getScene().getWindow();
 
         // Utilisation de ViewFactory pour afficher la fenêtre de création de facture
@@ -212,7 +250,6 @@ public class GestionFacturesController implements Initializable {
      * Affiche un message d'erreur si aucune facture n'est sélectionnée.
      */
     private void actionBtnModifier() {
-        System.out.println("Modifier facture");
         Facture factureSelectionnee = factureTable.getSelectionModel().getSelectedItem();
 
         if (factureSelectionnee == null) {

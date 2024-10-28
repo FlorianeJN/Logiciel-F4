@@ -2,13 +2,18 @@ package com.f4.logicielf4.Controllers.Admin.GestionFacture;
 
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
+import javafx.concurrent.Task;
 import javafx.fxml.Initializable;
 
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contrôleur pour l'ajout d'un nouveau quart de travail à une facture.
@@ -16,6 +21,8 @@ import java.util.*;
  * Elle permet d'ajouter un quart à la base de données en validant les informations saisies et en les envoyant via {@link DBUtils}.
  */
 public class AjouterQuartController extends AjouterModifierQuartTemplate implements Initializable {
+
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
     private String numFacture;
     private PresentationFactureController presentationFactureController;
@@ -70,21 +77,49 @@ public class AjouterQuartController extends AjouterModifierQuartTemplate impleme
                 boolean tempsDouble = checkBoxTempsDouble.isSelected();
                 boolean tempsDemi = checkBoxTempsDemi.isSelected();
 
-                // Ajout du quart via DBUtils
-                DBUtils.ajouterQuart(numFacture, prestationValue, dateQuartValue, debutQuartValue, finQuartValue, pauseValue,
-                        tempsTotalValue, tauxHoraireValue.doubleValue(), montantTotalValue.doubleValue(), notesValue, empName, tempsDouble, tempsDemi);
+                // Création d'une tâche pour exécuter l'opération de base de données en arrière-plan
+                Task<Void> task = new Task<Void>() {
+                    @Override
+                    protected Void call() throws Exception {
+                        // Ajout du quart via DBUtils
+                        DBUtils.ajouterQuart(numFacture, prestationValue, dateQuartValue, debutQuartValue, finQuartValue, pauseValue,
+                                tempsTotalValue, tauxHoraireValue.doubleValue(), montantTotalValue.doubleValue(), notesValue, empName, tempsDouble, tempsDemi);
+                        return null;
+                    }
+                };
 
-                Dialogs.showMessageDialog("Succès", "Quart ajouté avec succès.");
+                task.setOnSucceeded(e -> {
+                    Dialogs.showMessageDialog("Succès", "Quart ajouté avec succès.");
+                    // Mise à jour de l'interface de la facture et réinitialisation du formulaire
+                    presentationFactureController.updateTable();
+                    clearFields();
+                });
 
-                // Mise à jour de l'interface de la facture et réinitialisation du formulaire
-                presentationFactureController.updateTable();
-                clearFields();
-            } catch (Exception e) {
-                Dialogs.showMessageDialog("Erreur", "Une erreur s'est produite lors de l'ajout du quart.");
-                e.printStackTrace();
+                task.setOnFailed(e -> {
+                    Throwable ex = task.getException();
+                    Dialogs.showMessageDialog("Erreur", "Une erreur s'est produite lors de l'ajout du quart.");
+                    Logger.getLogger(AjouterQuartController.class.getName()).log(Level.SEVERE, null, ex);
+                });
+
+                new Thread(task).start();
+
+            } catch (DateTimeParseException | NumberFormatException e) {
+                Dialogs.showMessageDialog("Erreur", "Format de données invalide. Veuillez vérifier les champs.");
+                Logger.getLogger(AjouterQuartController.class.getName()).log(Level.WARNING, null, e);
             }
         } else {
             Dialogs.showMessageDialog("Erreur de validation", "Veuillez vérifier les champs du formulaire.");
         }
+    }
+
+    /**
+     * Méthode pour analyser une chaîne de caractères en LocalTime en utilisant le format HH:mm.
+     *
+     * @param timeText La chaîne de caractères représentant l'heure.
+     * @return L'objet LocalTime correspondant.
+     * @throws DateTimeParseException Si le format de la chaîne est incorrect.
+     */
+    public LocalTime parseTime(String timeText) throws DateTimeParseException {
+        return LocalTime.parse(timeText, TIME_FORMATTER);
     }
 }

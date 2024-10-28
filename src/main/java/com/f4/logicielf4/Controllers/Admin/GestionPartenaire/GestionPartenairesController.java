@@ -6,6 +6,10 @@ import com.f4.logicielf4.Models.Partenaire;
 import com.f4.logicielf4.Models.Quart;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.*;
@@ -16,10 +20,9 @@ import javafx.stage.Stage;
 
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Contrôleur pour l'écran de gestion des partenaires dans l'interface d'administration.
@@ -82,6 +85,8 @@ public class GestionPartenairesController implements Initializable {
     @FXML
     private VBox revenuGraphBox;
 
+    private static final Logger LOGGER = Logger.getLogger(GestionPartenairesController.class.getName());
+
     /**
      * Initialise le contrôleur. Définit les actions des boutons, les valeurs des cellules,
      * et met à jour le tableau des partenaires et les étiquettes affichant les statistiques.
@@ -103,91 +108,145 @@ public class GestionPartenairesController implements Initializable {
 
     /**
      * Configure et affiche un graphique en secteurs (PieChart) montrant la répartition des quarts par partenaire.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void setupQuartsPieChart() {
-        PieChart pieChart = new PieChart();
-        Label pieChartTitle = new Label("Répartition des quarts par partenaire");
-        pieChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
+        Task<PieChart> task = new Task<PieChart>() {
+            @Override
+            protected PieChart call() throws Exception {
+                PieChart pieChart = new PieChart();
+                List<Quart> quarts = DBUtils.fetchAllQuarts();
+                Map<String, Integer> partnerShiftCount = new HashMap<>();
 
-        List<Quart> quarts = DBUtils.fetchAllQuarts();
-        Map<String, Integer> partnerShiftCount = new HashMap<>();
+                // Fetch all factures in a single call to avoid N+1 problem
+                Map<String, Facture> factureMap = DBUtils.fetchAllFacturesAsMap();
 
-        for (Quart quart : quarts) {
-            Facture facture = DBUtils.fetchFactureByNumFacture(quart.getNumFacture());
-            if (facture != null) {
-                String partnerName = facture.getNomPartenaire();
-                partnerShiftCount.put(partnerName, partnerShiftCount.getOrDefault(partnerName, 0) + 1);
+                for (Quart quart : quarts) {
+                    Facture facture = factureMap.get(quart.getNumFacture());
+                    if (facture != null) {
+                        String partnerName = facture.getNomPartenaire();
+                        partnerShiftCount.put(partnerName, partnerShiftCount.getOrDefault(partnerName, 0) + 1);
+                    }
+                }
+
+                for (Map.Entry<String, Integer> entry : partnerShiftCount.entrySet()) {
+                    String label = entry.getKey() + " (" + entry.getValue() + ")";
+                    PieChart.Data slice = new PieChart.Data(label, entry.getValue());
+                    pieChart.getData().add(slice);
+                }
+
+                return pieChart;
             }
-        }
+        };
 
-        for (Map.Entry<String, Integer> entry : partnerShiftCount.entrySet()) {
-            String label = entry.getKey() + " (" + entry.getValue() + ")";
-            PieChart.Data slice = new PieChart.Data(label, entry.getValue());
-            pieChart.getData().add(slice);
-        }
+        task.setOnSucceeded(event -> {
+            PieChart pieChart = task.getValue();
+            Label pieChartTitle = new Label("Répartition des quarts par partenaire");
+            pieChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #004d40;");
 
-        for (PieChart.Data data : pieChart.getData()) {
-            Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
-            Tooltip.install(data.getNode(), tooltip);
-        }
+            for (PieChart.Data data : pieChart.getData()) {
+                Tooltip tooltip = new Tooltip(data.getName() + ": " + (int) data.getPieValue() + " quarts");
+                Tooltip.install(data.getNode(), tooltip);
+            }
 
-        quartsGraphBox.getChildren().clear();
-        quartsGraphBox.getChildren().addAll(pieChartTitle, pieChart);
+            quartsGraphBox.getChildren().clear();
+            quartsGraphBox.getChildren().addAll(pieChartTitle, pieChart);
+        });
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la création du graphique des quarts.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la création du graphique des quarts", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
      * Configure et affiche un graphique à barres (BarChart) montrant la répartition des revenus par partenaire.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void setupRevenuBarChart() {
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis yAxis = new NumberAxis();
-        yAxis.setLabel("Revenus ($)");
+        Task<BarChart<String, Number>> task = new Task<BarChart<String, Number>>() {
+            @Override
+            protected BarChart<String, Number> call() throws Exception {
+                CategoryAxis xAxis = new CategoryAxis();
+                NumberAxis yAxis = new NumberAxis();
+                yAxis.setLabel("Revenus ($)");
 
-        Label barChartTitle = new Label("Répartition des revenus par partenaire");
-        barChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill:#004d40;");
+                BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
+                XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
 
-        BarChart<String, Number> barChart = new BarChart<>(xAxis, yAxis);
-        XYChart.Series<String, Number> dataSeries = new XYChart.Series<>();
+                List<Facture> factures = DBUtils.fetchAllFacture();
+                Map<String, BigDecimal> partnerTotalAmount = new HashMap<>();
 
-        List<Facture> factures = DBUtils.fetchAllFacture();
-        Map<String, BigDecimal> partnerTotalAmount = new HashMap<>();
+                for (Facture facture : factures) {
+                    String partnerName = facture.getNomPartenaire();
+                    BigDecimal montantApresTaxes = facture.getMontantApresTaxes();
+                    partnerTotalAmount.put(partnerName, partnerTotalAmount.getOrDefault(partnerName, BigDecimal.ZERO).add(montantApresTaxes));
+                }
 
-        for (Facture facture : factures) {
-            String partnerName = facture.getNomPartenaire();
-            BigDecimal montantApresTaxes = facture.getMontantApresTaxes();
-            partnerTotalAmount.put(partnerName, partnerTotalAmount.getOrDefault(partnerName, BigDecimal.ZERO).add(montantApresTaxes));
-        }
+                for (Map.Entry<String, BigDecimal> entry : partnerTotalAmount.entrySet()) {
+                    dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+                }
 
-        for (Map.Entry<String, BigDecimal> entry : partnerTotalAmount.entrySet()) {
-            dataSeries.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
-        }
+                barChart.getData().add(dataSeries);
 
-        barChart.getData().add(dataSeries);
+                return barChart;
+            }
+        };
 
-        revenuGraphBox.getChildren().clear();
-        revenuGraphBox.getChildren().addAll(barChartTitle, barChart);
+        task.setOnSucceeded(event -> {
+            BarChart<String, Number> barChart = task.getValue();
+            Label barChartTitle = new Label("Répartition des revenus par partenaire");
+            barChartTitle.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill:#004d40;");
+
+            revenuGraphBox.getChildren().clear();
+            revenuGraphBox.getChildren().addAll(barChartTitle, barChart);
+        });
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la création du graphique des revenus.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la création du graphique des revenus", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
      * Met à jour les étiquettes affichant les statistiques des partenaires (actifs, inactifs, total).
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void updateLabels() {
-        int partenairesActifs = 0;
-        int partenairesInactifs = 0;
-        int partenairesTotal = 0;
-        List<Partenaire> liste = DBUtils.fetchAllPartners();
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                List<Partenaire> liste = DBUtils.fetchAllPartners();
+                int partenairesActifs;
+                int partenairesTotal = liste.size();
 
-        for (Partenaire p : liste) {
-            if (p.getStatus().equals("actif"))
-                partenairesActifs++;
-        }
+                partenairesActifs = (int) liste.stream().filter(p -> "actif".equalsIgnoreCase(p.getStatus())).count();
 
-        partenairesTotal = liste.size();
-        partenairesInactifs = partenairesTotal - partenairesActifs;
+                int partenairesInactifs = partenairesTotal - partenairesActifs;
 
-        activePartnersLabel.setText(String.valueOf(partenairesActifs));
-        inactivePartnersLabel.setText(String.valueOf(partenairesInactifs));
-        totalPartnersLabel.setText(String.valueOf(partenairesTotal));
+                Platform.runLater(() -> {
+                    activePartnersLabel.setText(String.valueOf(partenairesActifs));
+                    inactivePartnersLabel.setText(String.valueOf(partenairesInactifs));
+                    totalPartnersLabel.setText(String.valueOf(partenairesTotal));
+                });
+
+                return null;
+            }
+        };
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la mise à jour des statistiques des partenaires.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des statistiques des partenaires", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
@@ -202,9 +261,9 @@ public class GestionPartenairesController implements Initializable {
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         statusColumn.setComparator((status1, status2) -> {
-            if (status1.equals("actif") && status2.equals("inactif")) {
+            if ("actif".equalsIgnoreCase(status1) && "inactif".equalsIgnoreCase(status2)) {
                 return -1;
-            } else if (status1.equals("inactif") && status2.equals("actif")) {
+            } else if ("inactif".equalsIgnoreCase(status1) && "actif".equalsIgnoreCase(status2)) {
                 return 1;
             } else {
                 return 0;
@@ -218,24 +277,39 @@ public class GestionPartenairesController implements Initializable {
      * Ouvre la fenêtre d'ajout d'un partenaire et met à jour le tableau et les étiquettes après l'ajout.
      */
     private void actionBtnAjouter() {
-        System.out.println("Bouton ajouter appuyé");
         Stage stage = (Stage) btnAjouter.getScene().getWindow();
         Model.getInstance().getViewFactory().showAddPartnerWindow(stage);
         updateTable();
         updateLabels();
+        setupQuartsPieChart();
+        setupRevenuBarChart();
     }
 
     /**
      * Met à jour la TableView avec la liste des partenaires actuelle.
+     * Exécute l'opération dans un thread d'arrière-plan pour éviter de bloquer l'interface utilisateur.
      */
     private void updateTable() {
-        try {
-            List<Partenaire> partenaires = DBUtils.fetchAllPartners();
-            partnersTable.getItems().setAll(partenaires);
+        Task<ObservableList<Partenaire>> task = new Task<ObservableList<Partenaire>>() {
+            @Override
+            protected ObservableList<Partenaire> call() throws Exception {
+                List<Partenaire> partenaires = DBUtils.fetchAllPartners();
+                return FXCollections.observableArrayList(partenaires);
+            }
+        };
+
+        task.setOnSucceeded(event -> {
+            partnersTable.getItems().setAll(task.getValue());
             partnersTable.sort();
-        } catch (Exception e) {
-            Dialogs.showMessageDialog("Erreur lors de la mise à jour des partenaires : " + e.getMessage(), "ERREUR");
-        }
+        });
+
+        task.setOnFailed(event -> {
+            Throwable ex = task.getException();
+            Dialogs.showMessageDialog("Erreur lors de la mise à jour des partenaires.", "ERREUR");
+            LOGGER.log(Level.SEVERE, "Erreur lors de la mise à jour des partenaires", ex);
+        });
+
+        new Thread(task).start();
     }
 
     /**
@@ -244,15 +318,17 @@ public class GestionPartenairesController implements Initializable {
      * Affiche un message d'erreur si aucun partenaire n'est sélectionné.
      */
     private void actionBtnMAJ() {
-        System.out.println("Bouton MAJ appuyé");
-        Partenaire partenaireSelectionné = partnersTable.getSelectionModel().getSelectedItem();
+        Partenaire partenaireSelectionne = partnersTable.getSelectionModel().getSelectedItem();
 
-        if (partenaireSelectionné == null) {
+        if (partenaireSelectionne == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de mise à jour.", "ERREUR MAJ");
         } else {
             Stage stage = (Stage) btnMAJ.getScene().getWindow();
-            Model.getInstance().getViewFactory().showUpdatePartnerWindow(stage, partenaireSelectionné);
+            Model.getInstance().getViewFactory().showUpdatePartnerWindow(stage, partenaireSelectionne);
             updateTable();
+            updateLabels();
+            setupQuartsPieChart();
+            setupRevenuBarChart();
         }
     }
 
@@ -262,16 +338,17 @@ public class GestionPartenairesController implements Initializable {
      * Affiche un message d'erreur si aucun partenaire n'est sélectionné.
      */
     private void actionBtnSupprimer() {
-        System.out.println("Bouton Supprimer appuyé");
-        Partenaire partenaireSelectionné = partnersTable.getSelectionModel().getSelectedItem();
+        Partenaire partenaireSelectionne = partnersTable.getSelectionModel().getSelectedItem();
 
-        if (partenaireSelectionné == null) {
+        if (partenaireSelectionne == null) {
             Dialogs.showMessageDialog("Veuillez sélectionner un partenaire avant de cliquer le bouton de suppression.", "ERREUR SUPPRESSION");
         } else {
             Stage stage = (Stage) btnSupprimer.getScene().getWindow();
-            Model.getInstance().getViewFactory().showDeletePartnerWindow(stage, partenaireSelectionné);
+            Model.getInstance().getViewFactory().showDeletePartnerWindow(stage, partenaireSelectionne);
             updateTable();
             updateLabels();
+            setupQuartsPieChart();
+            setupRevenuBarChart();
         }
     }
 }
