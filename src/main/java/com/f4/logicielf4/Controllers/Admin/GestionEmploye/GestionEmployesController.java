@@ -254,7 +254,7 @@ public class GestionEmployesController implements Initializable {
      * Utilise des PropertyValueFactory pour mapper les colonnes aux attributs correspondants des employés.
      */
     private void setCellValues() {
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         nomColumn.setCellValueFactory(new PropertyValueFactory<>("nom"));
         prenomColumn.setCellValueFactory(new PropertyValueFactory<>("prenom"));
         phoneColumn.setCellValueFactory(new PropertyValueFactory<>("telephone"));

@@ -9,39 +9,48 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<?import java.lang.String?>
-<AnchorPane prefHeight="600.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionEmploye/MiseAJourSuppressionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="433.0" prefWidth="700.0" stylesheets="@../../../Styles/GestionEmploye/MiseAJourSuppressionEmploye.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <!-- Title -->
         <Label layoutX="220.0" layoutY="20.0" styleClass="main-title" text="Supprimer un employé" />
 
         <GridPane hgap="20" layoutX="40.0" layoutY="80.0" vgap="15">
-            <Label styleClass="details-label" text="Nom:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-            <TextField fx:id="nomField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+            <!-- Row 1 -->
+            <Label styleClass="details-label" text="Nom d'utilisateur :" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="usernameField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-            <Label styleClass="details-label" text="Prénom:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-            <TextField fx:id="prenomField" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <!-- Row 2 -->
+            <Label styleClass="details-label" text="Nom :" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="nomField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
-            <Label styleClass="details-label" text="Téléphone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-            <TextField fx:id="telephoneField" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <!-- Row 3 -->
+            <Label styleClass="details-label" text="Prénom :" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <TextField fx:id="prenomField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-            <Label styleClass="details-label" text="Courriel:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-            <TextField fx:id="emailField" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <!-- Row 4 -->
+            <Label styleClass="details-label" text="Téléphone :" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <TextField fx:id="telephoneField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <!-- Row 5 -->
+            <Label styleClass="details-label" text="Courriel :" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <TextField fx:id="emailField" prefHeight="36.0" prefWidth="400.0" styleClass="details-textfield" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
             <columnConstraints>
                 <ColumnConstraints minWidth="120.0" prefWidth="150.0" />
                 <ColumnConstraints minWidth="350.0" prefWidth="450.0" />
             </columnConstraints>
+
             <rowConstraints>
-                <RowConstraints />
-                <RowConstraints />
-                <RowConstraints />
-                <RowConstraints />
+                <RowConstraints minHeight="40.0" prefHeight="40.0" />
+                <RowConstraints minHeight="40.0" prefHeight="40.0" />
+                <RowConstraints minHeight="40.0" prefHeight="40.0" />
+                <RowConstraints minHeight="40.0" prefHeight="40.0" />
+                <RowConstraints minHeight="40.0" prefHeight="40.0" />
             </rowConstraints>
         </GridPane>
 
         <!-- Buttons for submitting or canceling -->
-        <HBox layoutX="141.0" layoutY="512.0" prefHeight="44.0" prefWidth="450.0" spacing="50" styleClass="buttons-container">
+        <HBox layoutX="116.0" layoutY="375.0" prefHeight="44.0" prefWidth="450.0" spacing="50" styleClass="buttons-container">
             <Button fx:id="btnSuppression" prefHeight="50.0" prefWidth="150.0" styleClass="action-button" text="Supprimer" />
             <Button fx:id="btnCancel" prefHeight="50.0" prefWidth="150.0" styleClass="action-button" text="Annuler" />
         </HBox>

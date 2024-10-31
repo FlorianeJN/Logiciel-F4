@@ -1,8 +1,8 @@
 package com.f4.logicielf4.Controllers.Admin.GestionEmploye;
 
+import com.f4.logicielf4.Models.Employe;
 import com.f4.logicielf4.Utilitaire.DBUtils;
 import com.f4.logicielf4.Utilitaire.Dialogs;
-import com.f4.logicielf4.Models.Employe;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -10,8 +10,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -21,6 +19,8 @@ import java.util.ResourceBundle;
  */
 public class SuppressionEmployeController implements Initializable {
 
+    @FXML
+    private TextField usernameField;
     @FXML
     private TextField nomField;
     @FXML
@@ -35,7 +35,7 @@ public class SuppressionEmployeController implements Initializable {
     private Button btnCancel;
 
     private Employe employe; // Modèle Employe
-    private int employeId;
+    private String empUsername;
 
     /**
      * Constructeur pour initialiser le contrôleur avec un employé spécifique.
@@ -45,7 +45,7 @@ public class SuppressionEmployeController implements Initializable {
     public SuppressionEmployeController(Employe employe) {
         this.employe = employe;
         if (employe != null) {
-            employeId = employe.getId();
+            empUsername = employe.getUsername();
         }
     }
 
@@ -71,6 +71,7 @@ public class SuppressionEmployeController implements Initializable {
      */
     private void remplirTextFields() {
         if (employe != null) {
+            usernameField.setText(employe.getUsername());
             nomField.setText(employe.getNom());
             prenomField.setText(employe.getPrenom());
             telephoneField.setText(employe.getTelephone());
@@ -83,6 +84,7 @@ public class SuppressionEmployeController implements Initializable {
      * Empêche l'utilisateur de modifier les informations affichées avant la suppression.
      */
     private void setFieldsReadOnly() {
+        usernameField.setEditable(false);
         nomField.setEditable(false);
         prenomField.setEditable(false);
         telephoneField.setEditable(false);
@@ -91,52 +93,32 @@ public class SuppressionEmployeController implements Initializable {
 
     /**
      * Action déclenchée lors du clic sur le bouton de suppression.
-     * Récupère les informations de l'employé, affiche une confirmation de suppression,
+     * Récupère le username, affiche une confirmation de suppression,
      * et supprime l'employé de la base de données si l'utilisateur confirme la suppression.
      */
     private void actionBtnSuppression() {
-        Map<String, String> infos = retrieveInfos();
-        if (infos != null) {
-            String message = "Vous êtes sur le point de supprimer " + infos.get("nom") + " " + infos.get("prenom") + ". Voulez-vous continuer ?";
-            if (Dialogs.showConfirmDialog(message, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC")) {
-                if (DBUtils.deleteEmploye(infos)) {
-                    String messageConfirmation = infos.get("nom") + " " + infos.get("prenom") + " a été supprimé avec succès.";
-                    Dialogs.showMessageDialog(messageConfirmation, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC");
-                    Stage stage = (Stage) btnSuppression.getScene().getWindow();
-                    stage.close();
-                } else {
-                    Dialogs.showMessageDialog("Erreur lors de la suppression de l'employé.", "ERREUR SUPPRESSION");
-                }
+        String username = usernameField.getText().trim();
+
+        // Vérifier si le username est vide
+        if (username.isEmpty()) {
+            Dialogs.showMessageDialog("Le nom d'utilisateur est vide. Impossible de supprimer.", "ERREUR SUPPRESSION");
+            return;
+        }
+
+        String message = "Vous êtes sur le point de supprimer l'employé avec le nom d'utilisateur '" + username + "'. Voulez-vous continuer ?";
+        boolean confirm = Dialogs.showConfirmDialog(message, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC");
+
+        if (confirm) {
+            boolean deleteReussi = DBUtils.deleteEmploye(username);
+            if (deleteReussi) {
+                String messageConfirmation = "L'employé avec le nom d'utilisateur '" + username + "' a été supprimé avec succès.";
+                Dialogs.showMessageDialog(messageConfirmation, "CONFIRMATION SUPPRESSION - F4 SANTÉ INC");
+                Stage stage = (Stage) btnSuppression.getScene().getWindow();
+                stage.close();
+            } else {
+                Dialogs.showMessageDialog("Erreur lors de la suppression de l'employé.", "ERREUR SUPPRESSION");
             }
         }
-    }
-
-    /**
-     * Récupère les informations de l'employé à partir des champs de texte,
-     * et les retourne sous forme de Map après validation.
-     *
-     * @return Une Map contenant les informations de l'employé si la validation est réussie, sinon null.
-     */
-    private Map<String, String> retrieveInfos() {
-        Map<String, String> employeeInfo = new HashMap<>();
-        String nom = nomField.getText();
-        String prenom = prenomField.getText();
-        String telephone = telephoneField.getText();
-        String email = emailField.getText();
-
-        // Validation des champs
-        if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
-            Dialogs.showMessageDialog("Veuillez remplir tous les champs", "ERREUR REMPLISSAGE DES CHAMPS");
-            return null;
-        }
-
-        employeeInfo.put("nom", nom);
-        employeeInfo.put("prenom", prenom);
-        employeeInfo.put("telephone", telephone);
-        employeeInfo.put("email", email);
-        employeeInfo.put("id", String.valueOf(employeId));
-
-        return employeeInfo;
     }
 
     /**

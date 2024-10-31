@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 /**
  * Contrôleur pour la mise à jour des informations d'un employé.
@@ -21,6 +22,10 @@ import java.util.ResourceBundle;
  */
 public class MiseAJourEmployeController implements Initializable {
 
+    private static final Logger LOGGER = Logger.getLogger(MiseAJourEmployeController.class.getName());
+
+    @FXML
+    private TextField usernameField;
     @FXML
     private TextField nomField;
     @FXML
@@ -35,18 +40,14 @@ public class MiseAJourEmployeController implements Initializable {
     private Button btnCancel;
 
     private Employe employe;
-    private int employeId;
 
     /**
-     * Constructeur pour initialiser le contrôleur avec un employé spécifique.
+     * Constructeur paramétré pour initialiser le contrôleur avec un employé spécifique.
      *
      * @param employe L'employé dont les informations doivent être mises à jour.
      */
     public MiseAJourEmployeController(Employe employe) {
         this.employe = employe;
-        if(employe != null) {
-            employeId = employe.getId();
-        }
     }
 
     /**
@@ -61,6 +62,7 @@ public class MiseAJourEmployeController implements Initializable {
         btnUpdate.setOnAction(event -> actionBtnUpdate());
         btnCancel.setOnAction(event -> actionBtnCancel());
         remplirTextFields();
+        setFieldsReadOnly();
     }
 
     /**
@@ -69,11 +71,24 @@ public class MiseAJourEmployeController implements Initializable {
      */
     private void remplirTextFields() {
         if (employe != null) {
+            usernameField.setText(employe.getUsername());
             nomField.setText(employe.getNom());
             prenomField.setText(employe.getPrenom());
             telephoneField.setText(employe.getTelephone());
             emailField.setText(employe.getEmail());
         }
+    }
+
+    /**
+     * Définit les champs de texte comme étant en lecture seule ou éditables.
+     * Empêche l'utilisateur de modifier le nom d'utilisateur avant la mise à jour.
+     */
+    private void setFieldsReadOnly() {
+        usernameField.setEditable(false);
+        nomField.setEditable(true);
+        prenomField.setEditable(true);
+        telephoneField.setEditable(true);
+        emailField.setEditable(true);
     }
 
     /**
@@ -85,39 +100,45 @@ public class MiseAJourEmployeController implements Initializable {
     public Map<String, String> retrieveInfos() {
         Map<String, String> employeInfo = new HashMap<>();
 
-        String nom = nomField.getText();
-        String prenom = prenomField.getText();
-        String telephone = telephoneField.getText();
-        String email = emailField.getText();
+        String username = usernameField.getText().trim();
+        String nom = nomField.getText().trim();
+        String prenom = prenomField.getText().trim();
+        String telephone = telephoneField.getText().trim();
+        String email = emailField.getText().trim();
 
         boolean valid = true;
 
-        // Valide le numéro de téléphone (doit contenir exactement 10 chiffres)
-        if (telephone == null || !telephone.matches("\\d{10}")) {
-            Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres", "ERREUR NUMERO DE TELEPHONE");
+        // Vérifie si tous les champs sont remplis
+        if (username.isEmpty() || nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
+            Dialogs.showMessageDialog("Veuillez remplir tous les champs.", "ERREUR REMPLISSAGE DES CHAMPS");
             valid = false;
         }
 
-        // Vérifie si tous les champs sont remplis
-        if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty() || email.isEmpty()) {
-            Dialogs.showMessageDialog("Veuillez remplir tous les champs", "ERREUR REMPLISSAGE DES CHAMPS");
+        // Valide le numéro de téléphone (doit contenir exactement 10 chiffres)
+        if (!telephone.matches("\\d{10}")) {
+            Dialogs.showMessageDialog("Le numéro de téléphone doit contenir exactement 10 chiffres.", "ERREUR NUMÉRO DE TÉLÉPHONE");
+            valid = false;
+        }
+
+        // Valide le format de l'email
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            Dialogs.showMessageDialog("L'email saisi n'est pas valide.", "ERREUR FORMAT EMAIL");
             valid = false;
         }
 
         // Si la validation échoue, retourne null
         if (!valid) {
+            LOGGER.warning("Validation des informations de l'employé échouée.");
             return null;
         }
 
         // Si la validation réussit, ajoute les valeurs récupérées à la Map
+        employeInfo.put("username", username);
         employeInfo.put("nom", nom);
         employeInfo.put("prenom", prenom);
         employeInfo.put("telephone", telephone);
         employeInfo.put("email", email);
-        employeInfo.put("id", String.valueOf(employeId)); // Ajoute l'ID de l'employé à la Map
-
-        Stage stage = (Stage) btnUpdate.getScene().getWindow();
-        stage.close();
+        employeInfo.put("statut", employe.getStatut()); // Conserver le statut actuel
 
         return employeInfo;
     }
@@ -130,9 +151,15 @@ public class MiseAJourEmployeController implements Initializable {
     private void actionBtnUpdate() {
         Map<String, String> infos = retrieveInfos();
         if (infos != null) {
-            if (DBUtils.updateEmploye(infos)) {
-                String message = "Les informations ont été mises à jour pour " + infos.get("nom");
+            boolean updateReussi = DBUtils.updateEmploye(infos);
+            if (updateReussi) {
+                String message = "Les informations ont été mises à jour pour " + infos.get("nom") + " " + infos.get("prenom");
                 Dialogs.showMessageDialog(message, "MISE À JOUR RÉUSSIE - F4 SANTÉ INC");
+                Stage stage = (Stage) btnUpdate.getScene().getWindow();
+                stage.close();
+            } else {
+                Dialogs.showMessageDialog("Erreur lors de la mise à jour de l'employé.", "ERREUR MISE À JOUR");
+                LOGGER.severe("Mise à jour de l'employé échouée pour le username: " + infos.get("username"));
             }
         }
     }

@@ -103,17 +103,25 @@ public class CommencerFacture {
                     if (success) {
                         Stage stage = (Stage) btnContinuer.getScene().getWindow();
                         stage.close();
-                        boolean addQuarts = Dialogs.showConfirmDialog(
-                                "La facture " + numFacture + " a été créée! Voulez-vous y ajouter des quarts ?",
-                                "MESSAGE CONFIRMATION + AJOUTS DE QUARTS"
-                        );
-                        if (addQuarts) {
-                            Model.getInstance().getViewFactory().showPresentationFactureWindow(stage, numFacture, partner);
-                        }
+
+                        Platform.runLater(() -> {
+                            boolean addQuarts = Dialogs.showConfirmDialog(
+                                    "La facture " + numFacture + " a été créée! Voulez-vous y ajouter des quarts ?",
+                                    "MESSAGE CONFIRMATION + AJOUTS DE QUARTS"
+                            );
+
+                            if (addQuarts) {
+                                Model.getInstance().getViewFactory().showPresentationFactureWindow(stage, numFacture, partner);
+                            }
+                        });
                     } else {
-                        Dialogs.showMessageDialog("La facture n'a pas pu être créée.", "ERREUR CRÉATION FACTURE");
+                        Platform.runLater(() -> Dialogs.showMessageDialog(
+                                "La facture n'a pas pu être créée.",
+                                "ERREUR CRÉATION FACTURE"
+                        ));
                     }
                 }
+
 
                 @Override
                 protected void failed() {

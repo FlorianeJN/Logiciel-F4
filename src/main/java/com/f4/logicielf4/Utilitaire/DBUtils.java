@@ -5,8 +5,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import javax.sql.DataSource;
-
-import javax.sql.DataSource;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.sql.Date;
@@ -17,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Classe utilitaire pour effectuer des opérations sur la base de données relatives aux utilisateurs, partenaires, employés, factures et quarts.
+ * Classe utilitaire pour effectuer des opérations sur la base de données relatives aux utilisateurs, partenaires, factures et quarts.
  */
 public class DBUtils {
 
@@ -56,7 +54,7 @@ public class DBUtils {
      * @return true si les informations d'identification sont correctes, false sinon
      */
     public static boolean loginUser(String username, String password) {
-        String query = "SELECT password FROM user WHERE id = ?";
+        String query = "SELECT password FROM users WHERE username = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement psLogin = connection.prepareStatement(query)) {
 
@@ -64,7 +62,7 @@ public class DBUtils {
             try (ResultSet resultSet = psLogin.executeQuery()) {
                 if (resultSet.next()) {
                     String retrievedPassword = resultSet.getString("password");
-                    if (retrievedPassword != null && retrievedPassword.equals(password)) {
+                    if (retrievedPassword != null && retrievedPassword.equals(password)) { // Consider hashing
                         // Connexion réussie
                         return true;
                     } else {
@@ -83,9 +81,9 @@ public class DBUtils {
     }
 
     /**
-     * Récupère tous les partenaires depuis la base de données.
+     * Récupère tous les utilisateurs depuis la base de données.
      *
-     * @return Liste de tous les partenaires
+     * @return Liste de tous les utilisateurs
      */
     public static List<Partenaire> fetchAllPartners() {
         List<Partenaire> partners = new ArrayList<>();
@@ -226,9 +224,9 @@ public class DBUtils {
      *
      * @return Liste de tous les employés
      */
-    public static List<Employe> fetchAllEmployees() {
+    public static List<Employe> fetchAllEmployees() {  // Kept original method name
         List<Employe> employes = new ArrayList<>();
-        String query = "SELECT * FROM employes";
+        String query = "SELECT * FROM users";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement psFetch = connection.prepareStatement(query);
@@ -244,21 +242,28 @@ public class DBUtils {
         return employes;
     }
 
+
     /**
-     * Ajoute un nouvel employé dans la base de données.
+     * Ajoute un nouvel employé dans la base de données avec un mot de passe par défaut.
      *
-     * @param employeeInfo Informations de l'employé à ajouter
+     * @param employeeInfo Informations de l'employé à ajouter (username, nom, prenom, telephone, email, statut).
      * @return true si l'employé a été ajouté avec succès, false sinon
      */
     public static boolean addEmployee(Map<String, String> employeeInfo) {
-        String query = "INSERT INTO employes (nom, prenom, telephone, email, statut) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String defaultPassword = "Password@123"; // Default password
+
+        String query = "INSERT INTO users (username, nom, prenom, telephone, email, statut, password) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            setEmployeeParameters(preparedStatement, employeeInfo);
-            preparedStatement.setString(5, "Actif");
+            preparedStatement.setString(1, employeeInfo.get("username"));
+            preparedStatement.setString(2, employeeInfo.get("nom"));
+            preparedStatement.setString(3, employeeInfo.get("prenom"));
+            preparedStatement.setString(4, employeeInfo.get("telephone"));
+            preparedStatement.setString(5, employeeInfo.get("email"));
+            preparedStatement.setString(6, employeeInfo.get("statut"));
+            preparedStatement.setString(7, defaultPassword);
 
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;
@@ -270,24 +275,55 @@ public class DBUtils {
     }
 
     /**
-     * Met à jour les informations d'un employé existant dans la base de données.
+     * Vérifie si un nom d'utilisateur existe déjà dans la base de données.
      *
-     * @param employeeInfo Informations de l'employé à mettre à jour
-     * @return true si l'employé a été mis à jour avec succès, false sinon
+     * @param username Le nom d'utilisateur à vérifier.
+     * @return true si le nom d'utilisateur existe, false sinon.
      */
-    public static boolean updateEmploye(Map<String, String> employeeInfo) {
-        String updateQuery = "UPDATE employes SET "
-                + "nom = ?, "
-                + "prenom = ?, "
-                + "telephone = ?, "
-                + "email = ? "
-                + "WHERE id = ?";
+    public static boolean usernameExists(String username) {
+        String query = "SELECT COUNT(*) FROM users WHERE username = ?";
 
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(updateQuery)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            setEmployeeParameters(preparedStatement, employeeInfo);
-            preparedStatement.setInt(5, Integer.parseInt(employeeInfo.get("id")));
+            // Définir le paramètre de requête
+            preparedStatement.setString(1, username);
+
+            // Exécuter la requête
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    // Si le compte est supérieur à 0, le nom d'utilisateur existe
+                    return count > 0;
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur lors de la vérification de l'existence du nom d'utilisateur", e);
+        }
+
+        // Par défaut, retourner false si une exception se produit
+        return false;
+    }
+
+    /**
+     * Met à jour les informations d'un employé dans la base de données.
+     *
+     * @param employeeInfo Informations de l'employé à mettre à jour (username, nom, prenom, telephone, email, statut).
+     * @return true si la mise à jour a réussi, false sinon
+     */
+    public static boolean updateEmploye(Map<String, String> employeeInfo) {
+        String query = "UPDATE users SET nom = ?, prenom = ?, telephone = ?, email = ?, statut = ? WHERE username = ?";
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, employeeInfo.get("nom"));
+            preparedStatement.setString(2, employeeInfo.get("prenom"));
+            preparedStatement.setString(3, employeeInfo.get("telephone"));
+            preparedStatement.setString(4, employeeInfo.get("email"));
+            preparedStatement.setString(5, employeeInfo.get("statut"));
+            preparedStatement.setString(6, employeeInfo.get("username"));
 
             int rowsAffected = preparedStatement.executeUpdate();
             return rowsAffected > 0;
@@ -299,26 +335,65 @@ public class DBUtils {
     }
 
     /**
-     * Supprime un employé de la base de données.
+     * Supprime un employé de la base de données en utilisant le nom d'utilisateur.
      *
-     * @param employeeInfo Informations de l'employé à supprimer
-     * @return true si l'employé a été supprimé avec succès, false sinon
+     * @param username Le nom d'utilisateur de l'employé à supprimer.
+     * @return true si la suppression a réussi, false sinon.
      */
-    public static boolean deleteEmploye(Map<String, String> employeeInfo) {
-        String query = "DELETE FROM employes WHERE id = ?";
+    public static boolean deleteEmploye(String username) {
+        String query = "DELETE FROM users WHERE username = ?";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-            preparedStatement.setInt(1, Integer.parseInt(employeeInfo.get("id")));
+            preparedStatement.setString(1, username);
 
             int rowsAffected = preparedStatement.executeUpdate();
-            return rowsAffected > 0;
+            if (rowsAffected > 0) {
+                LOGGER.info("Employé supprimé avec succès : " + username);
+                return true;
+            } else {
+                LOGGER.warning("Aucun employé trouvé avec le nom d'utilisateur : " + username);
+                return false;
+            }
 
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Erreur lors de la suppression de l'employé", e);
+            LOGGER.log(Level.SEVERE, "Erreur lors de la suppression de l'employé : " + username, e);
             return false;
         }
+    }
+
+    /**
+     * Récupère un employé à partir de la base de données en utilisant le nom d'utilisateur.
+     *
+     * @param username Le nom d'utilisateur de l'employé.
+     * @return Un objet Employe contenant les informations de l'employé, ou null si non trouvé.
+     */
+    public static Employe getEmployeByUsername(String username) {
+        String query = "SELECT * FROM users WHERE username = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+
+            preparedStatement.setString(1, username);
+
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    // Supposons que la table 'users' contient les colonnes : username, nom, prenom, telephone, email, statut, password, etc.
+                    String nom = rs.getString("nom");
+                    String prenom = rs.getString("prenom");
+                    String telephone = rs.getString("telephone");
+                    String email = rs.getString("email");
+                    String statut = rs.getString("statut");
+                    String password = rs.getString("password"); // Récupération du mot de passe
+
+                    return new Employe(username, nom, prenom, telephone, email, statut, password);
+                }
+            }
+
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Erreur lors de la récupération de l'employé : " + username, e);
+        }
+        return null;
     }
 
     /**
@@ -670,6 +745,32 @@ public class DBUtils {
 
     // Helper methods to reduce code duplication
 
+    /**
+     * Extrait un objet Employe depuis un ResultSet.
+     *
+     * @param rs ResultSet contenant les données de l'employé
+     * @return Un objet Employe
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
+    private static Employe extractEmployeFromResultSet(ResultSet rs) throws SQLException {  // Kept original method name
+        String username = rs.getString("username");
+        String nom = rs.getString("nom");
+        String prenom = rs.getString("prenom");
+        String telephone = rs.getString("telephone");
+        String email = rs.getString("email");
+        String statut = rs.getString("statut");
+        Timestamp createdAt = rs.getTimestamp("created_at");
+        String password = rs.getString("password");
+        return new Employe(username,nom,prenom,telephone,email,statut,password);
+    }
+
+    /**
+     * Extrait un objet Partenaire depuis un ResultSet.
+     *
+     * @param rs ResultSet contenant les données du partenaire
+     * @return Un objet Partenaire
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     private static Partenaire extractPartnerFromResultSet(ResultSet rs) throws SQLException {
         String nom = rs.getString("nom");
         String numeroCivique = rs.getString("numero_civique");
@@ -684,17 +785,13 @@ public class DBUtils {
         return new Partenaire(nom, numeroCivique, rue, ville, province, codePostal, telephone, courriel, status);
     }
 
-    private static Employe extractEmployeFromResultSet(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String nom = rs.getString("nom");
-        String prenom = rs.getString("prenom");
-        String telephone = rs.getString("telephone");
-        String email = rs.getString("email");
-        String statut = rs.getString("statut");
-
-        return new Employe(id, nom, prenom, telephone, email, statut);
-    }
-
+    /**
+     * Extrait un objet Facture depuis un ResultSet.
+     *
+     * @param rs ResultSet contenant les données de la facture
+     * @return Un objet Facture
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     private static Facture extractFactureFromResultSet(ResultSet rs) throws SQLException {
         String numFacture = rs.getString("num_facture");
         LocalDate dateFacture = rs.getDate("date").toLocalDate();
@@ -709,6 +806,13 @@ public class DBUtils {
         return new Facture(numFacture, partenaire, dateFacture, montantAvantTaxes, tps, tvq, montantApresTaxes, statut);
     }
 
+    /**
+     * Extrait un objet Quart depuis un ResultSet.
+     *
+     * @param rs ResultSet contenant les données du quart
+     * @return Un objet Quart
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     private static Quart extractQuartFromResultSet(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String numFacture = rs.getString("num_facture");
@@ -729,23 +833,59 @@ public class DBUtils {
                 tempsTotal, prestation, tauxHoraire, montantTotal, notes, nomEmp, tempsDouble, tempsDemi);
     }
 
+    /**
+     * Définit les paramètres pour une requête d'ajout ou de mise à jour d'un employé.
+     *
+     * @param ps          PreparedStatement à configurer
+     * @param employeeInfo Map contenant les informations de l'employé
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
+    private static void setEmployeeParameters(PreparedStatement ps, Map<String, String> employeeInfo) throws SQLException {  // Kept original method name
+        ps.setString(1, employeeInfo.get("username"));
+        ps.setString(2, employeeInfo.get("nom"));
+        ps.setString(3, employeeInfo.get("prenom"));
+        ps.setString(4, employeeInfo.get("telephone"));
+        ps.setString(5, employeeInfo.get("email"));
+        ps.setString(6, employeeInfo.get("statut"));
+        ps.setString(7, employeeInfo.get("password"));
+    }
+
+    /**
+     * Définit les paramètres pour une requête d'ajout ou de mise à jour d'un partenaire.
+     *
+     * @param ps          PreparedStatement à configurer
+     * @param partnerInfo Map contenant les informations du partenaire
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     private static void setPartnerParameters(PreparedStatement ps, Map<String, String> partnerInfo) throws SQLException {
-        ps.setString(1, partnerInfo.get("numeroCivique"));
+        ps.setString(1, partnerInfo.get("numero_civique"));
         ps.setString(2, partnerInfo.get("rue"));
         ps.setString(3, partnerInfo.get("ville"));
         ps.setString(4, partnerInfo.get("province"));
-        ps.setString(5, partnerInfo.get("codePostal"));
+        ps.setString(5, partnerInfo.get("code_postal"));
         ps.setString(6, partnerInfo.get("telephone"));
         ps.setString(7, partnerInfo.get("email"));
     }
 
-    private static void setEmployeeParameters(PreparedStatement ps, Map<String, String> employeeInfo) throws SQLException {
-        ps.setString(1, employeeInfo.get("nom"));
-        ps.setString(2, employeeInfo.get("prenom"));
-        ps.setString(3, employeeInfo.get("telephone"));
-        ps.setString(4, employeeInfo.get("email"));
-    }
-
+    /**
+     * Définit les paramètres pour une requête d'ajout ou de mise à jour d'un quart.
+     *
+     * @param ps            PreparedStatement à configurer
+     * @param numFacture    Numéro de facture associé au quart (peut être null pour les mises à jour)
+     * @param prestation    Prestation effectuée pendant le quart
+     * @param dateQuart     Date du quart
+     * @param debutQuart    Heure de début du quart
+     * @param finQuart      Heure de fin du quart
+     * @param pause         Durée de la pause pendant le quart
+     * @param tempsTotal    Temps total travaillé pendant le quart
+     * @param tauxHoraire   Taux horaire
+     * @param montantTotal  Montant total pour le quart
+     * @param notes         Notes associées au quart
+     * @param empName       Nom de l'employé ayant travaillé le quart
+     * @param tempsDouble   Indique si le quart est payé en double
+     * @param tempsDemi     Indique si le quart est payé en temps et demi
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
     private static void setQuartParameters(PreparedStatement ps, String numFacture, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
                                            LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
                                            boolean tempsDouble, boolean tempsDemi) throws SQLException {
@@ -767,7 +907,11 @@ public class DBUtils {
         ps.setInt(index++, tempsDouble ? 1 : 0);
     }
 
-    // Fetch all factures as a Map to avoid N+1 problem
+    /**
+     * Récupère toutes les factures sous forme de Map pour éviter le problème N+1.
+     *
+     * @return Map des factures avec le numéro de facture comme clé
+     */
     public static Map<String, Facture> fetchAllFacturesAsMap() {
         Map<String, Facture> factureMap = new HashMap<>();
         String query = "SELECT f.*, p.* FROM Facture f JOIN partenaire p ON f.nom_partenaire = p.nom";
@@ -785,4 +929,7 @@ public class DBUtils {
         }
         return factureMap;
     }
+
+    // Additional helper methods or updates can be added here as needed
+
 }

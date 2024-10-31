@@ -13,7 +13,7 @@
 <AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionEmploye/GestionEmployes.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployesController">
    <children>
       <!-- Main Title -->
-      <Label layoutY="22.0" text="Gestion des Employés" styleClass="main-title" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" alignment="CENTER" />
+      <Label alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Gestion des Employés" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
 
       <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 
@@ -36,7 +36,7 @@
       <!-- Employees Table -->
       <TableView fx:id="employeesTable" layoutX="20.0" layoutY="200.0" prefHeight="216.0" prefWidth="960.0" styleClass="employees-table" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="200.0">
          <columns>
-            <TableColumn fx:id="idColumn" prefWidth="132.0" text="ID" />
+            <TableColumn fx:id="idColumn" prefWidth="132.0" text="Nom d'utilisateur" />
             <TableColumn fx:id="nomColumn" prefWidth="200.0" text="Nom" />
             <TableColumn fx:id="prenomColumn" prefWidth="200.0" text="Prénom" />
             <TableColumn fx:id="phoneColumn" prefWidth="149.5999755859375" text="Téléphone" />

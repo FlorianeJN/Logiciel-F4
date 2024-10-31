@@ -6,39 +6,52 @@
     -fx-background-color: #f0f2f5; /* Fond gris clair */
 }
 
-/* Titre principal */
-.main-title {
-    -fx-text-fill: #004d40;
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
-    -fx-alignment: center;
+/* Header Section */
+.header {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15 25 15 25;
+
+    /* Définir uniquement la bordure inférieure */
+    -fx-border-color: transparent transparent #e0e0e0 transparent; /* top, right, bottom, left */
+    -fx-border-width: 0 0 1px 0; /* top, right, bottom, left */
+    -fx-border-style: none none solid none;
+
+    -fx-alignment: CENTER_LEFT;
 }
 
-/* Titres de section */
-.section-title {
+/* Header Title */
+.header-title {
     -fx-text-fill: #004d40;
     -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Section Container */
+.section {
+    -fx-background-color: #ffffff;
+    -fx-padding: 20;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0.5, 0, 2);
+}
+
+/* Section Title */
+.section-title {
+    -fx-text-fill: #004d40;
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
     -fx-padding: 0 0 10 0;
 }
 
-/* Conteneur d'informations */
-.info-container {
-    -fx-background-color: #ffffff;
-    -fx-padding: 20;
-    -fx-border-radius: 10;
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0.5, 0, 2);
-}
-
-/* Labels des champs */
+/* Information Labels */
 .info-label {
     -fx-text-fill: #004d40;
-    -fx-font-size: 16px;
+    -fx-font-size: 14px;
     -fx-font-weight: bold;
+    -fx-alignment: CENTER_RIGHT;
 }
 
-/* Champs de texte */
+/* Text Fields */
 .text-field {
     -fx-background-color: #ffffff;
     -fx-text-fill: #333333;
@@ -56,12 +69,30 @@
     -fx-border-width: 2;
 }
 
-/* Boutons d'action principaux */
+/* Password Fields */
+.password-field {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #333333;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 8;
+    -fx-font-size: 14px;
+    -fx-pref-width: 250px;
+}
+
+.password-field:focused {
+    -fx-border-color: #004d40;
+    -fx-border-width: 2;
+}
+
+/* Action Buttons */
 .action-button {
     -fx-background-color: #004d40;
     -fx-text-fill: #ffffff;
-    -fx-font-size: 16px;
-    -fx-padding: 10 30;
+    -fx-font-size: 14px;
+    -fx-padding: 8 24;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-cursor: hand;
@@ -76,14 +107,14 @@
     -fx-background-color: #00221a;
 }
 
-/* Boutons d'action secondaires */
+/* Action Buttons Secondaires */
 .action-button-secondary {
     -fx-background-color: #ffffff;
     -fx-text-fill: #004d40;
     -fx-border-color: #004d40;
     -fx-border-width: 2;
-    -fx-font-size: 16px;
-    -fx-padding: 10 30;
+    -fx-font-size: 14px;
+    -fx-padding: 8 24;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-cursor: hand;
@@ -98,7 +129,7 @@
     -fx-background-color: #e0e0e0;
 }
 
-/* Bouton de lien */
+/* Link Button */
 .link-button {
     -fx-background-color: transparent;
     -fx-text-fill: #004d40;
@@ -116,12 +147,7 @@
     -fx-text-fill: #00221a;
 }
 
-/* Image de profil */
-.profile-image {
-    /* Les styles spécifiques de l'image de profil peuvent être ajoutés ici si nécessaire */
-}
-
-/* Alignement du GridPane */
+/* GridPane Alignment */
 GridPane {
     -fx-alignment: CENTER;
 }
@@ -131,6 +157,32 @@ GridPane > .info-label {
     -fx-alignment: CENTER_RIGHT;
 }
 
-GridPane > .text-field {
+GridPane > .text-field, GridPane > .password-field {
     -fx-alignment: CENTER_LEFT;
+}
+
+/* Content Container */
+.content-container {
+    -fx-background-color: #f9fafb;
+    -fx-padding: 10;
+    -fx-spacing: 20;
+}
+
+/* Separator */
+.separator {
+    -fx-background-color: #e0e0e0;
+    -fx-padding: 0 0 10 0;
+}
+
+/* Footer Section */
+.footer {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15 25 15 25;
+
+    /* Définir uniquement la bordure supérieure */
+    -fx-border-color: #e0e0e0 transparent transparent transparent; /* top, right, bottom, left */
+    -fx-border-width: 1px 0 0 0; /* top, right, bottom, left */
+    -fx-border-style: solid none none none;
+
+    -fx-alignment: CENTER_RIGHT;
 }
