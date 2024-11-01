@@ -128,5 +128,7 @@ public class MenuController implements Initializable {
      */
     private void actionBtnReport() {
         System.out.println("Bouton Report appuyé");
+        Stage stage = (Stage) btnReport.getScene().getWindow();
+        Model.getInstance().getViewFactory().showReportBugWindow(stage);
     }
 }

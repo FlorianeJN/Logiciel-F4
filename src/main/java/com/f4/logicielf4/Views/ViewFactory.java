@@ -330,4 +330,14 @@ public class ViewFactory {
         loader.setController(controller);
         createStageShowAndWait(loader, stage, "Modifier un quart");
     }
+
+    /**
+     * Affiche la fenêtre de signalement de bug ou de suggestions.
+     *
+     * @param stage Le stage parent.
+     */
+    public void showReportBugWindow(Stage stage) {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Fxml/Admin/SignalerBug.fxml"));
+        createStageShowAndWait(loader, stage, "Commentaires ou Suggestions");
+    }
 }

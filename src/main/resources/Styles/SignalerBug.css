@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+.root {
+    -fx-font-family: 'Lato', sans-serif;
+    -fx-background-color: #f0f2f5;
+}
+
+VBox {
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+.title-label {
+    -fx-text-fill: #004d40;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.line {
+    -fx-stroke: #004d40;
+    -fx-opacity: 0.6;
+}
+
+.text-area {
+    -fx-border-color: #004d40;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px;
+    -fx-font-size: 14px;
+    -fx-text-fill: #004d40;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 3, 0.5, 0, 1);
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area:hover {
+    -fx-border-color: #00332a;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0.3, 0, 2);
+}
+
+.text-area:focused {
+    -fx-border-color: #00332a;
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 5, 0.5, 0, 2);
+}
+
+.button {
+    -fx-background-color: #004d40;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 25px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 5, 0.4, 0, 3);
+    -fx-transition: -fx-background-color 0.3s ease, -fx-transform 0.2s ease;
+}
+
+.button:hover {
+    -fx-background-color: #00332a;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 6, 0.4, 0, 4);
+}
+
+.button:pressed {
+    -fx-background-color: #00221a;
+    -fx-transform: scale(0.97);
+}
+
+.progress-indicator {
+    -fx-progress-color: #004d40;
+    -fx-accent: #004d40;
+    -fx-background-color: transparent;
+}
+
+.progress-indicator .spinner {
+    -fx-stroke: #004d40;
+    -fx-stroke-width: 3;
+}
+
+.progress-indicator .track {
+    -fx-stroke: #e0e0e0;
+    -fx-stroke-width: 3;
+}

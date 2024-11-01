@@ -94,8 +94,6 @@ public class ProfilController implements Initializable {
             boolean updateReussi = DBUtils.updateEmploye(employeInfo);
             if (updateReussi) {
                 Dialogs.showMessageDialog("Les informations ont été mises à jour avec succès.", "MISE À JOUR RÉUSSIE");
-                Stage stage = (Stage) btnSauvegarder.getScene().getWindow();
-                stage.close();
             } else {
                 Dialogs.showMessageDialog("Erreur lors de la mise à jour des informations.", "ERREUR MISE À JOUR");
             }
@@ -132,7 +130,6 @@ public class ProfilController implements Initializable {
             valid = false;
         }
 
-        // Validation du numéro de téléphone (exemple : 10 chiffres)
         if (!telephone.matches("\\d{10}")) {
             errorMessage.append("Le numéro de téléphone doit contenir exactement 10 chiffres.\n");
             valid = false;
@@ -155,11 +152,11 @@ public class ProfilController implements Initializable {
         employeInfo.put("prenom", prenom);
         employeInfo.put("email", email);
         employeInfo.put("telephone", telephone);
-        employeInfo.put("statut", "Actif"); // Exemple : Vous pouvez adapter selon votre logique
+        employeInfo.put("statut", "Actif");
 
         // Gérer le mot de passe
         if (!password.isEmpty()) {
-            employeInfo.put("password", password); // Utiliser le mot de passe tel quel, sans hachage
+            employeInfo.put("password", password);
         }
 
         return employeInfo;

@@ -12,28 +12,38 @@ import java.util.Optional;
 public class Dialogs {
 
     /**
+     * Affiche une alerte de type spécifié avec un message et un titre.
+     *
+     * @param alertType Le type d'alerte (INFORMATION, CONFIRMATION, etc.).
+     * @param titre     Le titre de l'alerte.
+     * @param message   Le message de l'alerte.
+     * @return Optional<ButtonType> avec la réponse de l'utilisateur.
+     */
+    public static Optional<ButtonType> showAlert(Alert.AlertType alertType, String titre, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(titre);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        return alert.showAndWait();
+    }
+
+    /**
      * Affiche une boîte de dialogue d'information avec un message et un titre.
      *
-     * @param message le message à afficher dans la boîte de dialogue
-     * @param titre   le titre de la boîte de dialogue
+     * @param message Le message à afficher.
+     * @param titre   Le titre de la boîte de dialogue.
      */
     public static void showMessageDialog(String message, String titre) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle(titre);
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        });
+        Platform.runLater(() -> showAlert(Alert.AlertType.INFORMATION, titre, message));
     }
 
     /**
      * Affiche une boîte de dialogue de confirmation avec un message et un titre.
      * Retourne vrai si l'utilisateur clique sur "Oui", sinon retourne faux.
      *
-     * @param message le message à afficher dans la boîte de dialogue
-     * @param titre   le titre de la boîte de dialogue
-     * @return vrai si l'utilisateur confirme, sinon faux
+     * @param message Le message de confirmation à afficher.
+     * @param titre   Le titre de la boîte de dialogue.
+     * @return Vrai si l'utilisateur confirme, sinon faux.
      */
     public static boolean showConfirmDialog(String message, String titre) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -41,13 +51,11 @@ public class Dialogs {
         alert.setHeaderText(null);
         alert.setContentText(message);
 
-        // Ajouter des boutons à la boîte de dialogue
         ButtonType btnOui = new ButtonType("Oui");
         ButtonType btnNon = new ButtonType("Non");
         alert.getButtonTypes().setAll(btnOui, btnNon);
 
         Optional<ButtonType> result = alert.showAndWait();
-
         return result.isPresent() && result.get() == btnOui;
     }
 }
