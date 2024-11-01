@@ -25,24 +25,23 @@ public class DBUtils {
 
     private static final Logger LOGGER = Logger.getLogger(DBUtils.class.getName());
 
-    // Connection pool (e.g., HikariCP)
     private static DataSource dataSource;
 
     static {
         try {
-            // Initialize the connection pool
+            // Initialisation du pool de connexions
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl(url);
             config.setUsername(user);
             config.setPassword(pass);
 
-            // Optional settings
+            // Paramètres optionnels
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(2);
 
             dataSource = new HikariDataSource(config);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error initializing the connection pool", e);
+            LOGGER.log(Level.SEVERE, "Erreur lors de l'initialisation du pool de connexions", e);
         }
     }
 
@@ -62,7 +61,7 @@ public class DBUtils {
             try (ResultSet resultSet = psLogin.executeQuery()) {
                 if (resultSet.next()) {
                     String retrievedPassword = resultSet.getString("password");
-                    if (retrievedPassword != null && retrievedPassword.equals(password)) { // Consider hashing
+                    if (retrievedPassword != null && retrievedPassword.equals(password)) {
                         // Connexion réussie
                         return true;
                     } else {
@@ -500,8 +499,8 @@ public class DBUtils {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            setQuartParameters(pstmt, numFacture, prestation, dateQuart, debutQuart, finQuart, pause,
-                    tempsTotal, tauxHoraire, montantTotal, notes, empName, tempsDouble, tempsDemi);
+            setQuartInsertParameters(pstmt, numFacture, dateQuart, debutQuart, finQuart, pause,
+                    tempsTotal, prestation, tauxHoraire, montantTotal, notes, empName, tempsDemi, tempsDouble);
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -609,8 +608,8 @@ public class DBUtils {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            setQuartParameters(pstmt, null, prestation, dateQuart, debutQuart, finQuart, pause,
-                    tempsTotal, tauxHoraire, montantTotal, notes, empName, tempsDouble, tempsDemi);
+            setQuartUpdateParameters(pstmt, prestation, dateQuart, debutQuart, finQuart, pause,
+                    tempsTotal, tauxHoraire, montantTotal, notes, empName, tempsDemi, tempsDouble);
             pstmt.setInt(13, id);
 
             pstmt.executeUpdate();
@@ -619,6 +618,7 @@ public class DBUtils {
             throw e;
         }
     }
+
 
     /**
      * Récupère tous les quarts depuis la base de données.
@@ -868,37 +868,71 @@ public class DBUtils {
     }
 
     /**
-     * Définit les paramètres pour une requête d'ajout ou de mise à jour d'un quart.
+     * Définit les paramètres pour une requête d'ajout d'un quart.
      *
      * @param ps            PreparedStatement à configurer
-     * @param numFacture    Numéro de facture associé au quart (peut être null pour les mises à jour)
-     * @param prestation    Prestation effectuée pendant le quart
+     * @param numFacture    Numéro de facture associé au quart
      * @param dateQuart     Date du quart
      * @param debutQuart    Heure de début du quart
      * @param finQuart      Heure de fin du quart
      * @param pause         Durée de la pause pendant le quart
      * @param tempsTotal    Temps total travaillé pendant le quart
+     * @param prestation    Prestation effectuée pendant le quart
      * @param tauxHoraire   Taux horaire
      * @param montantTotal  Montant total pour le quart
      * @param notes         Notes associées au quart
      * @param empName       Nom de l'employé ayant travaillé le quart
-     * @param tempsDouble   Indique si le quart est payé en double
      * @param tempsDemi     Indique si le quart est payé en temps et demi
+     * @param tempsDouble   Indique si le quart est payé en double
      * @throws SQLException si une erreur d'accès à la base de données survient
      */
-    private static void setQuartParameters(PreparedStatement ps, String numFacture, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
-                                           LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
-                                           boolean tempsDouble, boolean tempsDemi) throws SQLException {
+    private static void setQuartInsertParameters(PreparedStatement ps, String numFacture, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
+                                                 LocalTime pause, String tempsTotal, String prestation, double tauxHoraire, double montantTotal, String notes,
+                                                 String empName, boolean tempsDemi, boolean tempsDouble) throws SQLException {
         int index = 1;
-        if (numFacture != null) {
-            ps.setString(index++, numFacture);
-        }
+        ps.setString(index++, numFacture);
         ps.setDate(index++, java.sql.Date.valueOf(dateQuart));
         ps.setTime(index++, java.sql.Time.valueOf(debutQuart));
         ps.setTime(index++, java.sql.Time.valueOf(finQuart));
         ps.setTime(index++, java.sql.Time.valueOf(pause));
         ps.setString(index++, tempsTotal);
         ps.setString(index++, prestation);
+        ps.setDouble(index++, tauxHoraire);
+        ps.setDouble(index++, montantTotal);
+        ps.setString(index++, notes);
+        ps.setString(index++, empName);
+        ps.setInt(index++, tempsDemi ? 1 : 0);
+        ps.setInt(index++, tempsDouble ? 1 : 0);
+    }
+
+    /**
+     * Définit les paramètres pour une requête de mise à jour d'un quart.
+     *
+     * @param ps            PreparedStatement à configurer
+     * @param prestation    Prestation mise à jour effectuée pendant le quart
+     * @param dateQuart     Date mise à jour du quart
+     * @param debutQuart    Heure de début mise à jour du quart
+     * @param finQuart      Heure de fin mise à jour du quart
+     * @param pause         Durée de la pause mise à jour pendant le quart
+     * @param tempsTotal    Temps total travaillé mis à jour pendant le quart
+     * @param tauxHoraire   Taux horaire mis à jour
+     * @param montantTotal  Montant total mis à jour pour le quart
+     * @param notes         Notes mises à jour associées au quart
+     * @param empName       Nom mis à jour de l'employé ayant travaillé le quart
+     * @param tempsDemi     Indique si le quart est payé en temps et demi
+     * @param tempsDouble   Indique si le quart est payé en double
+     * @throws SQLException si une erreur d'accès à la base de données survient
+     */
+    private static void setQuartUpdateParameters(PreparedStatement ps, String prestation, LocalDate dateQuart, LocalTime debutQuart, LocalTime finQuart,
+                                                 LocalTime pause, String tempsTotal, double tauxHoraire, double montantTotal, String notes, String empName,
+                                                 boolean tempsDemi, boolean tempsDouble) throws SQLException {
+        int index = 1;
+        ps.setString(index++, prestation);
+        ps.setDate(index++, java.sql.Date.valueOf(dateQuart));
+        ps.setTime(index++, java.sql.Time.valueOf(debutQuart));
+        ps.setTime(index++, java.sql.Time.valueOf(finQuart));
+        ps.setTime(index++, java.sql.Time.valueOf(pause));
+        ps.setString(index++, tempsTotal);
         ps.setDouble(index++, tauxHoraire);
         ps.setDouble(index++, montantTotal);
         ps.setString(index++, notes);
