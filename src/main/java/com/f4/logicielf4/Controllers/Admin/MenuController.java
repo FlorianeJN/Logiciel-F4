@@ -53,22 +53,12 @@ public class MenuController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        btnDashboard.setOnAction(event -> actionBtnDashboard());
         btnFacture.setOnAction(event -> actionBtnFacture());
         btnPartenaire.setOnAction(event -> actionBtnPartenaire());
         btnEmploye.setOnAction(event -> actionBtnEmploye());
         btnMonProfil.setOnAction(event -> actionBtnMonProfil());
         btnDeconnexion.setOnAction(event -> actionBtnDeconnexion());
         btnReport.setOnAction(event -> actionBtnReport());
-    }
-
-    /**
-     * Gère l'action du bouton "Dashboard".
-     * Sélectionne l'option "Dashboard" dans le modèle de vue pour afficher le tableau de bord.
-     */
-    private void actionBtnDashboard() {
-        System.out.println("Bouton Dashboard appuyé");
-        Model.getInstance().getViewFactory().getOptionSelectionnee().set("Dashboard");
     }
 
     /**

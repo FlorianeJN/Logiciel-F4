@@ -18,7 +18,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) {
         ViewFactory viewFactory = new ViewFactory();
-        viewFactory.showLoginWindow();
-        //  viewFactory.showAdminWindow();
+        //viewFactory.showLoginWindow();
+        viewFactory.showAdminWindow();
     }
 }

@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class ViewFactory {
 
-    private AnchorPane dashboardView;
+
     private AnchorPane facturesView;
     private AnchorPane employesView;
     private AnchorPane partenairesView;
@@ -53,21 +53,7 @@ public class ViewFactory {
         return this.optionSelectionnee;
     }
 
-    /**
-     * Récupère la vue du tableau de bord administrateur, la charge si nécessaire.
-     *
-     * @return la vue du tableau de bord administrateur
-     */
-    public AnchorPane getAdminDashboardView() {
-        if (dashboardView == null) {
-            try {
-                dashboardView = new FXMLLoader(getClass().getResource("/Fxml/Admin/TableauDeBord/Dashboard.fxml")).load();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return dashboardView;
-    }
+
 
     /**
      * Récupère la vue des factures, la charge si nécessaire.

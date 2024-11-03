@@ -48,18 +48,17 @@ public class AdminController implements Initializable {
         // Ajouter un écouteur sur la sélection d'options
         viewFactory.getOptionSelectionnee().addListener((ChangeListener<String>) (observableValue, oldVal, newVal) -> {
             if (newVal == null) {
-                // Si aucune option n'est sélectionnée, affiche le tableau de bord par défaut
-                admin_parent.setCenter(viewFactory.getAdminDashboardView());
+                // Si aucune option n'est sélectionnée, affiche la page de facture par defaut
+                admin_parent.setCenter(viewFactory.getFacturesView());
                 return;
             }
 
             // Mise à jour de la vue centrale selon l'option sélectionnée
             switch (newVal) {
-                case "Factures" -> admin_parent.setCenter(viewFactory.getFacturesView());
                 case "Partenaires" -> admin_parent.setCenter(viewFactory.getPartenairesView());
                 case "Employes" -> admin_parent.setCenter(viewFactory.getEmployesView());
                 case "Profil" -> admin_parent.setCenter(viewFactory.getProfilView());
-                default -> admin_parent.setCenter(viewFactory.getAdminDashboardView());
+                default -> admin_parent.setCenter(viewFactory.getFacturesView());
             }
         });
     }

@@ -10,13 +10,12 @@
 <?import javafx.scene.shape.Line?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="750.0" prefWidth="250.0" stylesheets="@../../Styles/AdminMenu.css" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.MenuController">
-
    <children>
-      <AnchorPane prefHeight="180.0" prefWidth="250.0" styleClass="header"> <!-- Adjusted height from 200 to 180 -->
+      <AnchorPane prefHeight="180.0" prefWidth="250.0" styleClass="header">
          <children>
             <VBox prefHeight="180.0" prefWidth="250.0" styleClass="header-content" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
-                  <ImageView fitHeight="90.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" styleClass="logo"> <!-- Adjusted size -->
+                  <ImageView fitHeight="90.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" styleClass="logo">
                      <image>
                         <Image url="@../../Images/logo_no_background.png" />
                      </image>
@@ -27,13 +26,9 @@
          </children>
       </AnchorPane>
 
-      <VBox prefHeight="350.0" prefWidth="212.0" styleClass="menu" VBox.vgrow="ALWAYS"> <!-- Adjusted height -->
+      <VBox prefHeight="350.0" prefWidth="212.0" styleClass="menu" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="btnDashboard" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Tableau de bord">
-               <graphic>
-                  <FontAwesomeIconView glyphName="HOME" size="20" />
-               </graphic>
-            </Button>
+            <!-- Removed the "Tableau de bord" button -->
             <Button fx:id="btnFacture" mnemonicParsing="false" prefWidth="175.0" styleClass="menu-button" text="Gestion des factures">
                <graphic>
                   <FontAwesomeIconView glyphName="CLOCK_ALT" size="20" />
@@ -63,7 +58,7 @@
          </children>
       </VBox>
 
-      <VBox prefHeight="160.0" prefWidth="250.0" styleClass="footer" VBox.vgrow="ALWAYS"> <!-- Adjusted height -->
+      <VBox prefHeight="160.0" prefWidth="250.0" styleClass="footer" VBox.vgrow="ALWAYS">
          <children>
             <Label styleClass="footer-label" text="Signaler bug/suggestion?" />
             <Label styleClass="footer-description" text="Utilisez ceci pour signaler toute erreur." />
