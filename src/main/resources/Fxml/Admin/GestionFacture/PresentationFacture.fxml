@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="716.0" prefWidth="1245.0" stylesheets="@../../../Styles/GestionEmploye/GestionEmployes.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="716.0" prefWidth="1245.0" stylesheets="@../../../Styles/Facture.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <!-- Main Title -->
         <Label fx:id="factureLabel" alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Facture" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />

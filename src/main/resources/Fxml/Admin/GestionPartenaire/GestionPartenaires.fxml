@@ -9,10 +9,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionPartenaire/GestionPartenaires.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/Partenaire.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionPartenaire.GestionPartenairesController">
    <children>
       <!-- Main Title -->
-      <Label alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Gestion des Partenaires" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Label alignment="CENTER" layoutY="14.0" layoutX="14.0" styleClass="main-title" text="Gestion des Partenaires" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
 
       <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 

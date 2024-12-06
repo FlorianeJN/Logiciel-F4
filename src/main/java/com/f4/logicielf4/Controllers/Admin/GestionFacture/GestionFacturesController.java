@@ -220,15 +220,19 @@ public class GestionFacturesController implements Initializable {
         try {
             double montant = 0;
             String numFacture = facture.getNumFacture();
+
             List<Quart> listeQuarts = DBUtils.fetchQuartsByNumFacture(numFacture);
             for (Quart quart : listeQuarts) {
                 montant += quart.getMontantTotal();
             }
             facture.setMontantAvantTaxes(BigDecimal.valueOf(montant));
+
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erreur lors du calcul du montant total pour la facture " + facture.getNumFacture(), e);
+           // LOGGER.log(Level.SEVERE, "Erreur lors du calcul du montant total pour la facture " + facture.getNumFacture(), e);
+            System.out.println("Erreur lors du calcul du montant total pour la facture ");
         }
     }
+
 
     /**
      * Action déclenchée lors du clic sur le bouton "Commencer".

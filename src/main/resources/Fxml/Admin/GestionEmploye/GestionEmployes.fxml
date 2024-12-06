@@ -10,10 +10,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/GestionEmploye/GestionEmployes.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployesController">
+<AnchorPane prefHeight="750.0" prefWidth="1065.0" stylesheets="@../../../Styles/Employe.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.f4.logicielf4.Controllers.Admin.GestionEmploye.GestionEmployesController">
    <children>
       <!-- Main Title -->
-      <Label alignment="CENTER" layoutY="22.0" styleClass="main-title" text="Gestion des Employés" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+      <Label alignment="CENTER" layoutX="14.0" layoutY="14.0" styleClass="main-title" text="Gestion des Employés" AnchorPane.leftAnchor="-11.0" AnchorPane.rightAnchor="11.0" />
 
       <Line endX="1035.0" layoutX="20.0" layoutY="70.0" styleClass="divider-line" />
 

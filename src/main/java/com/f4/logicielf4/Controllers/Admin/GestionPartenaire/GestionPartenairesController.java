@@ -32,10 +32,7 @@ import java.util.logging.Logger;
 public class GestionPartenairesController implements Initializable {
 
     @FXML
-    private Label activePartnersLabel;
-
-    @FXML
-    private Label inactivePartnersLabel;
+    private Label activePartnersLabel, inactivePartnersLabel;
 
     @FXML
     private Label totalPartnersLabel;
@@ -44,46 +41,16 @@ public class GestionPartenairesController implements Initializable {
     private TableView<Partenaire> partnersTable;
 
     @FXML
-    private TableColumn<Partenaire, String> nameColumn;
+    private TableColumn<Partenaire, String> nameColumn, addressColumn, phoneColumn, emailColumn, statusColumn;
 
     @FXML
-    private TableColumn<Partenaire, String> addressColumn;
+    private TextField nameField, adressField, phoneField, emailField;
 
     @FXML
-    private TableColumn<Partenaire, String> phoneColumn;
+    private Button btnAjouter, btnMAJ, btnSupprimer;
 
     @FXML
-    private TableColumn<Partenaire, String> emailColumn;
-
-    @FXML
-    private TableColumn<Partenaire, String> statusColumn;
-
-    @FXML
-    private TextField nameField;
-
-    @FXML
-    private TextField addressField;
-
-    @FXML
-    private TextField phoneField;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private Button btnAjouter;
-
-    @FXML
-    private Button btnMAJ;
-
-    @FXML
-    private Button btnSupprimer;
-
-    @FXML
-    private VBox quartsGraphBox;
-
-    @FXML
-    private VBox revenuGraphBox;
+    private VBox quartsGraphBox, revenuGraphBox;
 
     private static final Logger LOGGER = Logger.getLogger(GestionPartenairesController.class.getName());
 
